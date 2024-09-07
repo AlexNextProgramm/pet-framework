@@ -1,0 +1,8 @@
+{
+    "name": "pet/framework",
+    "version": "1.0.0",
+    "description": "Core library",
+    "require": {
+      "php": ">=8.0"
+    }
+  }
