@@ -41,7 +41,6 @@ class Essence{
     }
 
     private function isArrayClass(&$class, &$method){
-        var_dump(gettype($class));
         $value = $class;
 
         if(gettype($value) == 'array'){

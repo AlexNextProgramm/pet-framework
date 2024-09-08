@@ -3,23 +3,26 @@ namespace Pet;
 
 
 use Pet\Errors\Errors;
+use Pet\Request\Request;
 use Pet\Router\Router;
 
 class App{
 
     const PUBLIC_DIR = PUBLIC_DIR;
     public $router;
-
+    public $request;
 
     public function __construct() {
         (new Errors());
         $this->ht_exits();
+        $this->request = new Request();
         $this->router = new Router();
     }
 
     static function init($router_dir = self::PUBLIC_DIR."/router")
     {
         $app = new App();
+        $GLOBALS['app'] = $app;
         $app->include_router($router_dir);
                 spl_autoload_register(function ($class) {
 

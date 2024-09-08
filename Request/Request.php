@@ -6,9 +6,12 @@ use Pet\Tools\Tools;
 class Request{
     public $attribute = [];
     public $parametr = [];
+    public $path;
+
     
     public function __construct() {
        $this->attribute = $this->input();
+       $this->path = $this->getURI();
     }
 
     function getMethod():string
@@ -34,9 +37,10 @@ class Request{
 
     private function parsing(){
         $REQUEST = array_merge($_GET, $_POST); 
+        $decode = [];
         if(key_exists('CONTENT_TYPE', $_SERVER) == 'application/json') $decode = Tools::jsonDe(file_get_contents('php://input'));
         return array_merge($REQUEST, $decode);
-        
+
     }
 
 

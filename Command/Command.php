@@ -29,7 +29,6 @@ class Command{
 
         $host = env("URLDEV");
         $hostName = str_replace(['https://', 'http://'], '', $host);
-
         exec("php -S $hostName -t dist/");
         echo "\033[02;32m  \n\r \n\r   site: $host \033[0m \n\r \n\r";
     }
