@@ -18,7 +18,7 @@ class Build{
     function build_architecture(){
         $this->build_file('pet.sample', 'pts');
 
-        if(!is_dir('dist/PHP/controller')) mkdir('dist/PHP/controller', 0777, true);
+        if(!is_dir('dist/PHP/controller')) mkdir('dist/PHP/Controller', 0777, true);
         if(!is_dir('dist/view')) mkdir('dist/view', 0777, true);
         if(!is_dir('dist/router')) mkdir('dist/router', 0777, true);
 

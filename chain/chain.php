@@ -13,4 +13,5 @@ function request():Request
 { 
     return $GLOBALS['app']->request;
 }
+function files(string $name = null){ return request()->file($name) ;}
 ?>
