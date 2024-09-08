@@ -25,6 +25,9 @@ class Command
             case 'serve':
                 $this->server();
                 break;
+            case 'build_sample':
+                $this->build();
+                break;
             case "make:controller":
                 $this->make(explode(':', $comm[1])[1], $comm);
                 break;
@@ -55,5 +58,9 @@ class Command
             $sample = str_replace('NAME', $name, $sample);
             file_put_contents(self::ROOT_DIR . self::NAME_DIR_PROJECT . "/PHP/Controller/$name" . "Controller.php", $sample);
         }
+    }
+
+    private function build(){
+        exec("php ./vendor/pet/framework/Command/Build.php");
     }
 }

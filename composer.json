@@ -1,7 +1,8 @@
 {
     "name": "pet/framework",
     "version": "1.0.0",
-    "description": "Core library",
+    "description": "framework Pet library",
+    "minimum-stability": "dev",
     "require": {
       "php": ">=8.0"
     }

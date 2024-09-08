@@ -23,6 +23,7 @@ framework for easy use
 }
 
 ```
+
  ## Запуск сервера PET
 
  ```
@@ -30,3 +31,8 @@ framework for easy use
 
  ```
  > Запускает сервер из установленных настроек в .env URLDEV
+ > Можете запустить стартовую (шаблон) сборку командой.
+ ```
+ php pts build_sample
+
+ ```
