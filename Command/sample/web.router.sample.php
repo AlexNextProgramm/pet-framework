@@ -2,5 +2,5 @@
 
 use Pet\Router\Router;
 
-Router::get('/home', view('./home'));
+Router::get('/home', function(){ view('home');});
 ?>

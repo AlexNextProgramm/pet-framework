@@ -36,12 +36,17 @@ class Router extends Middleware{
     static function init(){
 
         $request =  new Request();
-
+        $control = false;
         foreach(Router::$Route as $Rout){
+
             if($Rout['method'] == $request->getMethod() && $request->getURI() == $Rout['path']){
               if(empty($Rout['middleware'])) (new Essence())->open($Rout['middleware'], []);
               (new Essence())->open($Rout['callback'], []);
+
+              $control = true;
             }
+
+           if(!$control) http_response_code('404');
         }
     }
 
