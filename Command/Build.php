@@ -17,13 +17,16 @@ class Build{
     
     function build_architecture(){
         $this->build_file('pet.sample', 'pts');
-        
+
         if(!is_dir('dist/PHP/controller')) mkdir('dist/PHP/controller', 0777, true);
         if(!is_dir('dist/view')) mkdir('dist/view', 0777, true);
+        if(!is_dir('dist/router')) mkdir('dist/router', 0777, true);
 
-        $this->build_file('index.sample', 'dist/index.php',);
-        $this->build_file('config.constant', 'dist/config.constant.php',);
-        $this->build_file('home.sample', 'dist/view/home.php',);
+        $this->build_file('index.sample', 'dist/index.php');
+        $this->build_file('config.constant', 'dist/config.constant.php');
+        $this->build_file('home.sample', 'dist/view/home.php');
+        $this->build_file('.env.sample', '.env');
+        $this->build_file('web.router.sample', 'dist/router/web.php');
     }
 
     function search_dir_vendor(){
