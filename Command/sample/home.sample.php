@@ -7,6 +7,6 @@
 </head>
 <body>
     <h1>Hello FrameWork Pet</h1>
-    <h2>Это просто <?=$hello;?></h2>
+    <h2>Это просто</h2>
 </body>
 </html>

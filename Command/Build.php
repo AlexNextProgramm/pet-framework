@@ -2,6 +2,8 @@
 
 namespace Pet\Command;
 
+use Command;
+
 class Build{
     public $OUT_DIR_VENDOR = '';
 
@@ -10,8 +12,11 @@ class Build{
        $this->build_architecture();
     }
     
-    function build_file($namesample = '', $namefile){
+    function build_file($namesample = '', $namefile, $rename = []){
         $sample = file_get_contents(__DIR__."/sample/$namesample.php");
+        if(count($rename)> 0){
+            foreach($rename as $name=>$value) $sample = str_replace($name, $value, $sample);
+        }
         file_put_contents($this->OUT_DIR_VENDOR."/$namefile", $sample );
     }
     
@@ -27,6 +32,9 @@ class Build{
         $this->build_file('home.sample', 'dist/view/home.php');
         $this->build_file('.env.sample', '.env');
         $this->build_file('web.router.sample', 'dist/router/web.php');
+        $this->build_file('controller.sample', 'dist/PHP/Controller/HomeController.php', 
+        ["NAME"=>"Home"]);
+        
     }
 
     function search_dir_vendor(){

@@ -14,5 +14,15 @@ class Tools{
             return [];
         }
     }
+
+
+    static function strRep($i, $seporator, &$string, $if = null): string
+    {
+        $string = str_split($string);
+        if ($if && $string[$i] === $if) $string[$i] = $seporator;
+    
+        if (!$if) $string[$i] = $seporator;
+        return implode("", $string);
+    }
 }
 ?>
