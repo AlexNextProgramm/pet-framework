@@ -10,34 +10,31 @@ function search_include_class($path, $class = '')
 
         if (is_readable($dir)) {
 
-                $file = file($dir);
+            $file = file($dir);
 
-                foreach ($file as $row)
-                    if (str_contains($row, "class " . $class)) require_once($dir);
-            }
+            foreach ($file as $row)
+                if (str_contains($row, "class " . $class)) require_once($dir);
         }
-    
+    }
 }
 
-function env($constans = null, $default = null){
-  
-    if(!file_exists(ROOT_DIR.'.env')) echo 'Нет файла .env в корне проекта';
+function env($constans = null, $default = null)
+{
 
-    $env = file(ROOT_DIR.'.env');
- 
-     foreach($env as $str){
-         if (str_contains(trim($str), '#') && strpos(trim($str),"#") == 0) continue;
-         if(str_contains($str, '=')){
- 
-             $param = explode('=', $str);
- 
-             if(trim($param[0]) == trim($constans)){
-                 return trim(str_replace([';','"',"'",],'', $param[1] ));
-             }
-         }
- 
-     }
-     return $default;
- }
+    if (!file_exists(ROOT_DIR . '.env')) echo 'Нет файла .env в корне проекта';
 
-?>
+    $env = file(ROOT_DIR . '.env');
+
+    foreach ($env as $str) {
+        if (str_contains(trim($str), '#') && strpos(trim($str), "#") == 0) continue;
+        if (str_contains($str, '=')) {
+
+            $param = explode('=', $str);
+
+            if (trim($param[0]) == trim($constans)) {
+                return trim(str_replace([';', '"', "'",], '', $param[1]));
+            }
+        }
+    }
+    return $default;
+}
