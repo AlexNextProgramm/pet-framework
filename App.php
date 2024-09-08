@@ -17,10 +17,10 @@ class App{
         $this->router = new Router();
     }
 
-    function init($router_dir = self::PUBLIC_DIR."/router")
+    static function init($router_dir = self::PUBLIC_DIR."/router")
     {
-        $this->include_router($router_dir);
-
+        $app = new App();
+        $app->include_router($router_dir);
                 spl_autoload_register(function ($class) {
 
                     $file = str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
@@ -32,7 +32,7 @@ class App{
 
                     return false;
                 });
-        $this->router::init();
+        $app->router::init();
     }
 
     private function ht_exits(){
