@@ -21,9 +21,9 @@ function search_include_class($path, $class = '')
 
 function env($constans = null, $default = null){
   
-    if(!file_exists(ROOT_DIR.'/.env')) echo 'Нет файла .env в корне проекта';
+    if(!file_exists(ROOT_DIR.'.env')) echo 'Нет файла .env в корне проекта';
 
-    $env = file(ROOT_DIR.'/.env');
+    $env = file(ROOT_DIR.'.env');
  
      foreach($env as $str){
          if (str_contains(trim($str), '#') && strpos(trim($str),"#") == 0) continue;
