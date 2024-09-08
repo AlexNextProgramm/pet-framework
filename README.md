@@ -1,4 +1,4 @@
-# pet-framework
+# Pet Framework
 framework for easy use
 
 
