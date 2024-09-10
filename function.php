@@ -1,4 +1,6 @@
 <?php
+
+
 function search_include_class($path, $class = '')
 {
 
