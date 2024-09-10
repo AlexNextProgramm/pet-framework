@@ -65,6 +65,10 @@ class App{
                 }
         }
     }
+
+    function initBase(){
+        defined('DB_NAME', env('DB_NAME'));
+    }
     
     
 }
