@@ -15,7 +15,7 @@ abstract class DB {
     private  $db_password = DB_PASSWORD;
     public $DB = null;
 
-    public function conn() {
+    public function conn(){
         try {
             $this->DB = new PDO("{$this->db_type}:host={$this->db_host}:{$this->db_port};dbname={$this->db_name}", $this->db_user, $this->db_password);
         } catch (\PDOException $e) {
