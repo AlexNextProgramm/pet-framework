@@ -25,8 +25,6 @@ abstract class DB {
 
 
     public function q($query) {
-    
-
         return $this->DB->query($query, PDO::FETCH_ASSOC);
     }
 }

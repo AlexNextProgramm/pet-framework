@@ -1,8 +1,7 @@
 <?php
 
 
-function search_include_class($path, $class = '')
-{
+function search_include_class($path, $class = '') {
 
     foreach (scandir($path) as $dir) {
 
@@ -20,8 +19,7 @@ function search_include_class($path, $class = '')
     }
 }
 
-function env($constans = null, $default = null)
-{
+function env($constans = null, $default = null) {
 
     if (!file_exists(ROOT_DIR . '.env')) echo 'Нет файла .env в корне проекта';
 
