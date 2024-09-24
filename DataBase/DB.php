@@ -4,6 +4,7 @@ namespace Pet\DataBase;
 
 use PDO;
 use Exception;
+use PDOStatement;
 
 abstract class DB {
 
@@ -13,7 +14,7 @@ abstract class DB {
     private  $db_port = DB_PORT;
     private  $db_user = DB_USER;
     private  $db_password = DB_PASSWORD;
-    public $DB = null;
+    public PDO|null $DB = null;
 
     public function conn(){
         try {
@@ -24,7 +25,12 @@ abstract class DB {
     }
 
 
-    public function q($query) {
-        return $this->DB->query($query, PDO::FETCH_ASSOC);
+    public function q($query):PDOStatement|null
+    {
+        if($this->DB != null){
+            return $this->DB->query($query, PDO::FETCH_ASSOC);
+        }else{
+            die('NOT CONNECT DB');
+        }
     }
 }
