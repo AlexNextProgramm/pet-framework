@@ -1,24 +1,31 @@
 <?php
+
 namespace Pet\DataBase;
 
-class Insert extends Select{
+class Insert extends Select {
 
   /**
    * insert
    *
-   * @param  mixed $ArrayColumnAndValue
+   * @param  array $ArrayColumnAndValue
    * @param  mixed $returnThis
    * @return bool
    */
-  function insert(array $ArrayColumnAndValue = [], $returnThis = false): bool|Insert {
+  public function insert(array $ArrayColumnAndValue = []): bool {
+
+    if (count($ArrayColumnAndValue) == 0) return false;
     $key = array_keys($ArrayColumnAndValue);
     $value = array_values($ArrayColumnAndValue);
     $this->strQuery = "INSERT INTO `{$this->table}` ( " . implode(' , ', $key) . " ) VALUES ( '" . implode("', '", $value) . "')";
-    return $returnThis ? $this : $this->DB->prepare($this->strQuery)->execute();
+    return  $this->DB->prepare($this->strQuery)->execute();
   }
 
-  function execute() {
+  /**
+   * execute
+   *
+   * @return bool
+   */
+  public function execute(): bool {
     return $this->DB->prepare($this->strQuery)->execute();
   }
 }
-?>

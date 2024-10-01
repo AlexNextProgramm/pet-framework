@@ -1,8 +1,15 @@
 <?php
 namespace Pet\Model;
 
-use Pet\DataBase\Insert;
+use Pet\DataBase\Delete;
+use Pet\DataBase\Update;
 
-class Model extends Insert{
-    
+abstract class Model extends Update{
+
+
+
+    function find($searh = [], $column  = []):array
+    {
+       return  $this->select($column)->And($searh)->fetch();
+    }
 }
