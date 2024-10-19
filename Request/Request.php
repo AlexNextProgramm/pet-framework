@@ -27,7 +27,8 @@ class Request
     {
         $path = str_contains($_SERVER['REQUEST_URI'], '?') ? explode('?', $_SERVER['REQUEST_URI'])[0] :
             $_SERVER['REQUEST_URI'];
-        return Tools::strRep(strlen($path) - 1, '', $path, '/');
+        return $path != '/'? Tools::strRep(strlen($path) - 1, '', $path, '/'): $path;
+        
     }
 
 
