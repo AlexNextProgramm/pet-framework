@@ -39,19 +39,22 @@ class Router extends Middleware
         $request = request();
         $control = false;
         foreach (Router::$Route as $Rout) {
+            if ($Rout['method'] != $request->getMethod()) continue;
 
-            if (
-                $Rout['method'] == $request->getMethod()
-                &&
-                ($request->path == $Rout['path'] || Router::flexibleLink($Rout['path']))  ==  $request->path
-            ) {
-                if (key_exists('middleware', $Rout)) (new Essence())->open($Rout['middleware'], $request);
-                (new Essence())->open($Rout['callback'], $request);
+            // Проверка на гибкие ссылки 
+            $fLink = Router::flexibleLink($Rout['path']);
+            $isFlexLink  = $fLink ? $fLink === $request->path : false;
 
-                $control = true;
-            }
+            if ($request->path != $Rout['path'] && !$isFlexLink) continue;
 
-            if (!$control) http_response_code('404');
+            if (key_exists('middleware', $Rout)) (new EssenceClass())->open($Rout['middleware'], $request);
+            (new EssenceClass())->open($Rout['callback'], $request);
+            $control = true;
+
+            break;
+        }
+        if (!$control){
+            http_response_code('404');
         }
     }
 

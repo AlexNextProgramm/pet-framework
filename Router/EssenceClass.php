@@ -2,7 +2,7 @@
 
 namespace Pet\Router;
 
-class Essence
+class EssenceClass
 {
 
 
