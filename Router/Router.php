@@ -53,12 +53,14 @@ class Router extends Middleware
             $isFlexLink  = $fLink ? $fLink === $request->path : false;
 
             if ($request->path != $Rout['path'] && !$isFlexLink) continue;
-
+            
             if (key_exists('middleware', $Rout)) (new EssenceClass())->open($Rout['middleware'], $request);
-            (new EssenceClass())->open($Rout['callback'], $request);
+            $controller = (new EssenceClass())->open($Rout['callback'], $request);
+            
+            // если контроллер что-то хочет вернуть
+            if(!empty($controller)) echo json_encode($controller, JSON_UNESCAPED_UNICODE);
             $control = true;
 
-            break;
         }
         if (!$control){
             http_response_code('404');
