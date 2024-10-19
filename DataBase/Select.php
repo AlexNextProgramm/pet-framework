@@ -73,7 +73,6 @@ class Select extends DB {
     public function fetch(): array {
         $this->strQuery = $this->strQuery . $this->strJoin . $this->strWhere;
         $this->whereSyntax($this->strQuery);
-        print_r($this->strQuery);
         return $this->q($this->strQuery)->fetchAll(PDO::FETCH_ASSOC);
     }
 
