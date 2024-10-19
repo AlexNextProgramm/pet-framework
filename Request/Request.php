@@ -34,7 +34,7 @@ class Request
     }
 
 
-    public function input(string|null $name = null): array|null
+    public function input(string|null $name = null): array|string|null
     {
         $REQUEST = $this->parsing();
         if (!$name) return $REQUEST;
@@ -46,7 +46,8 @@ class Request
     {
         $REQUEST = array_merge($_GET, $_POST);
         $decode = [];
-        if (key_exists('CONTENT_TYPE', $_SERVER) == 'application/json') $decode = Tools::jsonDe(file_get_contents('php://input'));
+        $input = file_get_contents('php://input');
+        if (key_exists('CONTENT_TYPE', $_SERVER)  == 'application/json' && !empty($input)) $decode = Tools::jsonDe($input);
         return array_merge($REQUEST, $decode);
     }
 
