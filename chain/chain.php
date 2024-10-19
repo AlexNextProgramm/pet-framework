@@ -22,8 +22,18 @@ function files(string $name = null)
     return request()->file($name);
 }
 
-function supple($key = null){
-    if($key) return request()->parametr[$key];
-    return request()->parametr;
+/**
+ * supple
+ * гибкая ссылка url/{name}
+ * @param  string $key
+ * @return null|array|string
+ */
+function supple(string $key = null):null|array|string
+{
+    $parametr = request()->parametr;
+    if($key) {
+        return !empty($parametr[$key]) ? $parametr[$key] : null;
+    }
+    return $parametr;
 }
 ?>
