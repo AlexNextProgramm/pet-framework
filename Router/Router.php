@@ -67,8 +67,10 @@ class Router extends Middleware
             $isFlexLink  = $fLink ? $fLink === $request->path : false;
 
             if ($request->path != $Rout['path'] && !$isFlexLink) continue;
-            
-            if (key_exists('middleware', $Rout)) (new EssenceClass())->open($Rout['middleware'], $request);
+            if (key_exists('middleware', $Rout))(new EssenceClass())->open($Rout['middleware'], $request);
+            if (!empty($request->header['action']) ){
+                
+            }
             $controller = (new EssenceClass())->open($Rout['callback'], $request);
             
             // если контроллер что-то хочет вернуть

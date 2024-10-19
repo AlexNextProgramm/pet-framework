@@ -8,6 +8,7 @@ class Request
 {
     public $attribute = [];
     public $parametr = [];
+    public $header = [];
     public $path;
 
 
@@ -15,6 +16,7 @@ class Request
     {
         $this->attribute = $this->input();
         $this->path = $this->getURI();
+        $this->parsingHeaders();
     }
 
     function getMethod(): string
@@ -53,5 +55,10 @@ class Request
         if (!$name) return $_FILES;
         if (key_exists($name, $_FILES)) return $_FILES[$name];
         return null;
+    }
+
+    private function parsingHeaders(){
+        $header =  getallheaders();
+        foreach($header as $key => $val) $this->header[strtolower($key)] = strtolower($val);
     }
 }
