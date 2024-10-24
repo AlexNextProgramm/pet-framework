@@ -24,41 +24,18 @@ class Select extends DB {
      * @param  mixed $ArrayColumnAndValue
      * @return Select
      */
-    public function select(array $ArrayColumnAndValue = [], $table = '', $AS = []): Select {
+    public function select(array $ArrayColumnAndValue = [], $AS = []): Select {
         $strColumn =  Tools::is_assos($ArrayColumnAndValue) == 'assos' ?
             array_keys($ArrayColumnAndValue) : $ArrayColumnAndValue;
-        if (count($this->column) != 0 && $table == '') {
+        if (count($this->column) != 0) {
             if (count(array_diff($ArrayColumnAndValue, $this->column)) != 0) {
                 $strColumn = $this->column;
             }
         }
-
-
-
-        if ($table == '') {
-            if (count($AS) > 0) {
-                $this->strSelect = count($strColumn) != 0 ? Tools::array_implode(
-                    ",",
-                    $strColumn,
-                    "`{$this->table}`.`[val]`",
-                    fn($v, $k, $betwin) => key_exists($v, $AS) ? str_replace(['[val]', '[key]'], [$v, $k],  $betwin . " AS {$AS[$v]}") :
-                        str_replace(['[val]', '[key]'], [$v, $k],  $betwin)
-                ) : "*";
-            } else {
-                $this->strSelect = count($strColumn) != 0 ? Tools::array_implode(",", $strColumn, "`{$this->table}`.`[val]`") : "*";
-            }
-        } else {
-            if (count($AS) > 0) {
-                $this->strSelect = "," . Tools::array_implode(
-                    ",",
-                    $strColumn,
-                    "`{$this->table}`.`[val]`",
-                    fn($v, $k, $betwin) => key_exists($v, $AS) ? str_replace(['[val]', '[key]'], [$v, $k],  $betwin . " AS {$AS[$v]}") :
-                        str_replace(['[val]', '[key]'], [$v, $k],  $betwin)
-                );
-            } else {
-                $this->strSelect .=  "," . Tools::array_implode(",", $strColumn, "`{$table}`.`[val]`");
-            }
+        if(count($strColumn) == 0)   $this->strSelect = "{$this->table}.*";
+        $this->strSelect .=  Tools::array_implode(",", $strColumn, "`{$this->table}`.`[val]`");
+        if(count($AS)){
+            $this->strSelect .= ", ". Tools::array_implode(",", $AS, "[key] AS [val]");
         }
 
         $this->strQuery = "SELECT {$this->strSelect} FROM `{$this->table}` ";
@@ -98,7 +75,7 @@ class Select extends DB {
     public function and($assos,  $tie = ''): Select {
         if (!str_contains($this->strWhere, 'WHERE')) $this->strWhere = " WHERE ";
         if (count($assos) != 0) {
-            $this->strWhere .= "(" . Tools::array_implode(' AND ', $assos, "`[key]`='[val]'") . ") $tie ";
+            $this->strWhere .= "(" . Tools::array_implode(' AND ', $assos, "`{$this->table}`.`[key]`='[val]'") . ") $tie ";
         } else {
             $this->strWhere .= " $tie ";
         }
@@ -113,7 +90,18 @@ class Select extends DB {
      * @return Select
      */
     public function join(string $table, array $select): Select {
-        $this->strJoin = "JOIN $table ON " . Tools::array_implode(' AND ', $select, "`{$this->table}`.`[key]` = `{$table}`.`[val]`");
+        $this->strJoin .= "JOIN $table ON " . Tools::array_implode(' AND ', $select, "`{$this->table}`.`[key]` = `{$table}`.`[val]`");
+        return $this;
+    }
+     /**
+     * join
+     *
+     * @param  mixed $table
+     * @param  mixed $select
+     * @return Select
+     */
+    public function leftJoin(string $table, array $select): Select {
+        $this->strJoin .= "LEFT JOIN $table ON " . Tools::array_implode(' AND ', $select, "`{$this->table}`.`[key]` = `{$table}`.`[val]`");
         return $this;
     }
 

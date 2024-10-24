@@ -4,6 +4,8 @@ namespace Pet\Router;
 
 use Pet\Router\Middleware;
 
+use function PHPSTORM_META\type;
+
 class Router extends Middleware
 {
 
@@ -61,20 +63,20 @@ class Router extends Middleware
         $control = false;
         foreach (Router::$Route as $Rout) {
             if ($Rout['method'] != $request->getMethod()) continue;
-
+            if ($control) continue;
             // Проверка на гибкие ссылки 
             $fLink = Router::flexibleLink($Rout['path']);
             $isFlexLink  = $fLink ? $fLink === $request->path : false;
 
             if ($request->path != $Rout['path'] && !$isFlexLink) continue;
             if (key_exists('middleware', $Rout))(new EssenceClass())->open($Rout['middleware'], $request);
-            if (!empty($request->header['action'])){
+            if (!empty($request->header['action']) ){
                 $Rout['callback'][1] = $request->header['action'];
             }
             $controller = (new EssenceClass())->open($Rout['callback'], $request);
             
             // если контроллер что-то хочет вернуть
-            if(!empty($controller)) echo json_encode($controller, JSON_UNESCAPED_UNICODE);
+            if(!empty($controller) || gettype($controller) == 'array') echo json_encode($controller, JSON_UNESCAPED_UNICODE);
             $control = true;
 
         }
@@ -107,3 +109,4 @@ class Router extends Middleware
         return false;
     }
 }
+

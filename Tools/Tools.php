@@ -70,7 +70,7 @@ class Tools {
         $str = implode("", $keys);
         if(is_numeric($str)) return 'index';
         try{
-            if (array_sum($keys) > 0 || array_sum($keys) == 0 && key_exists('0', $array)) {
+            if (@array_sum($keys) > 0 || @array_sum($keys) == 0 && key_exists('0', $array)) {
                 return "gibrid";
             } else {
                 return 'assos';
