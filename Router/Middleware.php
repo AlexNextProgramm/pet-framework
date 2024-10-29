@@ -6,19 +6,27 @@ use Pet\Router\Router;
 
 abstract class Middleware
 {
-    static $idM;
+    static $startIdRout;
     static $callback;
-
+    
+    /**
+     * middleware
+     *  
+     * @param  mixed $callback
+     * @return Router
+     */
     static function middleware($callback): Router
     {
         Middleware::$callback = $callback;
-        Middleware::$idM = Router::$id;
+        Middleware::$startIdRout = count(Router::$Route);
         return new Router();
     }
 
-    public function setRoutes($Routes)
+    public function set($Routes)
     {
-        for ($i = Middleware::$idM; $i < (Router::$id + 1); $i++) {
+        $countRoute = count(func_get_args()) + Middleware::$startIdRout;
+        if($countRoute == 0 ) return;
+        for ($i = Middleware::$startIdRout; $i < $countRoute; $i++) {
             Router::$Route[$i]['middleware'] =  Middleware::$callback;
         }
     }
