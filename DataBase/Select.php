@@ -56,7 +56,7 @@ trait Select{
 
     public function orn($name, $array , $tie = ''){
         if (!str_contains($this->strWhere, 'WHERE')) $this->strWhere = " WHERE ";
-        foreach($array as $k => $v) if(count($array) != $k + 1 )$array[$k] = $v." OR ";
+        foreach($array as $k => $v) if(count($array) != $k + 1 ) $array[$k] = $v." OR ";
         $this->strWhere .= "($name =".implode("$name =", $array).")" . $tie;
         return $this;
     }
