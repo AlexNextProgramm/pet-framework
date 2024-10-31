@@ -1,6 +1,8 @@
 <?php
 
 include_once(__DIR__ . '/../function.php');
+include_once(__DIR__ . '/FTP/ConnectFtp.php');
+include_once(__DIR__ . '/console/Console.php');
 class Command
 {
     const ROOT_DIR = ROOT_DIR;
@@ -27,6 +29,9 @@ class Command
                 break;
             case 'build_sample':
                 $this->build();
+                break;
+            case 'load':
+                ConnectFtp::load();
                 break;
             case "make:controller":
                 $this->make(explode(':', $comm[1])[1], $comm);

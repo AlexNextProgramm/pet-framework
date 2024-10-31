@@ -19,8 +19,9 @@ function search_include_class($path, $class = '') {
     }
 }
 
-function env($constans = null, $default = null) {
-
+function env($constans = null, $default = null) : ?string
+{
+    if(!$constans) return null;
     if (!file_exists(ROOT_DIR . '.env')) echo 'Нет файла .env в корне проекта';
 
     $env = file(ROOT_DIR . '.env');
