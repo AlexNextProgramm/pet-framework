@@ -3,9 +3,10 @@
 
 namespace FTP;
 
+use Console;
 use Exception;
 
-class Ftp{
+class Ftp {
     public $host = "";
     public $port = 21;
 
@@ -18,59 +19,54 @@ class Ftp{
     public $fileIgnore = [];
     public $dirIgnore = [];
 
-    function connect():bool
-    {
-        try{
+    function connect(): bool {
+        try {
             $this->connect = @ftp_connect($this->host, $this->port);
-            return $this->connect && @ftp_login($this->connect,$this->login, $this->password)? true :false;
+            return $this->connect && @ftp_login($this->connect, $this->login, $this->password) ? true : false;
         } catch (Exception $e) {
             return false;
         }
-
     }
-    
-    function connectCount($count):bool
-    {
+
+    function connectCount($count): bool {
+
         for ($i = 1; $i < $count; $i++) {
 
             if (@$this->connect()) {
-                echo "\033[92m Connection ftp \033[0m \n\r";
-               return true;
+                Console::text("Connection ftp", "green");
+                return true;
             } else {
                 $n = $i + 1;
-                echo " \033[37m Попытка подключения ftp $n \033[0m \n ";
+                Console::text("WARNING: Попытка подключения ftp $n ", 'yellow');
                 sleep(5);
             }
         }
 
         return false;
-
     }
 
-    function loadfile($dirFile, $ftpDir, $fileName):bool
-    {
-        if(in_array($fileName, $this->fileIgnore) || in_array("$ftpDir.'/'.$fileName", $this->fileIgnore) ){
-            echo " \033[31m Игнорируемый файл $fileName \n \033[0m";
+    function loadfile($dirFile, $ftpDir, $fileName): bool {
+        if (in_array($fileName, $this->fileIgnore) || in_array("$ftpDir.'/'.$fileName", $this->fileIgnore)) {
+            Console::text("WARNING: Игнорируемый файл $fileName", 'yellow');
             return false;
         }
-        echo "Загружаю файл $fileName \n";
+        Console::text("Загружаю файл $fileName ...");
 
-        $fp = fopen($dirFile.'/'. $fileName , 'r');
+        $fp = fopen($dirFile . '/' . $fileName, 'r');
 
-        if(ftp_fput($this->connect, $ftpDir.'/'.$fileName, $fp, FTP_BINARY)){
-            echo "\033[92m Файл $fileName успешно загружен \033[0m\n";
+        if (ftp_fput($this->connect, $ftpDir . '/' . $fileName, $fp, FTP_BINARY)) {
+            Console::text(" Файл $fileName успешно загружен!", 'green');
             return true;
-        }else{
+        } else {
 
-            if($this->connectCount(5)){
+            if ($this->connectCount(5)) {
                 $this->dir($this->dirHost);
                 ftp_pasv($this->connect, $this->pasv);
-                if(ftp_fput($this->connect, $ftpDir . '/' . $fileName, $fp, FTP_BINARY)){
-                    echo " \033[92m Файл $fileName успешно загружен \033[0m\n";
+                if (ftp_fput($this->connect, $ftpDir . '/' . $fileName, $fp, FTP_BINARY)) {
+                    Console::text(" Файл $fileName успешно загруже! ", 'green');
                 }
-
             }
-            echo " \033[31m При загрузке $fileName произошла проблема \033[0m \n";
+            Console::text("ERROR: При загрузке $fileName произошла проблема", "red");
             return false;
         }
 
@@ -78,139 +74,125 @@ class Ftp{
     }
 
 
-    function dir($dir){
-      
-        if (ftp_chdir($this->connect, $dir))
-        {
+    function dir($dir) {
+
+        if (ftp_chdir($this->connect, $dir)) {
             $this->dirpwd = $dir;
-          
-            echo " \033[92m Новая текущая директория: " . ftp_pwd($this->connect) . "  \033[0m \n";
+
+            Console::text(" Новая текущая директория: " . ftp_pwd($this->connect));
             return true;
         } else {
-            echo " \033[31m Не удалось сменить директорию  \033[0m \n";
+            Console::text("ERROR: Не удалось сменить директорию", "red");
             return false;
         }
-
     }
 
 
-    function deleteDir($dir, $files = false)
-    {
+    function deleteDir($dir, $files = false) {
 
-        if($files){
+        if ($files) {
 
             $lists = $this->list($dir);
             // удаляем файлы
             foreach ($lists as $list) {
-                $full = $dir.'/'. $list['name'];
-                if($list['type'] == 'dir'){
-                    if(count($this->list($full)) == 0){
+                $full = $dir . '/' . $list['name'];
+                if ($list['type'] == 'dir') {
+                    if (count($this->list($full)) == 0) {
 
                         ftp_rmdir($this->connect, $full);
-
-                    }else{
+                    } else {
 
                         $this->deleteDir($full, true);
                     }
-                }else{
+                } else {
                     ftp_delete($this->connect, $full);
                 }
             }
 
             ftp_rmdir($this->connect, $dir);
-
-       }else{
-           ftp_rmdir($this->connect, $dir);
-
-       }
-
+        } else {
+            ftp_rmdir($this->connect, $dir);
+        }
     }
 
 
 
-    function list($dir)
-    {
+    function list($dir) {
 
-            ftp_pasv($this->connect, $this->pasv);
+        ftp_pasv($this->connect, $this->pasv);
 
-         $dataFilesName = ftp_nlist($this->connect, $dir);
+        $dataFilesName = ftp_nlist($this->connect, $dir);
 
-        if($data = ftp_rawlist($this->connect, $dir)){
+        if ($data = ftp_rawlist($this->connect, $dir)) {
 
             $array = [];
-            foreach($data as $i => $txt){
-                
+            foreach ($data as $i => $txt) {
+
                 $array[$i] = [];
-                preg_match("(-?[a-z]{1,})",$txt, $match);
-                $array[$i]['type'] = str_contains($match[0],'dr')? "dir":"file";
+                preg_match("(-?[a-z]{1,})", $txt, $match);
+                $array[$i]['type'] = str_contains($match[0], 'dr') ? "dir" : "file";
                 $array[$i]['name'] = array_reverse(explode('/', $dataFilesName[$i]))[0];
             }
 
             return $array;
-
         }
 
         return [];
     }
 
-    function is_list($list_ftp, $name):bool
-    {
-        foreach($list_ftp as $list){
-            if($list['name'] == $name) return true;
+    function is_list($list_ftp, $name): bool {
+        foreach ($list_ftp as $list) {
+            if ($list['name'] == $name) return true;
         }
         return false;
     }
 
 
 
-    function close(){
+    function close() {
         ftp_close($this->connect);
     }
 
-    function putDirFiles($dirLocal, $dirHost){
+    function putDirFiles($dirLocal, $dirHost) {
         ftp_pasv($this->connect, $this->pasv);
         $files = scandir($dirLocal);
 
-       foreach ($files as $file) {
-           if ($file == '.' || $file == '..') continue;
-           if(is_file($dirLocal . '/' . $file)){
-               $this->loadfile($dirLocal, $dirHost,  $file );
-           }
-       }
-
-     $list  = $this->list($dirHost);
-
-       foreach($files as $file){
-            if($file == '.' || $file == '..') continue;
-
-
-            if(is_dir($dirLocal.'/'.$file)){
-
-            if(in_array($file, $this->dirIgnore)){
-                echo "\033[31m Игнорируемая директория $file  \033[0m \n";
-                continue;
+        foreach ($files as $file) {
+            if ($file == '.' || $file == '..') continue;
+            if (is_file($dirLocal . '/' . $file)) {
+                $this->loadfile($dirLocal, $dirHost,  $file);
             }
-            if(!$this->is_list($list, $file)){
-                $this->createDir($dirHost . '/' . $file);
-            }
+        }
 
-            $this->putDirFiles($dirLocal."/".$file, $dirHost . '/' . $file);
+        $list  = $this->list($dirHost);
 
+        foreach ($files as $file) {
+            if ($file == '.' || $file == '..') continue;
+
+
+            if (is_dir($dirLocal . '/' . $file)) {
+
+                if (in_array($file, $this->dirIgnore)) {
+                    Console::text("WARNING: Игнорируемая директория $file ", "yellow");
+                    continue;
+                }
+                if (!$this->is_list($list, $file)) {
+                    $this->createDir($dirHost . '/' . $file);
+                }
+
+                $this->putDirFiles($dirLocal . "/" . $file, $dirHost . '/' . $file);
             }
         }
     }
 
 
-    function createDir($dir):bool
-    {
+    function createDir($dir): bool {
         if (ftp_mkdir($this->connect, $dir)) {
-            echo "\033[93m Создана директория $dir \n \033[0m";
+            Console::text(" Создана директория $dir ", 'green');
             return true;
         } else {
-            echo "\033[31m Не удалось создать директорию $dir  \033[0m  \n";
+            Console::text("ERROR: Не удалось создать директорию $dir", "red");
             return false;
         }
     }
 }
-
-?>
