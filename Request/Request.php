@@ -33,7 +33,13 @@ class Request
         
     }
 
-
+    
+    /**
+     * input
+     *
+     * @param  string|null $name
+     * @return array|string|null
+     */
     public function input(string|null $name = null): array|string|null
     {
         $REQUEST = $this->parsing();
@@ -50,8 +56,14 @@ class Request
         if (key_exists('CONTENT_TYPE', $_SERVER)  == 'application/json' && !empty($input)) $decode = Tools::jsonDe($input);
         return array_merge($REQUEST, $decode);
     }
-
-    public function file(string $name = null)
+    
+    /**
+     * file
+     *
+     * @param  string $name
+     * @return string|null|array
+     */
+    public function file(string $name = null): array|string|null
     {
         if (!$name) return $_FILES;
         if (key_exists($name, $_FILES)) return $_FILES[$name];

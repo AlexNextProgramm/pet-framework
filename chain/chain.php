@@ -3,21 +3,44 @@
 use Pet\Request\Request;
 use Pet\View\View;
 
-function view($name, $argument)
+/**
+ * view
+ *
+ * @param  string $name
+ * @param  array $argument
+ * @return void
+ */
+function view(string $name, array $argument = [])
 {
     (new View())->open($name, $argument);
 }
-function attr($name = null)
+
+/**
+ * attr
+ * @param  string|null $name
+ * @return string
+ */
+function attr(string|null $name = null): string|array|null
 {
-    return $GLOBALS['app']->request->input($name);
+    return request()->input($name);
 }
 
+/**
+ * request
+ * @return Request
+ */
 function request(): Request
 {
     return $GLOBALS['app']->request;
 }
 
-function files(string $name = null)
+/**
+ * files
+ * получает файл
+ * @param  string $name
+ * @return void
+ */
+function files(string $name = null): array|string|null
 {
     return request()->file($name);
 }

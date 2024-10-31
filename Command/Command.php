@@ -3,24 +3,24 @@
 include_once(__DIR__ . '/../function.php');
 include_once(__DIR__ . '/FTP/ConnectFtp.php');
 include_once(__DIR__ . '/console/Console.php');
+
 class Command
 {
     const ROOT_DIR = ROOT_DIR;
-    const NAME_DIR_PROJECT = 'dist';
+    public $NAME_DIR_PROJECT;
 
     public function __construct($command)
     {
-
-        $this->routCommand($command);
+        $this->NAME_DIR_PROJECT = env("PUBLIC_DIR", 'dist');
+        $this->stand($command);
     }
 
     static function init($comm)
     {
-
         return new Command($comm);
     }
 
-    private function routCommand($comm)
+    private function stand($comm)
     {
         unset($comm[0]);
         switch (trim($comm[1])) {
@@ -44,13 +44,10 @@ class Command
 
     private function server()
     {
-
         $host = env("URLDEV");
         $hostName = str_replace(['https://', 'http://'], '', $host);
-        $folder = self::NAME_DIR_PROJECT;
-
-        echo "\033[02;32m  \n \nsite: $host \033[0m \n \n";
-        exec("php -S $hostName -t $folder/");
+        Console::text("Web: $host", "green");
+        exec("php -S $hostName -t {$this->NAME_DIR_PROJECT}/");
     }
 
     private function make(string $type, $comm)
@@ -61,7 +58,7 @@ class Command
 
             $sample = file_get_contents(__DIR__ . "/sample/controller.sample.php");
             $sample = str_replace('NAME', $name, $sample);
-            file_put_contents(self::ROOT_DIR . self::NAME_DIR_PROJECT . "/PHP/Controller/$name" . "Controller.php", $sample);
+            file_put_contents(self::ROOT_DIR . $this->NAME_DIR_PROJECT . "/PHP/Controller/$name" . "Controller.php", $sample);
         }
     }
 

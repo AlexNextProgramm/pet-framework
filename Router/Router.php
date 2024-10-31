@@ -6,62 +6,55 @@ use Pet\Router\Middleware;
 
 use function PHPSTORM_META\type;
 
-class Router extends Middleware
-{
+class Router extends Middleware {
 
     const PUBLIC_DIR = PUBLIC_DIR;
     static $Route = [];
     static $id = 0;
 
-    public function __construct() {}
+    public function __construct() {
+    }
 
 
-    static public function get($path, $callback): Router
-    {
+    static public function get($path, $callback): Router {
         Router::$Route[] = ["path" => $path, "method" => 'GET', "callback" => $callback];
         Router::$id = array_key_last(Router::$Route);
         return new Router();
     }
 
-    static public function post($path, $callback): Router
-    {
+    static public function post($path, $callback): Router {
         Router::$Route[] = ["path" => $path, "method" => 'POST', "callback" => $callback];
         Router::$id = array_key_last(Router::$Route);
         return new Router();
     }
 
-    static public function delete($path, $callback): Router
-    {
+    static public function delete($path, $callback): Router {
         Router::$Route[] = ["path" => $path, "method" => 'DELETE', "callback" => $callback];
         Router::$id = array_key_last(Router::$Route);
         return new Router();
     }
 
-    static public function put($path, $callback): Router
-    {
+    static public function put($path, $callback): Router {
         Router::$Route[] = ["path" => $path, "method" => 'PUT', "callback" => $callback];
         Router::$id = array_key_last(Router::$Route);
         return new Router();
     }
 
-    public function name($string): Router
-    {
+    public function name($string): Router {
         Router::$Route[Router::$id]['name'] = $string;
         return $this;
     }
 
-    public function group($string): Router
-    {
+    public function group($string): Router {
         Router::$Route[Router::$id]['group'] = $string;
         return $this;
     }
 
-    static function init()
-    {
+    static function init() {
 
         $request = request();
         $control = false;
-        var_dump(Router::$Route);
+
         foreach (Router::$Route as $Rout) {
             if ($Rout['method'] != $request->getMethod()) continue;
             if ($control) continue;
@@ -71,28 +64,30 @@ class Router extends Middleware
             $isFlexLink  = $fLink ? $fLink === $request->path : false;
 
             if ($request->path != $Rout['path'] && !$isFlexLink) continue;
-            if (key_exists('middleware', $Rout)){
-               $resultMiddleware =  (new EssenceClass())->open($Rout['middleware'], $request);
-               if($resultMiddleware === false) break;
+
+            //Заглушка в middleware
+            if (key_exists('middleware', $Rout)) {
+                $resultMiddleware = (new EssenceClass())->open($Rout['middleware'], $request);
+                if ($resultMiddleware === false) break;
             }
-            if (!empty($request->header['action']) ){
+
+            //Прямое направление через action при ajax
+            if (!empty($request->header['action'])) {
                 $Rout['callback'][1] = $request->header['action'];
             }
 
             $controller = (new EssenceClass())->open($Rout['callback'], $request);
-            
-            // если контроллер что-то хочет вернуть
-            if(!empty($controller) || gettype($controller) == 'array') echo json_encode($controller, JSON_UNESCAPED_UNICODE);
-            $control = true;
 
+            // если контроллер что-то хочет вернуть
+            if (!empty($controller) || gettype($controller) == 'array') echo json_encode($controller, JSON_UNESCAPED_UNICODE);
+            $control = true;
         }
-        if (!$control){
-            http_response_code('404');
-        }
+
+        // Если по итогу роутер не найден
+        if (!$control) http_response_code('404');
     }
 
-    static function flexibleLink($flex)
-    {
+    static function flexibleLink($flex) {
 
         if (preg_match_all("|{([a-z]{1,})}|", $flex, $matches)) {
 

@@ -2,12 +2,10 @@
 
 namespace Pet\Router;
 
-class EssenceClass
-{
+class EssenceClass {
 
 
-    function open($class, $argm = [])
-    {
+    function open($class, $argm = []) {
         $argm = func_get_args();
 
         unset($argm[0]);
@@ -38,8 +36,7 @@ class EssenceClass
         return 'Undefintd class else function ' . print_r($class, true);
     }
 
-    private function isArrayClass(&$class, &$method)
-    {
+    private function isArrayClass(&$class, &$method) {
         $value = $class;
 
         if (gettype($value) == 'array') {
@@ -54,8 +51,7 @@ class EssenceClass
     }
 
 
-    public function isCallable($class, string $method = null): bool
-    {
+    public function isCallable($class, string $method = null): bool {
 
         if ($method && is_callable([$class, $method])) return true;
 
