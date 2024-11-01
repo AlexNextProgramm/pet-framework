@@ -33,27 +33,32 @@ class Start {
 
     public function mig($scanfile, Model $track)
     {
+        $static = 0;
         foreach ($scanfile as $i => $file) {
 
             $track->find(['name'=> $file]);
 
             if($track->isInfo() && $track->v('status') == 1 ) continue;
             if(!$track->isInfo() || ($track->isInfo() && $track->v('status') == 0)){
-
+                $static++;
                 try{
                     require($this->DIR."/$file");
                     $name = str_replace('.php', '', explode('_', $file)[2]);
                     (new $name())->up();
                 }catch(Error $e){
                     $track->setUp('name',['name' => $file, 'status'=> $status, 'error' => $e->getMessage()]);
+                    Console::text("Error: $file - Миграция не может быть достигнута из-за фатальной ошибки!", 'red');
                     continue;
                 }
                  $status =  Schema::$ERROR == ''? 1 : 0 ;
                  $track->setUp('name', ['name' => $file, 'status'=> $status, 'error' => Schema::$ERROR]);
+                 if($status == 0) Console::text("ERROR: $file - Миграция не может быть достигнута из-за синтаксической ошибки sql запроса!", 'red');
+                 if($status == 1) Console::text("Успешная миграция  $file", "green");
                  Schema::$ERROR = '';
             }
 
         }
+        if($static == 0)  Console::text("WARNING: Нет новых миграций!", "yellow");
     }
 
      static function create($name)

@@ -38,7 +38,7 @@ class Table{
 
     public function int(string $name, int $length = 60):Table
     {
-        $this->param[] = " `$name` IN($length) NULL"; 
+        $this->param[] = " `$name` INT($length) NULL"; 
         return $this;
     }
 
