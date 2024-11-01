@@ -27,12 +27,12 @@ framework for easy use
  ## Запуск сервера PET
 
  ```
- php pts serve
+ php sib serve
 
  ```
  > Запускает сервер из установленных настроек в .env URLDEV
  > Можете запустить стартовую (шаблон) сборку командой.
  ```
- php pts build_sample
+ php sib build_sample
 
  ```

@@ -1,7 +1,8 @@
 <?php
-include_once(__DIR__ . '/FTP.php');
+namespace Pet\Command\FTP;
 
 use FTP\Ftp;
+use Pet\Command\Console\Console;
 
 class ConnectFtp {
 

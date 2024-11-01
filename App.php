@@ -19,22 +19,11 @@ class App{
         $this->router = new Router();
     }
 
-    static function init($router_dir = self::PUBLIC_DIR."/router")
-    {
+    static function init($router_dir = self::PUBLIC_DIR."/router") {
         $app = new App();
         $GLOBALS['app'] = $app;
         $app->include_router($router_dir);
-                spl_autoload_register(function ($class) {
-
-                    $file = str_replace('\\', DIRECTORY_SEPARATOR, $class).'.php';
-
-                    if (file_exists($file)) {
-                        require_once $file;
-                        return true;
-                    }
-
-                    return false;
-                });
+        self::initProjectFile();
         $app->router::init();
     }
 
@@ -66,10 +55,15 @@ class App{
         }
     }
 
-    function initBase(){
-        defined('DB_NAME', env('DB_NAME'));
+    static function initProjectFile(){
+        spl_autoload_register(function ($class) {
+            $file = str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+            if (file_exists($file)) {
+                require_once $file;
+                return true;
+            }
+            return false;
+        });
     }
-    
-    
 }
 ?>

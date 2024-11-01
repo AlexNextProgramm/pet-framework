@@ -1,8 +1,9 @@
 <?php
 
-include_once(__DIR__ . '/../function.php');
-include_once(__DIR__ . '/FTP/ConnectFtp.php');
-include_once(__DIR__ . '/console/Console.php');
+namespace Pet\Command;
+
+use Pet\Command\FTP\ConnectFtp;
+use Pet\Migration\Start;
 
 class Command
 {
@@ -33,6 +34,12 @@ class Command
             case 'load':
                 ConnectFtp::load();
                 break;
+            case 'migrate':
+                    Start::init('migrate');
+                    break;
+            case 'make:migrate':
+                    Start::create($comm);
+                    break;
             case "make:controller":
                 $this->make(explode(':', $comm[1])[1], $comm);
                 break;

@@ -1,4 +1,5 @@
 <?php
+namespace Pet\Command\Console;
 
 class Console {
     const OS = PHP_OS;

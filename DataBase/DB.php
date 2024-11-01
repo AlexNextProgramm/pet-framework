@@ -48,7 +48,8 @@ abstract class DB {
         $this->strQuery = $this->strQuery . $this->strJoin . $this->strWhere;
         $this->strJoin  = $this->strJoin = $this->strWhere = '';
         $this->whereSyntax($this->strQuery);
-        return $this->q($this->strQuery)->fetchAll(PDO::FETCH_ASSOC);
+        $this->info = $this->q($this->strQuery)->fetchAll(PDO::FETCH_ASSOC);
+        return $this->info;
     }
 
     public function conn(){
@@ -103,4 +104,23 @@ abstract class DB {
 
         return [];
     }
+
+    public function isInfo():bool
+    {
+        return count($this->info) != 0;
+    }
+
+    public function v($key):string|null
+    {
+       return !empty($this->info[0][$key])?$this->info[0][$key]:null;
+    }
+
+    public function arrayQuote(&$array)
+    {
+         foreach($array as $i=> $v)
+         {
+            $array[$i] = $this->DB->quote($v);
+         }
+    }
+
 }

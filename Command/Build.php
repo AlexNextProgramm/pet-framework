@@ -21,7 +21,7 @@ class Build{
     }
     
     function build_architecture(){
-        $this->build_file('pet.sample.php', 'pts');
+        $this->build_file('pet.sample.php', 'sib');
 
         if(!is_dir('dist/PHP/Controller')) mkdir('dist/PHP/Controller', 0777, true);
         if(!is_dir('dist/view/css')) mkdir('dist/view/css', 0777, true);

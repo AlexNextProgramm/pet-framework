@@ -17,7 +17,7 @@ trait Select{
      * @param  mixed $ArrayColumnAndValue
      * @return Select
      */
-    public function select(array $ArrayColumnAndValue = [], $AS = []): Select {
+    public function select(array $ArrayColumnAndValue = [], $AS = []): Model {
         $strColumn =  Tools::is_assos($ArrayColumnAndValue) == 'assos' ?
             array_keys($ArrayColumnAndValue) : $ArrayColumnAndValue;
         if (count($this->column) != 0) {
@@ -118,5 +118,9 @@ trait Select{
     public function limit($limit = 100, $DESC = "DESC", $cl = 'id'){
         $this->strWhere .= "ORDER BY $cl $DESC LIMIT $limit;";
         return $this;
+    }
+
+    public function max($column = 'id'){
+       return  $this->q("SELECT MAX(`$column`) FROM `{$this->table}`")->fetch()['MAX(`id`)'];
     }
 }

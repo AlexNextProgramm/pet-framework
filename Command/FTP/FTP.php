@@ -1,9 +1,9 @@
 <?php
 
 
-namespace FTP;
+namespace Pet\Command\FTP;
 
-use Console;
+use Pet\Command\Console;
 use Exception;
 
 class Ftp {

@@ -18,12 +18,28 @@ abstract class Model extends DB{
      * @param  int $limit
      * @return array
      */
-    function find($searh = [], $column  = [], $limit = null):array
+    function find($searh = [], $column  = [], $limit = null): array
     {
         if($limit){
             return  $this->select($column)->And($searh)->limit($limit)->fetch();
         }else{
             return  $this->select($column)->And($searh)->fetch();
+        }
+    }
+
+    function isRow($searh): bool
+    {
+        return $this->find($searh, [], 1) != [];
+    }
+
+
+    public function setUp($find, $value)
+    {
+        if(gettype($find) == 'string') $find = [$find => $value[$find]];
+        if($this->isRow($find)){
+            $this->update($value)->and($find)->fetch();
+        }else{
+            $this->set($value);
         }
     }
 }   

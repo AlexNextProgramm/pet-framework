@@ -14,8 +14,11 @@ trait Update {
      * @return Update
      */
     function update(array $arrayKeyAndValue): Model {
-        $value = Tools::array_implode(',', $arrayKeyAndValue, "`[key]`='[val]'");
-        $this->strQuery  = "UPDATE `{$this->table}` SET $value";
+       
+        $this->arrayQuote($arrayKeyAndValue);
+        $str = Tools::array_implode(',',$arrayKeyAndValue, "`[key]`=[val]");
+        $this->strQuery  = "UPDATE `{$this->table}` SET $str";
         return $this;
     }
+
 }

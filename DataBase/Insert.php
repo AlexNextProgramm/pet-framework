@@ -16,7 +16,8 @@ trait Insert {
     if (count($ArrayColumnAndValue) == 0) return false;
     $key = array_keys($ArrayColumnAndValue);
     $value = array_values($ArrayColumnAndValue);
-    $this->strQuery = "INSERT INTO `{$this->table}` ( " . implode(' , ', $key) . " ) VALUES ( '" . implode("', '", $value) . "')";
+    $this->arrayQuote($value);
+    $this->strQuery = "INSERT INTO `{$this->table}` ( " . implode(' , ', $key) . " ) VALUES ( " . implode(", ", $value) . ")";
     return  $this->DB->prepare($this->strQuery)->execute();
   }
 
