@@ -2,6 +2,7 @@
 
 namespace Pet\Command;
 
+use Pet\Command\Console\Console;
 use Pet\Command\FTP\ConnectFtp;
 use Pet\Migration\Start;
 

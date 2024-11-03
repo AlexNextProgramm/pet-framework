@@ -20,11 +20,9 @@ class Start {
         $Start = new self();
         if (!is_dir($Start->DIR))
         {
-            return Console::text("Директория миграций не найдена", 'red');
+            return Console::text("ERROR: Директория миграций не найдена", 'red');
         }
         $scanfile = $Start->scandir();
-        $Start->hash =  hash('sha256', implode('-', $scanfile));
-
         Migration::createTableMigrate();
         $track =  new Track();
         $Start->mig($scanfile, $track);
@@ -41,13 +39,14 @@ class Start {
             if($track->isInfo() && $track->v('status') == 1 ) continue;
             if(!$track->isInfo() || ($track->isInfo() && $track->v('status') == 0)){
                 $static++;
+                $status = 0;
                 try{
                     require($this->DIR."/$file");
                     $name = str_replace('.php', '', explode('_', $file)[2]);
                     (new $name())->up();
-                }catch(Error $e){
+                } catch (Error $e){
                     $track->setUp('name',['name' => $file, 'status'=> $status, 'error' => $e->getMessage()]);
-                    Console::text("Error: $file - Миграция не может быть достигнута из-за фатальной ошибки!", 'red');
+                    Console::text("ERROR: $file - Миграция не может быть достигнута из-за фатальной ошибки!", 'red');
                     continue;
                 }
                  $status =  Schema::$ERROR == ''? 1 : 0 ;
@@ -58,6 +57,7 @@ class Start {
             }
 
         }
+
         if($static == 0)  Console::text("WARNING: Нет новых миграций!", "yellow");
     }
 

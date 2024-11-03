@@ -1,91 +1,99 @@
 <?php
 namespace Pet\Migration;
 
+use Exception;
+use Pet\Migration\Common\Common;
+use Pet\Migration\Common\Attribute;
 
 class Table{
-    public $param = [];
-    public $engine = "ENGINE = InnoDB";
 
-    public function string(string $name, int $length = 255): Table
+    use Common;
+    public $param = [];
+    public $AddIndex = [];
+    public $engine = "ENGINE = InnoDB";
+    public $tInfo = [];
+    public $isChange = false;
+
+    public function string(string $name, int $length = 255): Attribute
     {
-        $this->param[] = "`$name` VARCHAR($length) NOT NULL";
-        return $this;
+        $newName = $this->changeName($name, $this->isChange);
+        $this->param[] = "`$name`  $newName  VARCHAR($length) {charset} NOT NULL";
+        return new Attribute($this);
     }
 
     public function id($id = 'id'){
         $this->param[] = "`$id` INT NOT NULL AUTO_INCREMENT";
         $this->param[] = "PRIMARY KEY (`$id`)";
-        return $this;
+        return new Attribute($this);
     }
 
-    public function text(string $name): Table
+    public function text(string $name): Attribute
     {
-        $this->param[] = "`$name` TEXT NOT NULL";
-        return $this;
+        $newName = $this->changeName($name, $this->isChange);
+        $this->param[] = "`$name` $newName TEXT {charset} NOT NULL";
+        return new Attribute($this);
     }
 
-    public function date(string $name): Table
+    public function date(string $name): Attribute
     {
-        $this->param[] = "`$name` DATE NOT NULL";
-        return $this;
+        $newName = $this->changeName($name, $this->isChange);
+        $this->param[] = "`$name` $newName DATE NOT NULL";
+        return new Attribute($this);
     }
 
-    public function datetime(string $name): Table
+    public function datetime(string $name): Attribute
     {
-        $this->param[] = "`$name` DATETIME NOT NULL";
-        return $this;
+        $newName = $this->changeName($name, $this->isChange);
+        $this->param[] = "`$name` $newName DATETIME NOT NULL";
+        return new Attribute($this);
     }
 
-    public function int(string $name, int $length = 60):Table
+    public function int(string $name, int $length = 60):Attribute
     {
-        $this->param[] = " `$name` INT($length) NULL"; 
-        return $this;
+        $newName = $this->changeName($name, $this->isChange);
+        $this->param[] = " `$name` $newName INT($length) NULL"; 
+        return new Attribute($this);
     }
 
-    public function boolean(string $name):Table
+    public function double(string $name, int $length = 10):Attribute
     {
-        $this->param[] = " `$name` BOOLEAN NULL";
-        return $this;
+        $newName = $this->changeName($name, $this->isChange);
+        $this->param[] = " `$name` $newName DOUBLE($length) NULL"; 
+        return new Attribute($this);
     }
 
-    public function timestamp(string $name = "date_time"):Table
+    public function boolean(string $name):Attribute
     {
-        $this->param[] = " `$name` DATETIME NULL DEFAULT CURRENT_TIMESTAMP";
-        return $this;
+        $newName = $this->changeName($name, $this->isChange);
+        $this->param[] = " `$name` $newName BOOLEAN NULL";
+        return new Attribute($this);
     }
 
-    public function null(): Table
+    public function timestamp(string $name = "date_time"):Attribute
     {
-        $i = array_key_last($this->param);
-        $str = $this->param[$i];
-        $str  = str_replace( "NOT", "", $str);
-        $this->param[$i] = str_replace("NULL", "NULL DEFAULT NULL", $str);
-        return $this;
+        $newName = $this->changeName($name, $this->isChange);
+        $this->param[] = " `$name` $newName DATETIME NULL DEFAULT CURRENT_TIMESTAMP";
+        return new Attribute($this);
     }
+
+   
 
     public function storage(string $type = "InnoDB")
     {
         $this->engine = "ENGINE = $type";
     }
 
-    public function default($default){
+    public function index($name, $indexName = '',  $length = '')
+    {
+        if($length != '') $length = "($length)";
+        if($indexName != '') $indexName = "`$indexName`";
+        $this->AddIndex[] = "INDEX $indexName (`$name` $length)";
+    }
 
-        $i = array_key_last($this->param);
-        $attr =  $this->param[$i];
-
-        if(gettype($default) == 'boolean'){
-            $default? $attr.= " DEFAULT TRUE "
-            : $attr .= " DEFAULT FALSE ";
-        }
-
-        if (gettype($default) == 'string') $attr.=" DEFAULT '$default' ";
-
-        
-        $this->param[$i] = $attr;
-
-        return $this;
-
-     }
-
+    public function primaryKey($name)
+    {
+        $this->AddIndex[] = "PRIMARY KEY (`$name`) USING BTREE";
+    }
+    
 }
 ?>
