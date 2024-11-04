@@ -14,6 +14,10 @@ framework for easy use
           "Pet\\": "vendor/pet/framework/"
         }
     },
+    ,
+  "files":[
+    "/vendor/pet/framework/function.php"
+  ],
     "scripts":{
         "post-package-install":[
             "php ./vendor/pet/framework/Command/build_sample.php"

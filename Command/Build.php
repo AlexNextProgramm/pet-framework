@@ -9,7 +9,7 @@ class Build {
      public $isAllReplace = false;
      public $isPetWarning = false;
     function __construct() {
-       if(empty(ROOT_DIR)) define("ROOT_DIR", $this->search_dir_vendor() . "/");
+       if(!defined('ROOT_DIR')) define('ROOT_DIR', $this->search_dir_vendor() . "/");
 
         if (!file_exists(ROOT_DIR . '.env')) {
             $this->copy('.env.sample.php', '.env');
@@ -57,6 +57,7 @@ class Build {
     function architecture() {
         $public =  env('PUBLIC_DIR', 'dist') . "/";
         $this->setfile('pet');
+    
         $this->setFile('index.php',  $public);
         $this->setFile(
             'Controller.php',
@@ -72,7 +73,8 @@ class Build {
 
         // КОПИ ФАЙЛ
         if(!is_dir(ROOT_DIR.$public."/view/img")) mkdir(ROOT_DIR.$public."/view/img", 0777, true);
-        $this->copy('/img/logo.png', $public.'/view/img/logo.png');
+        $this->copy('img/logo.png', $public.'/view/img/logo.png');
+        $this->copy('config.constant.php', 'config.constant.php');
     }
 
     function search_dir_vendor() {
@@ -80,6 +82,6 @@ class Build {
     }
 
     private function copy($file, $fileOut) {
-        copy(__DIR__ . "/sample/$file", ROOT_DIR . "$fileOut",);
+        copy(realpath(__DIR__ . "/sample/$file"),  ROOT_DIR . "$fileOut");
     }
 }
