@@ -15,7 +15,7 @@ class Build {
             $this->copy('.env.sample.php', '.env');
         }
         include_once ROOT_DIR . 'vendor/autoload.php';
-        $this->architecture();
+       // $this->architecture();
     }
 
     function setFile($names = '', $dir = "", $rename = []) {
@@ -43,6 +43,7 @@ class Build {
             if(Console::isYes($str))$this->isAllReplace = true;
             $this->isPetWarning = true;
         }
+
         if(!$this->isAllReplace && $isFile)
         {
             if($sample != file_get_contents(ROOT_DIR . $dir . $NAME . $names)){

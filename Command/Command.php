@@ -28,7 +28,7 @@ class Command {
                 $this->server();
                 break;
             case 'build_sample':
-                $this->build();
+               (new Build())->architecture();
                 break;
             case 'load':
                 ConnectFtp::load();
@@ -78,10 +78,5 @@ class Command {
             $sample = str_replace('NAME', $name, $sample);
             file_put_contents(self::ROOT_DIR . $this->NAME_DIR_PROJECT . "/PHP/Controller/$name" . "Controller.php", $sample);
         }
-    }
-
-    private function build()
-    {
-      (new Build());
     }
 }

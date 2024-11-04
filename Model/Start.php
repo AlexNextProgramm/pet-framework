@@ -1,15 +1,27 @@
 <?php
+
 namespace Pet\Model;
 
-class Start {
+use Pet\Command\Build;
+use Pet\Migration\Table;
 
-    public $sampleDir = "";
-   public function __construct()
+class Start
+{
+    public Build|null $Build = null;
+
+    public function __construct()
     {
-        $this->$sampleDir = realpath(__DIR__."/../Command/sample/");
+        $this->Build = new Build();
+        $this->Build->isPetWarning = true;
+        $this->$sampleDir = realpath(__DIR__ . "/../Command/sample/");
     }
-    function init($name)
+
+    public function init($name)
     {
-        
+        $this->Build->setFile('Model.php', env("PUBLIC_DIR", "dist") . "/PHP/Model/", [
+            "NAME" => ucwords($name),
+            "SPACE" => "PHP\\Model",
+            "TABLE" => strtolower($name),
+        ]);
     }
 }

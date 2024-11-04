@@ -7,8 +7,10 @@ use PDO;
 use Pet\Command\Console\Console;
 use Pet\DataBase\DB;
 use Pet\Migration\Table;
+use Pet\Model\Start;
 
-class Schema extends DB {
+class Schema extends DB
+{
     public $QUERY = '';
     public $DB_NAME = DB_NAME;
     static $ERROR = '';
@@ -16,7 +18,8 @@ class Schema extends DB {
     static $SchemaQuery = '';
 
 
-    private function set() {
+    private function set()
+    {
         $result = false;
         self::$SchemaQuery = $this->QUERY;
         try {
@@ -28,12 +31,13 @@ class Schema extends DB {
         return $result;
     }
 
-    static function create($name, callable $callable, $auto = true) {
-        if(Schema::isTable($name)) return false;
+    static function create($name, callable $callable, $auto = true)
+    {
+        if (Schema::isTable($name)) return false;
         $Schema = new self();
         $table = new Table();
 
-        if($auto){
+        if ($auto) {
             //  Авто cоздание id cdate;
             $table->id('id');
             $table->timestamp('cdate');
@@ -53,20 +57,30 @@ class Schema extends DB {
         }
         // Console::text( $Schema->QUERY);
         $Schema->set();
+        Console::text("Создать файл Модели для этой таблицы? (y/n)", 'yellow');
+        Console::input($input);
+        if (Console::isYes($input)) {
+            (new Start())->init($name);
+        }
     }
 
-    static function drop($table, $column = null) {
+    static function drop($table, $column = null)
+    {
         $Schema = new self();
-        if($column){
+        if ($column) {
             $Schema->QUERY = "ALTER TABLE `$table` DROP `$column`;";
-        }else{
+        } else {
+            Console::text("Вы уверены что хотите удалить таблицу $table? (y/n)", 'yellow');
+            Console::input($input);
+            if (!Console::isYes($input)) return;
             $Schema->QUERY = "DROP TABLE `{$Schema->DB_NAME}`.`$table`";
         }
         $Schema->set();
     }
 
 
-    static function change(string $name, callable $callable) {
+    static function change(string $name, callable $callable)
+    {
         if (!Schema::isTable($name)) return false;
         $Schema = new self();
         $table = new Table();
@@ -79,7 +93,8 @@ class Schema extends DB {
         $Schema->set();
     }
 
-    static function add(string $name, callable $callable) {
+    static function add(string $name, callable $callable)
+    {
         if (!Schema::isTable($name)) return false;
         $Schema = new self();
         $table = new Table();
@@ -98,14 +113,16 @@ class Schema extends DB {
         $Schema->set();
     }
 
-    static function isTable($name): bool {
+    static function isTable($name): bool
+    {
         $Schema = (new self());
         $result = $Schema->q("SHOW TABLES FROM `{$Schema->DB_NAME}` LIKE '$name';")->fetch(PDO::FETCH_ASSOC);
         $result = empty($result) ? [] : $result;
         return in_array($name, $result);
     }
 
-    static function sql($query) {
+    static function sql($query)
+    {
         $Schema = (new self());
         $Schema->QUERY = $query;
         $Schema->set();
