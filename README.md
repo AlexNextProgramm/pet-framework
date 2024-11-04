@@ -35,32 +35,32 @@ framework for easy use
  ```
  php pet build_sample
 
- ```
+```
  ## Миграции
-    Создает новую миграцию;
-    Создавайте миграцию через консоль чтобы небыло ошибок;
- ```
-    php pet make:migrate
+Создает новую миграцию;
+Создавайте миграцию через консоль чтобы небыло ошибок;
 
 ```
-    Накатить все миграции
-```
-    php pet migrate
-    php pet migrate:up
+php pet make:migrate
 
 ```
-   Накатить только 1 следующую
+Накатить все миграции
 ```
-    php pet migrate:up:one
+php pet migrate
+php pet migrate:up
 
 ```
-    Откатить все миграции
+Накатить только 1 следующую
 ```
-    php pet migrate:back
+php pet migrate:up:one
+```
+Откатить все миграции
+```
+php pet migrate:back
 
 ```
-    Откатить последнюю
+Откатить последнюю
 ```
-    php pet migrate:back:end
+php pet migrate:back:end
 
 ```
