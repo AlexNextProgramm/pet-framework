@@ -10,6 +10,7 @@ use Pet\Migration\Track;
 use Pet\Model\Model;
 
 class Start {
+
     private $DIR = '';
     public $hash = '';
     public $command = '';
@@ -67,7 +68,8 @@ class Start {
                 } catch (Error $e) {
                     $track->setUp('name', ['name' => $file, 'status' => $status, 'error' => $e->getMessage()]);
                     $isEndBack = true;
-                    Console::text("ERROR: $file - Миграция не может быть достигнута из-за фатальной ошибки!", 'red');
+                    Console::text("ERROR: $file - Миграция (или Откат) не может быть достигнута из-за фатальной ошибки в файле миграций!", 'red');
+                    Console::text($e->getMessage(), 'red');
                     continue;
                 }
                 $status =  Schema::$ERROR == '' ? 1 : 0;
@@ -87,7 +89,11 @@ class Start {
                     Console::text("ERROR: $file - Миграция не может быть достигнута из-за синтаксической ошибки sql запроса!", 'red');
                     Console::text('QUERY: ' .  $query , 'yellow');
                 }
-                if ($status == 1) Console::text("Успешная миграция  $file", "green");
+
+                if ($status == 1)
+                {  if($this->command == 'migrate:back') Console::text("Откат миграции $file", "green");
+                   if($this->command == 'migrate:up') Console::text("Успешная миграция  $file", "green");
+                }
                 Schema::$ERROR = '';
             }
         }

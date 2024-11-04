@@ -72,7 +72,10 @@ class Schema extends DB
         } else {
             Console::text("Вы уверены что хотите удалить таблицу $table? (y/n)", 'yellow');
             Console::input($input);
-            if (!Console::isYes($input)) return;
+            if (!Console::isYes($input))
+            {
+                return;
+            }
             $Schema->QUERY = "DROP TABLE `{$Schema->DB_NAME}`.`$table`";
         }
         $Schema->set();
