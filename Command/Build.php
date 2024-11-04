@@ -3,51 +3,83 @@
 namespace Pet\Command;
 
 use Command;
+use Pet\Command\Console\Console;
 
-class Build{
-    public $OUT_DIR_VENDOR = '';
-
-     public function __construct() {
-       $this->OUT_DIR_VENDOR = $this->search_dir_vendor();
-       $this->build_architecture();
-    }
-    
-    function build_file($namesample = '', $namefile, $rename = []){
-        $sample = file_get_contents(__DIR__."/sample/$namesample");
-        if(count($rename)> 0){
-            foreach($rename as $name=>$value) $sample = str_replace($name, $value, $sample);
+class Build {
+     public $isAllReplace = false;
+     public $isPetWarning = false;
+    function __construct() {
+        define("ROOT_DIR", $this->search_dir_vendor() . "/");
+        if (!file_exists(ROOT_DIR . '.env')) {
+            $this->copy('.env.sample.php', '.env');
         }
-        file_put_contents($this->OUT_DIR_VENDOR."/$namefile", $sample );
-    }
-    
-    function build_architecture(){
-        $this->build_file('pet.sample.php', 'pet');
-
-        if(!is_dir('dist/PHP/Controller')) mkdir('dist/PHP/Controller', 0777, true);
-        if(!is_dir('dist/view/css')) mkdir('dist/view/css', 0777, true);
-        if(!is_dir('dist/view/img')) mkdir('dist/view/img', 0777, true);
-        if(!is_dir('dist/router')) mkdir('dist/router', 0777, true);
-
-
-        $this->build_file('index.sample.php', 'dist/index.php');
-        $this->build_file('config.constant.php', 'dist/config.constant.php');
-        $this->build_file('home.sample.php', 'dist/view/home.php');
-        $this->build_file('.env.sample.php', '.env');
-        $this->build_file('web.router.sample.php', 'dist/router/web.php');
-        $this->build_file('controller.sample.php', 'dist/PHP/Controller/HomeController.php', 
-        ["NAME"=>"Home"]);
-
-        
-        $this->build_file("style.sample.css", 'dist/view/css/style.css');
-        $this->copy('/img/logo.png','/dist/view/img/logo.png');
+        include ROOT_DIR . 'vendor/autoload.php';
+        $this->architecture();
     }
 
-    function search_dir_vendor(){
+    function setFile($names = '', $dir = "", $rename = []) {
+        $name  = explode('.', $names)[0];
+        $ext = empty(explode('.', $names)[1]) ? "php" : explode('.', $names)[1];
+        $sample = file_get_contents(__DIR__ . "/sample/$name.sample.$ext");
+        $NAME = "";
+
+        if (!empty($rename)) {
+            $sample = str_replace(array_keys($rename), array_values($rename), $sample);
+            if (!empty($rename['NAME'])) {
+                $NAME = $rename['NAME'];
+            }
+        }
+
+        $dirCreate = mb_substr(ROOT_DIR . $dir, 0, -1);
+        if (!is_dir($dirCreate)) mkdir($dirCreate, 0777, true);
+        $control = true;
+
+        $isFile = file_exists(ROOT_DIR . $dir . $NAME . $names);
+
+        if(!$this->isPetWarning && $isFile){
+            Console::text("WARNING: Pet обнаружил что проект уже строился!\nВы точно хотите построить проект по шаблону тогда вы можете потерять некоторые файлы (y/n)?", "yellow");
+            Console::input($str);
+            if(Console::isYes($str))$this->isAllReplace = true;
+            $this->isPetWarning = true;
+        }
+        if(!$this->isAllReplace && $isFile)
+        {
+            if($sample != file_get_contents(ROOT_DIR . $dir . $NAME . $names)){
+                Console::text(" Вы уверены что хотите перезаписать файл $NAME$names? (y/n)");
+                Console::input($str);
+                if(!Console::isYes($str)) $control = false;
+            }
+        }
+        if($control) file_put_contents(ROOT_DIR . $dir . $NAME . $names, $sample);
+    }
+
+    function architecture() {
+        $public =  env('PUBLIC_DIR', 'dist') . "/";
+        $this->setfile('pet');
+        $this->setFile('index.php',  $public);
+        $this->setFile(
+            'Controller.php',
+            $public  . 'PHP/Controller/',
+            [
+                "NAME" => "Home",
+                "NAMESPACE" => "PHP\\Controller",
+            ]
+        );
+        $this->setFile('home.php', $public . "/view/");
+        $this->setFile('style.css', $public . "/view/css/");
+        $this->setFile('web.php', $public . "/router/");
+
+        // КОПИ ФАЙЛ
+        if(!is_dir(ROOT_DIR.$public."/view/img")) mkdir(ROOT_DIR.$public."/view/img", 0777, true);
+        $this->copy('/img/logo.png', $public.'/view/img/logo.png');
+    }
+
+    function search_dir_vendor() {
         return str_replace('\\', DIRECTORY_SEPARATOR, getcwd());
     }
 
-    private function copy($file, $fileOut){
-       copy( __DIR__."/sample/$file", $this->OUT_DIR_VENDOR."/$fileOut",); 
+    private function copy($file, $fileOut) {
+        copy(__DIR__ . "/sample/$file", ROOT_DIR . "$fileOut",);
     }
 }
 

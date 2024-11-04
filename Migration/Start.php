@@ -19,6 +19,9 @@ class Start {
 
     function __construct() {
         $this->DIR = ROOT_DIR . env('MIGRATE_DIR');
+        if(!is_dir($this->DIR)){
+            mkdir($this->DIR, 0777);
+        }
     }
 
     static function init($command) {

@@ -3,6 +3,7 @@ URLPROJECT = https://exapmle.com
 
 #Внутрении директории
 PUBLIC_DIR = dist
+MIGRATE_DIR = 'dist/PHP/Migration'
 
 #Настроки базы
 DB_TYPE = 

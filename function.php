@@ -33,7 +33,8 @@ function env($constans = null, $default = null) : ?string
             $param = explode('=', $str);
 
             if (trim($param[0]) == trim($constans)) {
-                return trim(str_replace([';', '"', "'",], '', $param[1]));
+               $param = trim(str_replace([';', '"', "'",], '', $param[1]));
+               return $param == ''? $default: $param;
             }
         }
     }

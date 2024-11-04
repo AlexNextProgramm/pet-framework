@@ -5,6 +5,7 @@ namespace Pet\DataBase;
 use PDO;
 use Exception;
 use PDOStatement;
+use Pet\Command\Console\Console;
 use Pet\Tools\Tools;
 
 abstract class DB {
@@ -56,7 +57,7 @@ abstract class DB {
         try {
             $this->DB = new PDO("{$this->db_type}:host={$this->db_host}:{$this->db_port};dbname={$this->db_name}", $this->db_user, $this->db_password);
         } catch (\PDOException $e) {
-            die($e->getMessage());
+           Console::text("ERROR DB: ".$e->getMessage(), 'red');
         }
     }
 
@@ -66,7 +67,8 @@ abstract class DB {
         if($this->DB != null){
             return $this->DB->query($query, PDO::FETCH_ASSOC);
         }else{
-            die('NOT CONNECT DB');
+            Console::text("NOT CONNECT DB", 'red');
+            exit;
         }
     }
 

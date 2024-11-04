@@ -1,4 +1,6 @@
 <?php
+namespace NAMESPACE;
+
 use Pet\Controller;
 use Pet\Request\Request;
 

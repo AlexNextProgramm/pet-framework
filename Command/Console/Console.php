@@ -40,10 +40,10 @@ class Console {
     /**
      * input
      *
-     * @param string $output
+     * @param string|null $output
      * @return void
      */
-    static function input(string &$output = ''): string
+    static function input(string|null &$output = ''): string
     {
         new self();
         $output = '';
