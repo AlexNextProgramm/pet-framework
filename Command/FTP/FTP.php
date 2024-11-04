@@ -3,7 +3,7 @@
 
 namespace Pet\Command\FTP;
 
-use Pet\Command\Console;
+use Pet\Command\Console\Console;
 use Exception;
 
 class Ftp {

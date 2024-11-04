@@ -4,6 +4,7 @@ namespace Pet\Migration;
 
 use Exception;
 use PDO;
+use Pet\Command\Console\Console;
 use Pet\DataBase\DB;
 use Pet\Migration\Table;
 
@@ -12,8 +13,12 @@ class Schema extends DB {
     public $DB_NAME = DB_NAME;
     static $ERROR = '';
     private $replace = ['{charset}'];
+    static $SchemaQuery = '';
+
+
     private function set() {
         $result = false;
+        self::$SchemaQuery = $this->QUERY;
         try {
             $result =  $this->q($this->QUERY);
         } catch (Exception $e) {
@@ -23,14 +28,16 @@ class Schema extends DB {
         return $result;
     }
 
-    static function create($name, callable $callable) {
-        // if(Schema::isTable($name)) return false;
+    static function create($name, callable $callable, $auto = true) {
+        if(Schema::isTable($name)) return false;
         $Schema = new self();
         $table = new Table();
 
-        //  Авто cоздание id cdate;
-        $table->id('id');
-        $table->timestamp('cdate');
+        if($auto){
+            //  Авто cоздание id cdate;
+            $table->id('id');
+            $table->timestamp('cdate');
+        }
 
         if ($callable) $callable($table);
 
@@ -44,20 +51,20 @@ class Schema extends DB {
             }
             $Schema->QUERY .= implode(';', $table->AddIndex) . ';';
         }
-        // var_dump($Schema->QUERY);
+        // Console::text( $Schema->QUERY);
         $Schema->set();
     }
 
-    static function dropTable($table) {
+    static function drop($table, $column = null) {
         $Schema = new self();
-        $Schema->QUERY = "DROP TABLE `{$Schema->DB_NAME}`.`$table`";
+        if($column){
+            $Schema->QUERY = "ALTER TABLE `$table` DROP `$column`;";
+        }else{
+            $Schema->QUERY = "DROP TABLE `{$Schema->DB_NAME}`.`$table`";
+        }
         $Schema->set();
     }
-    static function drop($table, $column) {
-        $Schema = new self();
-        $Schema->QUERY = "ALTER TABLE `$table` DROP `$column`;";
-        $Schema->set();
-    }
+
 
     static function change(string $name, callable $callable) {
         if (!Schema::isTable($name)) return false;
@@ -89,7 +96,6 @@ class Schema extends DB {
         }
         $Schema->QUERY .= ';';
         $Schema->set();
-        var_dump(Schema::$ERROR);
     }
 
     static function isTable($name): bool {

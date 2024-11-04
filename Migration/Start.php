@@ -12,12 +12,18 @@ use Pet\Model\Model;
 class Start {
     private $DIR = '';
     public $hash = '';
+    public $command = '';
+    public $isParam = false;
+    public $param = false;
+    public $endFile = '';
+
     function __construct() {
         $this->DIR = ROOT_DIR . env('MIGRATE_DIR');
     }
 
     static function init($command) {
         $Start = new self();
+        $Start->setParam($command);
         if (!is_dir($Start->DIR)) {
             return Console::text("ERROR: Директория миграций не найдена", 'red');
         }
@@ -29,26 +35,55 @@ class Start {
 
     public function mig($scanfile, Model $track) {
         $static = 0;
+
+        if($this->param == 'end') $scanfile = array_reverse($scanfile); // при  end нужен обратный порядок 
+        $isEndBack = false;
+        $isUpOne = false;
+
         foreach ($scanfile as $i => $file) {
 
             $track->find(['name' => $file]);
 
-            if ($track->isInfo() && $track->v('status') == 1) continue;
-            if (!$track->isInfo() || ($track->isInfo() && $track->v('status') == 0)) {
+            if($this->param == 'one' && $isUpOne) continue;
+
+            if($this->param == 'end' && !$track->isInfo() || $this->param == 'end' && $isEndBack) continue;
+
+            if ($track->isInfo() && $track->v('status') == 1 && $this->command != 'migrate:back') continue;
+
+            if (!$track->isInfo() || ($track->isInfo() && $track->v('status') == 0 ) || ($track->isInfo() && $this->command == 'migrate:back')) {
                 $static++;
                 $status = 0;
+
                 try {
                     require($this->DIR . "/$file");
                     $name = str_replace('.php', '', explode('_', $file)[2]);
-                    (new $name())->up();
+                    $MIG = new $name();
+                    if ($this->command == 'migrate:up') $MIG->up();
+                    if ($this->command == 'migrate:back') $MIG->back();
+                  
                 } catch (Error $e) {
                     $track->setUp('name', ['name' => $file, 'status' => $status, 'error' => $e->getMessage()]);
+                    $isEndBack = true;
                     Console::text("ERROR: $file - Миграция не может быть достигнута из-за фатальной ошибки!", 'red');
                     continue;
                 }
                 $status =  Schema::$ERROR == '' ? 1 : 0;
-                $track->setUp('name', ['name' => $file, 'status' => $status, 'error' => Schema::$ERROR]);
-                if ($status == 0) Console::text("ERROR: $file - Миграция не может быть достигнута из-за синтаксической ошибки sql запроса!", 'red');
+                $query =  Schema::$SchemaQuery;
+
+                if($this->command == 'migrate:up'){
+                    $track->setUp('name', ['name' => $file, 'status' => $status, 'error' => Schema::$ERROR]);
+                    $isUpOne = true;
+                }
+
+                if($this->command == 'migrate:back'){
+                    $track->del(['name' => $file]);
+                    $isEndBack = true;
+                }
+
+                if ($status == 0){
+                    Console::text("ERROR: $file - Миграция не может быть достигнута из-за синтаксической ошибки sql запроса!", 'red');
+                    Console::text('QUERY: ' .  $query , 'yellow');
+                }
                 if ($status == 1) Console::text("Успешная миграция  $file", "green");
                 Schema::$ERROR = '';
             }
@@ -78,7 +113,13 @@ class Start {
         file_put_contents($Start->DIR . "/$number" . "_$date" . "_$name.php", $text);
     }
 
-
+    private function setParam($command)
+    {
+        $this->command = $command;
+        $this->isParam  = !empty(explode(':', $command)[2]);
+        $this->param = $this->isParam ? trim(explode(':', $command)[2]) : '';
+        $this->command = $this->isParam   ? explode(':', $command)[0].':'.explode(':', $command)[1] : $command;
+    }
 
     public function scandir(&$n = 0) {
 

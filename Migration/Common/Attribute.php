@@ -11,7 +11,7 @@ class Attribute {
         $this->table = $Table;
     }
 
-    public function default($default): Attribute {
+    public function default(int|string|bool $default): Attribute {
 
         $i = array_key_last($this->table->param);
         $attr =  $this->table->param[$i];

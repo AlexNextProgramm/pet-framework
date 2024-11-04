@@ -1,7 +1,7 @@
 <?php
 namespace Pet\Command\FTP;
 
-use FTP\Ftp;
+use Pet\Command\FTP\Ftp;
 use Pet\Command\Console\Console;
 
 class ConnectFtp {
@@ -12,7 +12,6 @@ class ConnectFtp {
     public static $IGNORE_DIR;
     public static $IGNORE_FILE;
     public static $isInput = false;
-    public static $outInput = ['y', 'Y', 'д', 'Д'];
 
     public function __construct() {
         self::$PUBLIC_DIR = self::ROOT_DIR . env('PUBLIC_DIR', 'dist');
@@ -38,14 +37,17 @@ class ConnectFtp {
 
         //Построить проект npm
         Console::text("Выполнить build Webpack перед загрузкой на сервер? (y/n)", 'yellow');
+        $outInput = '';
+        Console::input($outInput);
 
-        if (in_array(Console::input(), self::$outInput)) {
+        if (Console::isYes($outInput)) {
             Console::cmd('cd "' . self::ROOT_DIR . '" && npm run build', fn($txt) => Console::text($txt, 'violet'));
         }
 
         //Загрузка vendor
         Console::text("Выполнить загрузку папки vendor? (y/n)", 'yellow');
-        $isVendor = in_array(Console::input(), self::$outInput);
+        Console::input($outInput);
+        $isVendor = Console::isYes($outInput);
 
         $ftp = new Ftp();
         $ftp->host = env('FTP_HOST');

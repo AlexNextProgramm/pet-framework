@@ -6,8 +6,7 @@ use Pet\Command\Console\Console;
 use Pet\Command\FTP\ConnectFtp;
 use Pet\Migration\Start;
 
-class Command
-{
+class Command {
     const ROOT_DIR = ROOT_DIR;
     public $NAME_DIR_PROJECT;
 
@@ -17,8 +16,7 @@ class Command
         $this->stand($command);
     }
 
-    static function init($comm)
-    {
+    static function init($comm) {
         return new Command($comm);
     }
 
@@ -35,12 +33,24 @@ class Command
             case 'load':
                 ConnectFtp::load();
                 break;
+            case 'migrate:up:one':
+                Start::init('migrate:up:one');
+                break;
             case 'migrate':
-                    Start::init('migrate');
-                    break;
+                Start::init('migrate:up');
+                break;
+            case 'migrate:up':
+                Start::init('migrate:up');
+                break;
+            case 'migrate:back':
+                Start::init('migrate:back');
+                break;
+            case 'migrate:back:end':
+                Start::init('migrate:back:end');
+                break;
             case 'make:migrate':
-                    Start::create($comm);
-                    break;
+                Start::create($comm);
+                break;
             case "make:controller":
                 $this->make(explode(':', $comm[1])[1], $comm);
                 break;
@@ -70,7 +80,8 @@ class Command
         }
     }
 
-    private function build(){
+    private function build()
+    {
         exec("php ./vendor/pet/framework/Command/Build.php");
     }
 }

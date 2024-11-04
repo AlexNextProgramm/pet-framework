@@ -27,12 +27,40 @@ framework for easy use
  ## Запуск сервера PET
 
  ```
- php sib serve
+ php pet serve
 
  ```
  > Запускает сервер из установленных настроек в .env URLDEV
  > Можете запустить стартовую (шаблон) сборку командой.
  ```
- php sib build_sample
+ php pet build_sample
 
  ```
+ ## Миграции
+    Создает новую миграцию;
+    Создавайте миграцию через консоль чтобы небыло ошибок;
+ ```
+    php pet make:migrate
+
+```
+    Накатить все миграции
+```
+    php pet migrate
+    php pet migrate:up
+
+```
+   Накатить только 1 следующую
+```
+    php pet migrate:up:one
+
+```
+    Откатить все миграции
+```
+    php pet migrate:back
+
+```
+    Откатить последнюю
+```
+    php pet migrate:back:end
+
+```

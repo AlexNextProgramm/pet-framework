@@ -5,10 +5,10 @@ class Console {
     const OS = PHP_OS;
     public static $DIR_LINUX;
     public static $DIR_WIN;
-
+    private static $isInputYes = ['y', 'Y', 'Д', 'д'];
     public function __construct() {
-        self::$DIR_LINUX = str_replace(' ', '\ ', ROOT_DIR . '/vendor/pet/framework/Command/console/linux/');
-        self::$DIR_WIN = str_replace(' ', '\ ', ROOT_DIR . '/vendor/pet/framework/Command/console/win/');
+        self::$DIR_LINUX = str_replace(" ", "\ ",ROOT_DIR . "vendor/pet/framework/Command/Console/linux/");
+        self::$DIR_WIN = str_replace(" ", "\ ", ROOT_DIR . "vendor/pet/framework/Command/Console/win/");
     }
     public static $color = [
         'red'    => '31',
@@ -43,9 +43,11 @@ class Console {
      * @param string $output
      * @return void
      */
-    static function input(string &$output = ''): string 
+    static function input(string &$output = ''): string
     {
         new self();
+        $output = '';
+
         if (self::OS == 'Linux') {
             exec(self::$DIR_LINUX . 'input.sh', $out);
             $output = $out[0];
@@ -55,6 +57,11 @@ class Console {
             $output = $out[2];
         }
         return $output;
+    }
+
+    static function isYes(string $str):bool
+    {
+        return in_array($str, self::$isInputYes);
     }
     
     /**
