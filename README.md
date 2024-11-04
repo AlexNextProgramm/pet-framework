@@ -16,7 +16,7 @@ framework for easy use
     },
     "scripts":{
         "post-package-install":[
-            "php ./vendor/pet/framework/Command/Build.php"
+            "php ./vendor/pet/framework/Command/build_sample.php"
         ]
     }
 

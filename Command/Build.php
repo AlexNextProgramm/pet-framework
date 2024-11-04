@@ -9,11 +9,12 @@ class Build {
      public $isAllReplace = false;
      public $isPetWarning = false;
     function __construct() {
-        define("ROOT_DIR", $this->search_dir_vendor() . "/");
+       if(empty(ROOT_DIR)) define("ROOT_DIR", $this->search_dir_vendor() . "/");
+
         if (!file_exists(ROOT_DIR . '.env')) {
             $this->copy('.env.sample.php', '.env');
         }
-        include ROOT_DIR . 'vendor/autoload.php';
+        include_once ROOT_DIR . 'vendor/autoload.php';
         $this->architecture();
     }
 
@@ -62,7 +63,7 @@ class Build {
             $public  . 'PHP/Controller/',
             [
                 "NAME" => "Home",
-                "NAMESPACE" => "PHP\\Controller",
+                "SPACE" => "PHP\\Controller",
             ]
         );
         $this->setFile('home.php', $public . "/view/");
@@ -82,5 +83,3 @@ class Build {
         copy(__DIR__ . "/sample/$file", ROOT_DIR . "$fileOut",);
     }
 }
-
-$const  = new Build();

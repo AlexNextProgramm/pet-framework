@@ -82,6 +82,6 @@ class Command {
 
     private function build()
     {
-        exec("php ./vendor/pet/framework/Command/Build.php");
+      (new Build());
     }
 }
