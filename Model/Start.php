@@ -13,7 +13,6 @@ class Start
     {
         $this->Build = new Build();
         $this->Build->isPetWarning = true;
-        $this->$sampleDir = realpath(__DIR__ . "/../Command/sample/");
     }
 
     public function init($name)
