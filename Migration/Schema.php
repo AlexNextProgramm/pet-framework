@@ -57,6 +57,7 @@ class Schema extends DB
         }
         // Console::text( $Schema->QUERY);
         $Schema->set();
+
         Console::text("Создать файл Модели для этой таблицы? (y/n)", 'yellow');
         Console::input($input);
         if (Console::isYes($input)) {
@@ -72,10 +73,8 @@ class Schema extends DB
         } else {
             Console::text("Вы уверены что хотите удалить таблицу $table? (y/n)", 'yellow');
             Console::input($input);
-            if (!Console::isYes($input))
-            {
-                return;
-            }
+            if (!Console::isYes($input)) return;
+            
             $Schema->QUERY = "DROP TABLE `{$Schema->DB_NAME}`.`$table`";
         }
         $Schema->set();
@@ -88,10 +87,13 @@ class Schema extends DB
         $Schema = new self();
         $table = new Table();
         $table->isChange = true;
+
         if ($callable) $callable($table);
+
         foreach ($table->param as $i => $param) {
             $table->param[$i] = 'ALTER TABLE `' . $name . '` CHANGE ' . $param;
         }
+
         $Schema->QUERY = str_replace($Schema->replace, '', implode('; ', $table->param)) . ';';
         $Schema->set();
     }
@@ -101,17 +103,22 @@ class Schema extends DB
         if (!Schema::isTable($name)) return false;
         $Schema = new self();
         $table = new Table();
+
         if ($callable) $callable($table);
+
         foreach ($table->param as $i => $param) {
             $table->param[$i] = 'ALTER TABLE `' . $name . '` ADD ' . $param;
         }
+
         $Schema->QUERY = str_replace($Schema->replace, '', implode('; ', $table->param));
+
         if (!empty($table->AddIndex)) {
             foreach ($table->AddIndex as $i => $add) {
                 $table->AddIndex[$i] =  'ALTER TABLE `' . $name . '` ADD ' . $add;
             }
             $Schema->QUERY .= implode(';', $table->AddIndex);
         }
+
         $Schema->QUERY .= ';';
         $Schema->set();
     }
