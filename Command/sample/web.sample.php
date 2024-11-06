@@ -1,8 +1,6 @@
 <?php
 
-use Pet\Request\Request;
 use Pet\Router\Router;
+use PHP\Controller\HomeController;
 
-Router::get('/', function (Request $request) {
-    view('home', $request->attribute);
-});
+Router::get('/', [HomeController::class, 'index']);
