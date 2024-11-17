@@ -1,5 +1,6 @@
-URLDEV = http://localhost:5555
+URLDEV = http://local:5555
 URLPROJECT = https://exapmle.com
+HOSTS = '/etc/hosts'
 
 #Внутрении директории
 PUBLIC_DIR = dist
@@ -20,3 +21,7 @@ FTP_HOST_DIR =
 FTP_HOST =
 FTP_LOGIN =
 FTP_PASSWORD = 
+
+#APACHE
+DIR_APACHE = '/etc/apache2'
+DIR_APACHE_SITE_ENBE = '/etc/apache2/sites-enabled'

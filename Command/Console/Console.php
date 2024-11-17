@@ -7,8 +7,8 @@ class Console {
     public static $DIR_WIN;
     private static $isInputYes = ['y', 'Y', 'Д', 'д'];
     public function __construct() {
-        self::$DIR_LINUX = str_replace(" ", "\ ",ROOT_DIR . "vendor/pet/framework/Command/Console/linux/");
-        self::$DIR_WIN = str_replace(" ", "\ ", ROOT_DIR . "vendor/pet/framework/Command/Console/win/");
+        self::$DIR_LINUX = str_replace(" ", "\ ",ROOT_DIR . "/vendor/pet/framework/Command/Console/linux/");
+        self::$DIR_WIN = str_replace(" ", "\ ", ROOT_DIR . "/vendor/pet/framework/Command/Console/win/");
     }
     public static $color = [
         'red'    => '31',
@@ -79,6 +79,15 @@ class Console {
         $background = $background ? ";" . self::$background[$background] : "";
         echo self::$code[$code] . '0;' . self::$color[$color] . $background . 'm' . $text . "\n" . self::$code[$code] . '0m';
     }
+
+    static function log(
+        string $text,
+        string $color = 'white',
+        string $background = null,
+        string $code = 'oct'
+    ): void {
+        self::text($text, $color, $background, $code);
+    }
     
     /**
      * cmd
@@ -87,10 +96,16 @@ class Console {
      * @param  callable $callback
      * @return void
      */
-    static function cmd(string $cmd, callable $callback = null) {
+    static function cmd(string $cmd, callable $callback = null, &$argm = null) {
         exec($cmd, $outputs);
         foreach ($outputs as $out) {
-            if ($callback) $callback($out);
+            if ($callback) $callback($out, $argm);
         }
+    }
+
+    static function system(string $cmd) {
+       $text = system($cmd, $out);
+        self::text($text);
+        self::text($out);
     }
 }

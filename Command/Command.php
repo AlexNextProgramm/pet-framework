@@ -2,12 +2,13 @@
 
 namespace Pet\Command;
 
+use Pet\Apache\Apache;
 use Pet\Command\Console\Console;
 use Pet\Command\FTP\ConnectFtp;
 use Pet\Migration\Start;
 
 class Command {
-    const ROOT_DIR = ROOT_DIR;
+    const ROOT_DIR = ROOT_DIR . DIRECTORY_SEPARATOR;
     public $NAME_DIR_PROJECT;
 
     public function __construct($command)
@@ -23,6 +24,8 @@ class Command {
     private function stand($comm)
     {
         unset($comm[0]);
+        $inCommands = trim($comm[1]);
+
         switch (trim($comm[1])) {
             case 'serve':
                 $this->server();
@@ -52,7 +55,13 @@ class Command {
                 Start::create($comm);
                 break;
             case "make:controller":
-                $this->make(explode(':', $comm[1])[1], $comm);
+                $this->make(explode(':',$inCommands)[1], $comm);
+                break;
+            case "make:apache":
+                (new Apache())->setVirtualHost($comm[2] ?? null);
+                    break;
+            case "make:cert":
+                (new Apache())->setCert($comm[2] ?? null);
                 break;
             default:
                 echo "no command ";

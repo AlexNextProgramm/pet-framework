@@ -22,9 +22,9 @@ function search_include_class($path, $class = '') {
 function env($constans = null, $default = null) : ?string
 {
     if(!$constans) return null;
-    if (!file_exists(ROOT_DIR . '.env')) echo 'Нет файла .env в корне проекта';
+    if (!file_exists(ROOT_DIR . '/.env')) echo 'Нет файла .env в корне проекта';
 
-    $env = file(ROOT_DIR . '.env');
+    $env = file(ROOT_DIR . '/.env');
 
     foreach ($env as $str) {
         if (str_contains(trim($str), '#') && strpos(trim($str), "#") == 0) continue;
@@ -39,4 +39,26 @@ function env($constans = null, $default = null) : ?string
         }
     }
     return $default;
+}
+
+
+function setConstantEnv($ROOT_DIR){
+    if (!file_exists($ROOT_DIR . '/.env')) echo 'Нет файла .env в корне проекта';
+    $env = file($ROOT_DIR . '/.env');
+    foreach ($env as $str) {
+        if (str_contains(trim($str), '#') && strpos(trim($str), "#") == 0) continue;
+        if (str_contains($str, '=')) {
+            $param = explode('=', $str);
+            $value= trim(str_replace([';', '"', "'",], '', $param[1]));
+
+            if(!defined(trim($param[0]))){
+                define(trim($param[0]), ($value == '' ? null :  $value));
+            }
+        }
+    }
+}
+
+function c($name)
+{
+
 }

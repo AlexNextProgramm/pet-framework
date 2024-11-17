@@ -79,4 +79,21 @@ class Tools {
             return 'assos';
         }
     }
+
+    /**
+     * strRepalceFile
+     *
+     * @param  array $search
+     * @param  array|string $replace
+     * @param  string $path
+     * @param  string $save
+     * @return string
+     */
+    static function strRepalceFile(array|string $search, array|string $replace, string $path, string $save = null): string|false {
+        if (!file_exists($path)) return false;
+        $file = file_get_contents($path);
+        $file = str_replace($search, $replace, $file);
+        if ($save) file_put_contents($save, $file);
+        return $file;
+    }
 }
