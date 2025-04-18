@@ -26,9 +26,8 @@ abstract class DB {
     public $table;
     public $tableChanged;
     public $column = [];
-   
     public PDO|null $DB = null;
-    
+
     /**
      * __construct
      *
@@ -45,7 +44,7 @@ abstract class DB {
      *
      * @return array
      */
-    public function fetch(){
+    public function fetch() {
         $this->strQuery = $this->strQuery . $this->strJoin . $this->strWhere;
         $this->strJoin  = $this->strJoin = $this->strWhere = '';
         $this->whereSyntax($this->strQuery);
@@ -53,20 +52,20 @@ abstract class DB {
         return $this->info;
     }
 
-    public function conn(){
+    public function conn() {
         try {
             $this->DB = new PDO("{$this->db_type}:host={$this->db_host}:{$this->db_port};dbname={$this->db_name}", $this->db_user, $this->db_password);
         } catch (\PDOException $e) {
-           Console::text("ERROR DB: ".$e->getMessage(), 'red');
+            Console::text("ERROR DB: " . $e->getMessage(), 'red');
         }
     }
 
 
-    public function q($query):PDOStatement|null
+    public function q($query): PDOStatement|null
     {
-        if($this->DB != null){
+        if ($this->DB != null) {
             return $this->DB->query($query, PDO::FETCH_ASSOC);
-        }else{
+        } else {
             Console::text("NOT CONNECT DB", 'red');
             exit;
         }
@@ -74,13 +73,14 @@ abstract class DB {
 
 
 
-    private function whereSyntax(&$query) {
+    private function whereSyntax(&$query)
+    {
         $str =  explode('WHERE', $query);
         if (count($str) == 2 && trim($str[1]) == '') {
             $query = $str[0] . 'WHERE 1';
-        }else{
+        } else {
             $str = explode('ORDER BY', $str[1]);
-            if(count($str) == 2 && trim($str[0]) == ''){
+            if (count($str) == 2 && trim($str[0]) == '') {
                 $query = str_replace('WHERE', '', $query);
             }
         }
@@ -89,17 +89,17 @@ abstract class DB {
 
     private function get($id): array
     {
-        if(gettype($id) == 'string' || gettype($id) == 'integer'){
+        if (gettype($id) == 'string' || gettype($id) == 'integer') {
             print_r($id);
-            return $id != ''? $this->q("SELECT * FROM {$this->table} WHERE id='$id';")->fetchAll(PDO::FETCH_ASSOC):[];
+            return $id != '' ? $this->q("SELECT * FROM {$this->table} WHERE id='$id';")->fetchAll(PDO::FETCH_ASSOC) : [];
         }
 
-        if(gettype($id)== 'array' && !empty($id)){
+        if (gettype($id) == 'array' && !empty($id)) {
             $ids = !empty($id['id']) ? $id['id'] : null;
-            if($ids){
+            if ($ids) {
                 return $this->q("SELECT * FROM {$this->table} WHERE id='$ids';")->fetchAll(PDO::FETCH_ASSOC);
             } else {
-                $where = Tools::array_implode(", AND ", $id,"[key]='[val]'");
+                $where = Tools::array_implode(", AND ", $id, "[key]='[val]'");
                 return $this->q("SELECT * FROM {$this->table} WHERE $where;")->fetchAll(PDO::FETCH_ASSOC);
             }
         }
@@ -107,22 +107,20 @@ abstract class DB {
         return [];
     }
 
-    public function isInfo():bool
+    public function isInfo(): bool
     {
         return count($this->info) != 0;
     }
 
-    public function v($key):string|null
+    public function v($key): string|null
     {
-       return !empty($this->info[0][$key])?$this->info[0][$key]:null;
+        return !empty($this->info[0][$key]) ? $this->info[0][$key] : null;
     }
 
     public function arrayQuote(&$array)
     {
-         foreach($array as $i=> $v)
-         {
+        foreach ($array as $i => $v) {
             $array[$i] = $this->DB->quote($v);
-         }
+        }
     }
-
 }
