@@ -19,21 +19,19 @@ class Request
         $this->parsingHeaders();
     }
 
-    function getMethod(): string
+    public function getMethod(): string
     {
         return $_SERVER['REQUEST_METHOD'];
     }
 
 
-    function getURI()
+    public function getURI()
     {
         $path = str_contains($_SERVER['REQUEST_URI'], '?') ? explode('?', $_SERVER['REQUEST_URI'])[0] :
             $_SERVER['REQUEST_URI'];
         return $path != '/'? Tools::strRep(strlen($path) - 1, '', $path, '/'): $path;
-        
     }
 
-    
     /**
      * input
      *
@@ -56,7 +54,7 @@ class Request
         if (key_exists('CONTENT_TYPE', $_SERVER)  == 'application/json' && !empty($input)) $decode = Tools::jsonDe($input);
         return array_merge($REQUEST, $decode);
     }
-    
+
     /**
      * file
      *

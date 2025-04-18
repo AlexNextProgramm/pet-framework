@@ -58,7 +58,18 @@ function setConstantEnv($ROOT_DIR){
     }
 }
 
-function c($name)
+/**
+ * debaging
+ * dd
+ * @param  mixed $vars
+ * @return void
+ */
+function dd(...$vars)
 {
-
+    echo '<pre style="background: #0c0c0c; padding:20px; color: #067706;">';
+    foreach ($vars as $var) {
+        var_dump($var);
+    }
+    echo '</pre>';
+    die();
 }

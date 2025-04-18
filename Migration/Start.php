@@ -19,8 +19,8 @@ class Start {
     public $endFile = '';
 
     function __construct() {
-        $this->DIR = ROOT_DIR . env('MIGRATE_DIR');
-        if(!is_dir($this->DIR)){
+        $this->DIR = ROOT_DIR . DS . env('MIGRATE_DIR');
+        if (!is_dir($this->DIR)) {
             mkdir($this->DIR, 0777);
         }
     }
@@ -101,7 +101,8 @@ class Start {
         if ($static == 0)  Console::text("WARNING: Нет новых миграций!", "yellow");
     }
 
-    static function create($name) {
+    static function create($name)
+    {
 
         $Start = new self();
         if (empty($name[2])) return Console::text('ERROR: Нет имени миграции', 'red');
