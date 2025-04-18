@@ -1,6 +1,6 @@
 # Pet Framework
-framework for easy use
 
+framework for easy use
 
 ```
 {
@@ -20,7 +20,7 @@ framework for easy use
   ],
     "scripts":{
         "post-package-install":[
-            "php ./vendor/pet/framework/Command/build_sample.php"
+            "php ./vendor/pet/framework/Command/start_build.php"
         ]
     }
 
@@ -28,20 +28,24 @@ framework for easy use
 
 ```
 
- ## Запуск сервера PET
-
- ```
- php pet serve
-
- ```
- > Запускает сервер из установленных настроек в .env URLDEV должен быть установлен обязательно.
-
- > Можете запустить стартовую (шаблон) сборку командой.
- ```
- php pet build_sample
+## Запуск сервера PET
 
 ```
- ## Миграции
+php pet serve
+
+```
+
+> Запускает сервер из установленных настроек в .env URLDEV должен быть установлен обязательно.
+
+> Можете запустить стартовую (шаблон) сборку командой.
+
+```
+php pet build_sample
+
+```
+
+## Миграции
+
 Создает новую миграцию;
 Создавайте миграцию через консоль чтобы небыло ошибок;
 
@@ -49,22 +53,30 @@ framework for easy use
 php pet make:migrate
 
 ```
+
 Накатить все миграции
+
 ```
 php pet migrate
 php pet migrate:up
 
 ```
+
 Накатить только 1 следующую
+
 ```
 php pet migrate:up:one
 ```
+
 Откатить все миграции
+
 ```
 php pet migrate:back
 
 ```
+
 Откатить последнюю
+
 ```
 php pet migrate:back:end
 

@@ -58,7 +58,7 @@ class Build {
     function architecture() {
         $public =  env('PUBLIC_DIR', 'dist') . "/";
         $this->setfile('pet');
-    
+
         $this->setFile('index.php',  $public);
         $this->setFile(
             'Controller.php',
