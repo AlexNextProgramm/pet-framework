@@ -7,7 +7,8 @@ use Pet\DataBase\DB;
 use Pet\Model\Model;
 use Pet\Tools\Tools;
 
-trait Select{
+trait Select
+{
 
     public $strSelect = '';
 
@@ -111,7 +112,7 @@ trait Select{
      * @return Select
      */
     public function where($str = ''): Model {
-      
+
         $this->strWhere = "WHERE $str";
         return $this;
     }
@@ -122,6 +123,6 @@ trait Select{
     }
 
     public function max($column = 'id'){
-       return  $this->q("SELECT MAX(`$column`) FROM `{$this->table}`")->fetch()['MAX(`id`)'];
+        return  $this->q("SELECT MAX(`$column`) FROM `{$this->table}`")->fetch()['MAX(`id`)'];
     }
 }
