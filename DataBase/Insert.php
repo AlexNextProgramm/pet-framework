@@ -2,7 +2,8 @@
 
 namespace Pet\DataBase;
 
-trait Insert {
+trait Insert
+{
 
   /**
    * insert
@@ -11,35 +12,38 @@ trait Insert {
    * @param  mixed $returnThis
    * @return bool
    */
-  public function insert(array $ArrayColumnAndValue = []): bool {
+    public function insert(array $ArrayColumnAndValue = []): bool
+    {
 
-    if (count($ArrayColumnAndValue) == 0) return false;
-    $key = array_keys($ArrayColumnAndValue);
-    $value = array_values($ArrayColumnAndValue);
-    $this->arrayQuote($value);
-    $this->strQuery = "INSERT INTO `{$this->table}` ( " . implode(' , ', $key) . " ) VALUES ( " . implode(", ", $value) . ")";
-    return  $this->DB->prepare($this->strQuery)->execute();
-  }
+        if (count($ArrayColumnAndValue) == 0) {
+            return false;
+        }
+        $key = array_keys($ArrayColumnAndValue);
+        $value = array_values($ArrayColumnAndValue);
+        $this->arrayQuote($value);
+        $this->strQuery = "INSERT INTO `{$this->table}` ( " . implode(' , ', $key) . " ) VALUES ( " . implode(", ", $value) . ")";
 
-  /**
-   * execute
-   *
-   * @return bool
-   */
-  public function execute(): bool {
-    return $this->DB->prepare($this->strQuery)->execute();
-  }
+        return  $this->DB->prepare($this->strQuery)->execute();
+    }
 
-  
-  /**
-   * set
-   *  вернет последний id после установки значения 
-   * @param  mixed $value
-   * @return string
-   */
-  public function set(array $value) : string
-  {
-      $this->insert($value);
-      return $this->DB->lastInsertId();
-  }
+    /**
+     * execute
+     *
+     * @return bool
+     */
+    public function execute(): bool {
+        return $this->DB->prepare($this->strQuery)->execute();
+    }
+
+
+    /**
+     * set
+     *  вернет последний id после установки значения
+     * @param  mixed $value
+     * @return string
+     */
+    public function set(array $value): string {
+        $this->insert($value);
+        return $this->DB->lastInsertId();
+    }
 }
