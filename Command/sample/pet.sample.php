@@ -1,8 +1,8 @@
 <?php
 
 include './vendor/autoload.php';
-include './config.constant.php';
 include './vendor/pet/framework/function.php';
+include './config.constant.php';
 use Pet\Command\Command;
 
 if ($argc == 1) die("Not arguments console \n");

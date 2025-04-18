@@ -1,4 +1,4 @@
-URLDEV = http://local:5555
+URLDEV = http://localhost:5555
 URLPROJECT = https://exapmle.com
 HOSTS = '/etc/hosts'
 
