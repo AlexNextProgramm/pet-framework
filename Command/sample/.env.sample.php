@@ -6,13 +6,13 @@ HOSTS = '/etc/hosts'
 PUBLIC_DIR = dist
 MIGRATE_DIR = 'dist/PHP/Migration'
 
-#Настроки базы
-DB_TYPE = 
-DB_HOST =
+#Настройки базы
+DB_TYPE = mysqli
+DB_HOST = localhost
+DB_USER = root
+DB_PORT = 3306
 DB_NAME =
-DB_USER =
 DB_PASSWORD = 
-DB_PORT = 
 
 #FTP
 FTP_DIR_EXEPTION =

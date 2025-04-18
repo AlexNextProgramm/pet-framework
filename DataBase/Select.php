@@ -17,7 +17,8 @@ trait Select{
      * @param  mixed $ArrayColumnAndValue
      * @return Select
      */
-    public function select(array $ArrayColumnAndValue = [], $AS = []): Model {
+    public function select(array $ArrayColumnAndValue = [], $AS = []): Model
+    {
         $strColumn =  Tools::is_assos($ArrayColumnAndValue) == 'assos' ?
             array_keys($ArrayColumnAndValue) : $ArrayColumnAndValue;
         if (count($this->column) != 0) {
@@ -26,13 +27,13 @@ trait Select{
             }
         }
          $strSelect = '*';
-        if(count($strColumn) == 0){
+        if (count($strColumn) == 0) {
             $strSelect = "{$this->table}.*";
         } else {
             $strSelect .=  Tools::array_implode(",", $strColumn, "`{$this->table}`.`[val]`");
         }
-        if(count($AS) > 0){
-            $strSelect .= ", ". Tools::array_implode(",", $AS, "[key] AS [val]");
+        if (count($AS) > 0) {
+            $strSelect .= ", " . Tools::array_implode(",", $AS, "[key] AS [val]");
         }
         $table = $this->tableChanged ?? $this->table;
 

@@ -7,7 +7,8 @@ use Pet\Model\Model;
 use Pet\Tools\Tools;
 
 
-trait Delete {
+trait Delete
+{
 
 
     /**
