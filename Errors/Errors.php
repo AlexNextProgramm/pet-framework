@@ -13,7 +13,6 @@ class Errors
 
     public function register_error()
     {
-
         register_shutdown_function(function () {
             $this->log();
         });

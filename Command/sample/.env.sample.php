@@ -7,7 +7,7 @@ PUBLIC_DIR = dist
 MIGRATE_DIR = 'dist/PHP/Migration'
 
 #Настройки базы
-DB_TYPE = mysqli
+DB_TYPE = mysql
 DB_HOST = localhost
 DB_USER = root
 DB_PORT = 3306
