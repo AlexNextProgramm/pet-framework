@@ -8,7 +8,7 @@ class Console {
 
     const RED = 'red';
     const GREEN = 'green';
-
+    const YELLOW = 'yellow';
     private static $isInputYes = ['y', 'Y', 'Д', 'д'];
     public function __construct() {
         self::$DIR_LINUX = str_replace(" ", "\ ",ROOT_DIR . "/vendor/pet/framework/Command/Console/linux/");

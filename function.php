@@ -92,10 +92,10 @@ function dirEach(string $path, $callDir = null, $callFile = null, &$error = null
     }
     foreach (scandir($path) as $entity) {
         if ($entity == '..' || $entity == '.') continue;
-        if (file_exists($entity)&& !empty($callFile)) {
+        if (file_exists($path . DS . $entity) && $callFile != null) {
             $callFile($entity);
         }
-        if (is_dir($entity) && !empty($callDir)) {
+        if (is_dir($path . DS . $entity) && $callDir != null) {
             $callDir($entity);
         }
     }

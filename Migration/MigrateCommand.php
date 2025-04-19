@@ -24,6 +24,7 @@ class MigrateCommand extends Model
         if (!is_dir($this->DIR)) {
             mkdir($this->DIR, 0777);
         }
+        parent::__construct();
     }
 
     public static function init($command)
@@ -39,9 +40,9 @@ class MigrateCommand extends Model
     private function up()
     {
         // проверить существование таблцы
-        if ($this->isTable()) {
+        if (!$this->isTable()) {
             $this->q(
-                "CREATE TABLE `migrate_local` (
+                "CREATE TABLE `migrate` (
                     `id` INT NOT NULL AUTO_INCREMENT ,
                     `name` VARCHAR(500) NULL DEFAULT NULL , 
                     `hash`  VARCHAR(500) NULL DEFAULT NULL , 
@@ -51,23 +52,24 @@ class MigrateCommand extends Model
             );
         }
 
-        dirEach($this->DIR, callFile: function ($name) {
+        $cq = 0;
+        dirEach($this->DIR, callFile: function ($name) use (&$cq){
             $query = file_get_contents($this->DIR . "/$name");
-            if (!empty($query)) {
+            if (empty($query)) {
                 Console::text("Пустой файл миграции", 'red');
             }
             $hash = md5($query);
-            $q = "SELECT * FROM `migrate` WHERE `hash` = '$hash';";
-            if (empty($this->q($q))) {
+            if (empty($this->find(['hash' => "$hash"]))) {
                 $this->insert(['name' => "$name", 'hash' => "$hash"]);
-                $cq = 1;
                 foreach (explode(";", $query) as $q) {
                     try {
                         if (empty(trim($q))) {
                             continue;
                         }
-                        if ($this->q($q . ";")) {
-                            Console::text($cq . "Выполнен: " . str_replace("\n", "", iconv_substr(trim($q), 0, 50, 'UTF-8')), Console::GREEN);
+                        $Query = $this->q($q);
+                        if ($Query) {
+                            $Query->fetch();
+                            Console::text(($cq + 1) . ") Выполнен: " . str_replace("\n", "", iconv_substr(trim($q), 0, 50, 'UTF-8')), Console::GREEN);
                         }
                     } catch (Error | Exception $e) {
                         Console::text("Error: " . $e->getMessage(), Console::RED);
@@ -76,5 +78,12 @@ class MigrateCommand extends Model
                 }
             }
         });
+        Console::text("=====================", Console::YELLOW);
+        if ($cq == 0) {
+            Console::text("Новых миграций нет", Console::YELLOW);
+        } else {
+            Console::text("Выполнено миграций", Console::YELLOW);
+            Console::text("$cq", Console::YELLOW);
+        }
     }
 }
