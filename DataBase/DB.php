@@ -12,7 +12,7 @@ abstract class DB {
 
     private $db_type = DB_TYPE;
     private $db_host = DB_HOST;
-    private $db_name = DB_NAME;
+    protected $db_name = DB_NAME;
     private $db_port = DB_PORT;
     private $db_user = DB_USER;
     private $db_password = DB_PASSWORD;
