@@ -5,7 +5,7 @@ namespace Pet\Command;
 use Pet\Apache\Apache;
 use Pet\Command\Console\Console;
 use Pet\Command\FTP\ConnectFtp;
-use Pet\Migration\MigrateCommad;
+use Pet\Migration\MigrateCommand;
 
 class Command {
     const ROOT_DIR = ROOT_DIR . DIRECTORY_SEPARATOR;
@@ -37,7 +37,7 @@ class Command {
                 ConnectFtp::load();
                 break;
             case 'migrate':
-                MigrateCommad::init('migrate');
+                MigrateCommand::init('migrate');
                 break;
             case "make:apache":
                 (new Apache())->setVirtualHost($comm[2] ?? null);

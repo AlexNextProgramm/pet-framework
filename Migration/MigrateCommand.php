@@ -7,7 +7,7 @@ use Exception;
 use Pet\Command\Console\Console;
 use Pet\Model\Model;
 
-class MigrateCommad extends Model
+class MigrateCommand extends Model
 {
 
     private $DIR = '';
