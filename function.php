@@ -73,3 +73,31 @@ function dd(...$vars)
     echo '</pre>';
     die();
 }
+
+
+/**
+ * dirEach
+ *
+ * @param  string $path
+ * @param  mixed $callDir
+ * @param  mixed $callFile
+ * @param  string $error
+ * @return bool
+ */
+function dirEach(string $path, $callDir = null, $callFile = null, &$error = null) : bool
+{
+    if (!is_dir($path)) {
+        $error = 'is not folder';
+        return false;
+    }
+    foreach (scandir($path) as $entity) {
+        if ($entity == '..' || $entity == '.') continue;
+        if (file_exists($entity)&& !empty($callFile)) {
+            $callFile($entity);
+        }
+        if (is_dir($entity) && !empty($callDir)) {
+            $callDir($entity);
+        }
+    }
+    return true;
+}

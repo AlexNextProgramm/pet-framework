@@ -5,6 +5,10 @@ class Console {
     const OS = PHP_OS;
     public static $DIR_LINUX;
     public static $DIR_WIN;
+
+    const RED = 'red';
+    const GREEN = 'green';
+
     private static $isInputYes = ['y', 'Y', 'Д', 'д'];
     public function __construct() {
         self::$DIR_LINUX = str_replace(" ", "\ ",ROOT_DIR . "/vendor/pet/framework/Command/Console/linux/");

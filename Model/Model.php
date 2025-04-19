@@ -51,4 +51,9 @@ abstract class Model extends DB
             $this->set($value);
         }
     }
+
+    public function isTable(): bool
+    {
+        return !empty($this->q("SHOW TABLES FROM `".$this->table."` LIKE 'migrate' ; ")->fetch_array());
+    }
 }

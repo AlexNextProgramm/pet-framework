@@ -5,7 +5,7 @@ namespace Pet\Command;
 use Pet\Apache\Apache;
 use Pet\Command\Console\Console;
 use Pet\Command\FTP\ConnectFtp;
-use Pet\Migration\Start;
+use Pet\Migration\MigrateCommad;
 
 class Command {
     const ROOT_DIR = ROOT_DIR . DIRECTORY_SEPARATOR;
@@ -31,35 +31,17 @@ class Command {
                 $this->server();
                 break;
             case 'build_sample':
-               (new Build())->architecture();
+                (new Build())->architecture();
                 break;
             case 'load':
                 ConnectFtp::load();
                 break;
-            case 'migrate:up:one':
-                Start::init('migrate:up:one');
-                break;
             case 'migrate':
-                Start::init('migrate:up');
-                break;
-            case 'migrate:up':
-                Start::init('migrate:up');
-                break;
-            case 'migrate:back':
-                Start::init('migrate:back');
-                break;
-            case 'migrate:back:end':
-                Start::init('migrate:back:end');
-                break;
-            case 'make:migrate':
-                Start::create($comm);
-                break;
-            case "make:controller":
-                $this->make(explode(':',$inCommands)[1], $comm);
+                MigrateCommad::init('migrate');
                 break;
             case "make:apache":
                 (new Apache())->setVirtualHost($comm[2] ?? null);
-                    break;
+                break;
             case "make:cert":
                 (new Apache())->setCert($comm[2] ?? null);
                 break;
