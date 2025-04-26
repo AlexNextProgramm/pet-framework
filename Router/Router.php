@@ -75,7 +75,7 @@ class Router extends Middleware
 
             //Прямое направление через action при ajax
             if ($result = self::ajax($Rout, $request)) {
-                if (gettype($result))
+                Response::die($result);
             }
 
             $controller = (new EssenceClass())->open($Rout['callback'], $request);
