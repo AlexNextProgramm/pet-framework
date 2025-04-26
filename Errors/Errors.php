@@ -4,7 +4,7 @@ namespace Pet\Errors;
 
 class Errors
 {
-    const LOG_DIR = LOG_DIR;
+    const LOG_DIR = ROOT_DIR . '/' . LOG_DIR;
 
     public function __construct()
     {

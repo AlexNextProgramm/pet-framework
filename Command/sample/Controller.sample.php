@@ -1,6 +1,6 @@
 <?php
 
-namespace PHP\Controller;
+namespace APP\Controller;
 
 use Pet\Controller;
 use Pet\Request\Request;

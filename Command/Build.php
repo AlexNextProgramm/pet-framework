@@ -8,6 +8,7 @@ use Pet\Command\Console\Console;
 class Build {
      public $isAllReplace = false;
      public $isPetWarning = false;
+     const APPNAME = 'APP';
     function __construct() {
        if(!defined('ROOT_DIR')) define('ROOT_DIR', $this->search_dir_vendor());
 
@@ -62,10 +63,10 @@ class Build {
         $this->setFile('index.php',  $public);
         $this->setFile(
             'Controller.php',
-            $public  . 'PHP/Controller/',
+            $public  . self::APPNAME.'/Controller/',
             [
                 "NAME" => "Home",
-                "SPACE" => "PHP\\Controller",
+                "SPACE" => self::APPNAME.'\\Controller',
             ]
         );
         $this->setFile('home.php', $public . "/view/page/");

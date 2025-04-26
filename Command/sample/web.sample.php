@@ -1,7 +1,7 @@
 <?php
 
 use Pet\Router\Router;
-use PHP\Controller\HomeController;
+use APP\Controller\HomeController;
 
 Router::get('/', [HomeController::class, 'index']);
 Router::get('/documentation', [HomeController::class, 'documentation']);

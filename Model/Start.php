@@ -17,9 +17,9 @@ class Start
 
     public function init($name)
     {
-        $this->Build->setFile('Model.php', env("PUBLIC_DIR", "dist") . "/PHP/Model/", [
+        $this->Build->setFile('Model.php', env("PUBLIC_DIR", "dist") . Build::APPNAME."/Model/", [
             "NAME" => ucwords($name),
-            "SPACE" => "PHP\\Model",
+            "SPACE" => Build::APPNAME.'\\Model',
             "TABLE" => strtolower($name),
         ]);
     }

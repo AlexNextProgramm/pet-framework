@@ -19,7 +19,7 @@ abstract class Model extends DB
      * @param  int $limit
      * @return array
      */
-    public function find($searh = [], $column = [], $limit = null): array 
+    public function find($searh = [], $column = [], $limit = null): array
     {
         if ($limit) {
             return  $this->select($column)->And($searh)->limit($limit)->fetch();

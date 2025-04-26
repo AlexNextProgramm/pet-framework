@@ -67,7 +67,7 @@ class Command {
 
             $sample = file_get_contents(__DIR__ . "/sample/controller.sample.php");
             $sample = str_replace('NAME', $name, $sample);
-            file_put_contents(self::ROOT_DIR . $this->NAME_DIR_PROJECT . "/PHP/Controller/$name" . "Controller.php", $sample);
+            file_put_contents(self::ROOT_DIR . $this->NAME_DIR_PROJECT . Build::APPNAME . "/Controller/$name" . "Controller.php", $sample);
         }
     }
 }

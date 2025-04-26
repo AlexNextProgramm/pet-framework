@@ -4,7 +4,7 @@ HOSTS = '/etc/hosts'
 
 #Внутрении директории
 PUBLIC_DIR = dist
-MIGRATE_DIR = 'dist/PHP/Migration'
+MIGRATE_DIR = 'dist/APP/Migration'
 
 #Настройки базы
 DB_TYPE = mysql
@@ -22,6 +22,10 @@ FTP_HOST =
 FTP_LOGIN =
 FTP_PASSWORD = 
 
+
 #APACHE
 DIR_APACHE = '/etc/apache2'
 DIR_APACHE_SITE_ENBE = '/etc/apache2/sites-enabled'
+
+#другое 
+LOG_DIR = "/"
