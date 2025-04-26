@@ -28,8 +28,8 @@ class App
     public static function init($router_dir = self::PUBLIC_DIR . "/router")
     {
         $GLOBALS['app'] = $app = new App();
-        $app->includeRouter($router_dir);
         self::initProjectFile();
+        $app->includeRouter($router_dir);
         $app->router::init();
     }
 
