@@ -11,8 +11,8 @@ class Console {
     const YELLOW = 'yellow';
     private static $isInputYes = ['y', 'Y', 'Д', 'д'];
     public function __construct() {
-        self::$DIR_LINUX = str_replace(" ", "\ ",ROOT_DIR . "/vendor/pet/framework/Command/Console/linux/");
-        self::$DIR_WIN = str_replace(" ", "\ ", ROOT_DIR . "/vendor/pet/framework/Command/Console/win/");
+        self::$DIR_LINUX = str_replace(" ", "\ ",ROOT . "/vendor/pet/framework/Command/Console/linux/");
+        self::$DIR_WIN = str_replace(" ", "\ ", ROOT . "/vendor/pet/framework/Command/Console/win/");
     }
     public static $color = [
         'red'    => '31',

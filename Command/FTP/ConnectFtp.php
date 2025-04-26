@@ -6,7 +6,7 @@ use Pet\Command\Console\Console;
 
 class ConnectFtp {
 
-    const ROOT_DIR = ROOT_DIR . DIRECTORY_SEPARATOR;
+    const ROOT = ROOT . DIRECTORY_SEPARATOR;
     public static $PUBLIC_DIR;
     public static $VENDOR_DIR;
     public static $IGNORE_DIR;
@@ -14,8 +14,8 @@ class ConnectFtp {
     public static $isInput = false;
 
     public function __construct() {
-        self::$PUBLIC_DIR = self::ROOT_DIR . env('PUBLIC_DIR', 'dist');
-        self::$VENDOR_DIR = self::ROOT_DIR . '/vendor';
+        self::$PUBLIC_DIR = self::ROOT . env('PUBLIC_DIR', 'dist');
+        self::$VENDOR_DIR = self::ROOT . '/vendor';
         self::$IGNORE_DIR = explode("|", env('FTP_DIR_EXEPTION'));
         self::$IGNORE_FILE = explode("|", env('FTP_FILE_EXEPTION'));
     }
@@ -41,7 +41,7 @@ class ConnectFtp {
         Console::input($outInput);
 
         if (Console::isYes($outInput)) {
-            Console::cmd('cd "' . self::ROOT_DIR . '" && npm run build', fn($txt) => Console::text($txt, 'violet'));
+            Console::cmd('cd "' . self::ROOT . '" && npm run build', fn($txt) => Console::text($txt, 'violet'));
         }
 
         //Загрузка vendor

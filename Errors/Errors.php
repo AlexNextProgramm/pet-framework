@@ -4,7 +4,7 @@ namespace Pet\Errors;
 
 class Errors
 {
-    const LOG_DIR = ROOT_DIR . '/' . LOG_DIR;
+    const LOG = ROOT . '/' . LOG;
 
     public function __construct()
     {
@@ -28,6 +28,6 @@ class Errors
     private function set($str)
     {
         $LOG = ">>> TIME: {date('d.m.Y H:i:s')} MESS: {$str}  \n\r";
-        file_put_contents(self::LOG_DIR . 'log.txt', $LOG, FILE_APPEND | LOCK_EX);
+        file_put_contents(self::LOG, $LOG, FILE_APPEND | LOCK_EX);
     }
 }

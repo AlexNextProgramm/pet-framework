@@ -8,7 +8,7 @@ use Pet\Command\FTP\ConnectFtp;
 use Pet\Migration\MigrateCommand;
 
 class Command {
-    const ROOT_DIR = ROOT_DIR . DIRECTORY_SEPARATOR;
+    const ROOT = ROOT . DIRECTORY_SEPARATOR;
     public $NAME_DIR_PROJECT;
 
     public function __construct($command)
@@ -67,7 +67,7 @@ class Command {
 
             $sample = file_get_contents(__DIR__ . "/sample/controller.sample.php");
             $sample = str_replace('NAME', $name, $sample);
-            file_put_contents(self::ROOT_DIR . $this->NAME_DIR_PROJECT . Build::APPNAME . "/Controller/$name" . "Controller.php", $sample);
+            file_put_contents(self::ROOT . $this->NAME_DIR_PROJECT . Build::APPNAME . "/Controller/$name" . "Controller.php", $sample);
         }
     }
 }

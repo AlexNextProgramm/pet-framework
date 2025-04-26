@@ -10,12 +10,12 @@ class Build {
      public $isPetWarning = false;
      const APPNAME = 'APP';
     function __construct() {
-       if(!defined('ROOT_DIR')) define('ROOT_DIR', $this->search_dir_vendor());
+       if(!defined('ROOT')) define('ROOT', $this->search_dir_vendor());
 
-        if (!file_exists(ROOT_DIR . '/.env')) {
+        if (!file_exists(ROOT . '/.env')) {
             $this->copy('.env.sample.php', '.env');
         }
-        include_once ROOT_DIR . '/vendor/autoload.php';
+        include_once ROOT . '/vendor/autoload.php';
        // $this->architecture();
     }
 
@@ -32,11 +32,11 @@ class Build {
             }
         }
 
-        $dirCreate = mb_substr(ROOT_DIR . DIRECTORY_SEPARATOR . $dir, 0, -1);
+        $dirCreate = mb_substr(ROOT . DIRECTORY_SEPARATOR . $dir, 0, -1);
         if (!is_dir($dirCreate)) mkdir($dirCreate, 0777, true);
         $control = true;
 
-        $isFile = file_exists(ROOT_DIR . $dir . $NAME . $names);
+        $isFile = file_exists(ROOT . $dir . $NAME . $names);
 
         if(!$this->isPetWarning && $isFile){
             Console::text("WARNING: Pet обнаружил что проект уже строился!\nВы точно хотите построить проект по шаблону тогда вы можете потерять некоторые файлы (y/n)?", "yellow");
@@ -47,13 +47,13 @@ class Build {
 
         if(!$this->isAllReplace && $isFile)
         {
-            if($sample != file_get_contents(ROOT_DIR . DIRECTORY_SEPARATOR . $dir . $NAME . $names)){
+            if($sample != file_get_contents(ROOT . DIRECTORY_SEPARATOR . $dir . $NAME . $names)){
                 Console::text(" Вы уверены что хотите перезаписать файл $NAME$names? (y/n)");
                 Console::input($str);
                 if(!Console::isYes($str)) $control = false;
             }
         }
-        if($control) file_put_contents(ROOT_DIR . DIRECTORY_SEPARATOR . $dir . $NAME . $names, $sample);
+        if($control) file_put_contents(ROOT . DIRECTORY_SEPARATOR . $dir . $NAME . $names, $sample);
     }
 
     function architecture() {
@@ -80,7 +80,7 @@ class Build {
         $this->setFile('web.php', $public . "/router/");
 
         // КОПИ ФАЙЛ
-        if(!is_dir(ROOT_DIR . DIRECTORY_SEPARATOR . $public."/view/img")) mkdir(ROOT_DIR.DIRECTORY_SEPARATOR.$public."/view/img", 0777, true);
+        if(!is_dir(ROOT . DIRECTORY_SEPARATOR . $public."/view/img")) mkdir(ROOT.DIRECTORY_SEPARATOR.$public."/view/img", 0777, true);
         $this->copy('img/logo.png', $public.'/view/img/logo.png');
         $this->copy('config.constant.php', 'config.constant.php');
     }
@@ -90,6 +90,6 @@ class Build {
     }
 
     private function copy($file, $fileOut) {
-        copy(realpath(__DIR__ . "/sample/$file"),  ROOT_DIR . DIRECTORY_SEPARATOR . "$fileOut");
+        copy(realpath(__DIR__ . "/sample/$file"),  ROOT . DIRECTORY_SEPARATOR . "$fileOut");
     }
 }

@@ -22,9 +22,9 @@ function search_include_class($path, $class = '') {
 function env($constans = null, $default = null) : ?string
 {
     if(!$constans) return null;
-    if (!file_exists(ROOT_DIR . '/.env')) echo 'Нет файла .env в корне проекта';
+    if (!file_exists(ROOT . '/.env')) echo 'Нет файла .env в корне проекта';
 
-    $env = file(ROOT_DIR . '/.env');
+    $env = file(ROOT . '/.env');
 
     foreach ($env as $str) {
         if (str_contains(trim($str), '#') && strpos(trim($str), "#") == 0) continue;
@@ -42,9 +42,9 @@ function env($constans = null, $default = null) : ?string
 }
 
 
-function setConstantEnv($ROOT_DIR){
-    if (!file_exists($ROOT_DIR . '/.env')) echo 'Нет файла .env в корне проекта';
-    $env = file($ROOT_DIR . '/.env');
+function setConstantEnv($ROOT){
+    if (!file_exists($ROOT . '/.env')) echo 'Нет файла .env в корне проекта';
+    $env = file($ROOT . '/.env');
     foreach ($env as $str) {
         if (str_contains(trim($str), '#') && strpos(trim($str), "#") == 0) continue;
         if (str_contains($str, '=')) {

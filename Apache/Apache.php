@@ -8,7 +8,7 @@ class Apache
 {
     static $DIR_APACHE_SITES_ENABLED = DIR_APACHE_SITES_ENABLED;
     static $DIR_SAMPLE = __DIR__.'/../Command/sample/apache';
-    static $DIR_SSL = ROOT_DIR . DIRECTORY_SEPARATOR .'ssl';
+    static $DIR_SSL = ROOT . DIRECTORY_SEPARATOR .'ssl';
     static $DIR_SH = '/vendor/pet/framework/Command/Console/linux';
     static $DIR_HOSTS = '/etc/hosts';
 
@@ -19,11 +19,11 @@ class Apache
         $sample = str_replace([
             '{name}',
             '{PUBLIC_DIR}',
-            '{ROOT_DIR}'
+            '{ROOT}'
          ],[
             $nameHost,
             PUBLIC_DIR,
-            ROOT_DIR
+            ROOT
         ], $sample);
         if(($type == 'https')){
             $sample = str_replace([
@@ -92,8 +92,8 @@ class Apache
         });
      
         $this->setVirtualHost($nameHost, "https",[
-            'crt' => ROOT_DIR . "/ssl/$nameHost.crt",
-            'key' => ROOT_DIR . "/ssl/$nameHost.key",
+            'crt' => ROOT . "/ssl/$nameHost.crt",
+            'key' => ROOT . "/ssl/$nameHost.key",
         ]);
         // Console::log('')
     }
