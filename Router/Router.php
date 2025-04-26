@@ -74,7 +74,9 @@ class Router extends Middleware
             }
 
             //Прямое направление через action при ajax
-            self::ajax($Rout, $request);
+            if ($result = self::ajax($Rout, $request)) {
+                if (gettype($result))
+            }
 
             $controller = (new EssenceClass())->open($Rout['callback'], $request);
 
@@ -87,13 +89,14 @@ class Router extends Middleware
         if (!$control) http_response_code('404');
     }
 
-    private static function  ajax(&$Rout, $request)
+    private static function ajax(&$Rout, $request):bool
     {
         foreach (self::$event as $key => $action) {
             if (!empty($request->header[$key])) {
-                (new EssenceClass())->open($action, $request);
+                return (new EssenceClass())->open($action, $request);
             }
         }
+        return false;
     }
 
     private static function flexibleLink($flex)
