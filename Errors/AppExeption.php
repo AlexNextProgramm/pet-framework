@@ -21,11 +21,4 @@ class AppException extends Exception
     {
         return $this->errorCode;
     }
-
-    // Метод для логирования ошибок (пример)
-    public function logError()
-    {
-        // Логирование ошибки в файл или систему логирования
-        file_put_contents('app_error_log.txt', date('Y-m-d H:i:s') . " - " . $this->getMessage() . PHP_EOL, FILE_APPEND);
-    }
 }

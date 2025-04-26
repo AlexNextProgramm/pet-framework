@@ -11,8 +11,8 @@ class Router extends Middleware
 
     const PUBLIC_DIR = PUBLIC_DIR;
     public static $Route = [];
-    public static $id = 0;
-
+    public static int $id = 0;
+    public static $event = [];
     public function __construct() {
     }
 
@@ -74,9 +74,7 @@ class Router extends Middleware
             }
 
             //Прямое направление через action при ajax
-            if (!empty($request->header['action'])) {
-                $Rout['callback'][1] = $request->header['action'];
-            }
+            self::ajax($Rout, $request);
 
             $controller = (new EssenceClass())->open($Rout['callback'], $request);
 
@@ -87,6 +85,15 @@ class Router extends Middleware
 
         // Если по итогу роутер не найден
         if (!$control) http_response_code('404');
+    }
+
+    private function ajax(&$Rout, $request)
+    {
+        foreach (self::$event as $key => $action) {
+            if (!empty($request->header[$key])) {
+                (new EssenceClass())->open($action, $request);
+            }
+        }
     }
 
     private static function flexibleLink($flex)

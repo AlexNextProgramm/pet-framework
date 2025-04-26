@@ -12,7 +12,6 @@ class App
     const PUBLIC_DIR = PUBLIC_DIR;
     public $router;
     public $request;
-
     public function __construct() {
         (new Errors());
         $this->htExits();
