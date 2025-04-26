@@ -51,7 +51,7 @@ class Request
         $REQUEST = array_merge($_GET, $_POST);
         $decode = [];
         $input = file_get_contents('php://input');
-        if (key_exists('CONTENT_TYPE', $_SERVER)  == 'application/json' && !empty($input)) $decode = Tools::jsonDe($input);
+        if (($_SERVER['CONTENT_TYPE'] ?? null) === 'application/json' && !empty($input)) $decode = Tools::jsonDe($input);
         return array_merge($REQUEST, $decode);
     }
 
