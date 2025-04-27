@@ -27,23 +27,13 @@ trait Insert
     }
 
     /**
-     * execute
-     *
-     * @return bool
-     */
-    public function execute(): bool
-    {
-        return $this->DB->prepare($this->strQuery)->execute();
-    }
-
-
-    /**
      * set
      *  вернет последний id после установки значения
      * @param  mixed $value
      * @return string
      */
-    public function set(array $value): string {
+    public function set(array $value): string
+    {
         $this->insert($value);
         return $this->DB->lastInsertId();
     }

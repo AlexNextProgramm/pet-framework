@@ -120,6 +120,7 @@ trait Select
     public function whereId($id): Model
     {
         $this->strWhere = "WHERE `{$this->table}`.`id` = '$id'";
+        return $this;
     }
 
     public function limit($limit = 100, $DESC = "DESC", $cl = 'id'){

@@ -44,13 +44,31 @@ abstract class DB {
      *
      * @return array
      */
-    public function fetch() {
-        $this->strQuery = $this->strQuery . $this->strJoin . $this->strWhere;
-        $this->strJoin  = $this->strJoin = $this->strWhere = '';
-        $this->whereSyntax($this->strQuery);
+    public function fetch()
+    {
+        $this->complecte();
         $this->info = $this->q($this->strQuery)->fetchAll(PDO::FETCH_ASSOC);
         return $this->info;
     }
+
+    public function complecte()
+    {
+        $this->strQuery = $this->strQuery . $this->strJoin . $this->strWhere;
+        $this->strJoin  = $this->strJoin = $this->strWhere = '';
+        $this->whereSyntax($this->strQuery);
+    }
+
+     /**
+     * execute
+     *
+     * @return bool
+     */
+    public function execute(): bool
+    {
+        $this->complecte();
+        return $this->DB->prepare($this->strQuery)->execute();
+    }
+
 
     private function conn() {
         try {
