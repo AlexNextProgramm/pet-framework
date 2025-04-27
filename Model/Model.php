@@ -79,7 +79,7 @@ abstract class Model extends DB
     {
         $result = [];
         if ($this->isInfo()) {
-            $result = Tools::is_assos($this->info) ? $this->info : $this->info[0];
+            $result = Tools::is_assos($this->info) === 'assos' ? $this->info : $this->info[0];
             foreach ($this->hidden as $col) {
                 unset($result[$col]);
             }

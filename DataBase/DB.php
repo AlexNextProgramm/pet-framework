@@ -139,7 +139,7 @@ abstract class DB {
     public function v($key): string|null
     {
         if ($this->isInfo()) {
-            Tools::is_assos($this->info) ? $this->info[$key] : $this->info[0][$key];
+            Tools::is_assos($this->info) === 'assos'  ? $this->info[$key] : $this->info[0][$key];
         }
         return null;
     }
