@@ -11,6 +11,10 @@ abstract class Model extends DB
 {
     use  Select, Update, Delete, Insert;
 
+    public function __construct($data)
+    {
+        parent::__construct($data);
+    }
     /**
      * find
      *

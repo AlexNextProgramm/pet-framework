@@ -34,7 +34,7 @@ abstract class DB {
      * @param array|string $id
      * @return void
      */
-    public function __construct(array|string $id = null) {
+    public function __construct(array|string|null $id = null) {
         $this->conn();
         $this->info = $this->get($id);
     }
@@ -52,7 +52,7 @@ abstract class DB {
         return $this->info;
     }
 
-    public function conn() {
+    private function conn() {
         try {
             $this->DB = new PDO("{$this->db_type}:host={$this->db_host}:{$this->db_port};dbname={$this->db_name}", $this->db_user, $this->db_password);
         } catch (\PDOException $e) {
@@ -90,7 +90,6 @@ abstract class DB {
     private function get($id): array
     {
         if (gettype($id) == 'string' || gettype($id) == 'integer') {
-            print_r($id);
             return $id != '' ? $this->q("SELECT * FROM {$this->table} WHERE id='$id';")->fetchAll(PDO::FETCH_ASSOC) : [];
         }
 
@@ -109,7 +108,7 @@ abstract class DB {
 
     public function isInfo(): bool
     {
-        return count($this->info) != 0;
+        return !empty($this->info);
     }
 
     public function v($key): string|null

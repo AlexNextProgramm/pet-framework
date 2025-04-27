@@ -22,7 +22,8 @@ export class Rocet {
   private RocetVirtualFunction: Function | undefined;
   private id:string|HTMLElement
 
-  constructor(id: string|HTMLElement = "body") {
+  constructor(id: string | HTMLElement = "body") {
+    if (id === null) id = "body";
     this.Element = typeof id == 'string'? this.open(id): id;
     this.RocetVirtualNode;
     this.id = id

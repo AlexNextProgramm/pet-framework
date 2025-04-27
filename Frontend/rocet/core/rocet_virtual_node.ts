@@ -6,7 +6,7 @@ export function RocetNode(tag:string, props:atribute|string|undefined|rocet|Arra
     let rChildren: Array<rocet> = []
     
 
-    if(typeof props  == 'string'){
+    if(props &&typeof props  == 'string'){
         if(props.indexOf('</') >= 0 && props.indexOf('>') >= 0 || props.indexOf('<br>') >= 0 ){
             rProps.innerHTML = props
         }else{
@@ -14,7 +14,7 @@ export function RocetNode(tag:string, props:atribute|string|undefined|rocet|Arra
         }
     }
 
-    if(typeof props  == 'object'){
+    if(props && typeof props  == 'object'){
         if(Array.isArray(props)){
             rChildren = props
         }else{
