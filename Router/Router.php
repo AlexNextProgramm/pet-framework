@@ -89,7 +89,7 @@ class Router extends Middleware
         if (!$control) http_response_code('404');
     }
 
-    private static function ajax($request):bool
+    private static function ajax($request) : mixed
     {
         foreach (self::$event as $key => $action) {
             if (!empty($request->header[$key])) {
