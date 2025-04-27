@@ -1,30 +1,32 @@
 <?php
+namespace Pet\Session;
 
 class Session
 {
     public $status;
-
-    public function __construct() {
+    public static $name = 'PET/SESSION' ;
+    public function __construct()
+    {
         $this->status = $this->init();
     }
 
-    private function init(){
-        if (session_status() != 2) session_start(['name' => "PET/SESSION"]);
+    private function init() {
+        if (session_status() != 2) session_start(['name' => self::$name]);
         return session_status();
     }
 
-    static function get(string|null $key = null): string|array
+    public static function get(string|null $key = null): string|array
     {
         if (!$key) return $_SESSION;
-        return !empty($_SESSION[$key])?$_SESSION[$key]: null; 
+        return !empty($_SESSION[$key])?$_SESSION[$key]: null;
     }
 
-    static function set(array $val): void
+    public static function set(array|object $val): void
     {
-        foreach($val as $i => $v) $_SESSION[$i] = $v;
+        foreach ($val as $i => $v) $_SESSION[$i] = $v;
     }
 
-    static function kill()
+    public static function kill()
     {
         session_destroy();
     }
