@@ -5,6 +5,7 @@ namespace Pet;
 use Pet\Errors\Errors;
 use Pet\Request\Request;
 use Pet\Router\Router;
+use Pet\Session\Session;
 
 class App
 {
@@ -12,9 +13,11 @@ class App
     const PUBLIC_DIR = PUBLIC_DIR;
     public $router;
     public $request;
+    public $session;
     public function __construct() {
         (new Errors());
         $this->htExits();
+        $this->session = new Session();
         $this->request = new Request();
         $this->router = new Router();
     }

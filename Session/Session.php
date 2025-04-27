@@ -11,11 +11,14 @@ class Session
     }
 
     private function init() {
-        if (session_status() != 2) session_start(['name' => self::$name]);
+        $status = session_status();
+        if ( $status == PHP_SESSION_NONE && $status != PHP_SESSION_DISABLED){
+            session_start(['name' => self::$name]);
+        }
         return session_status();
     }
 
-    public static function get(string|null $key = null): string|array
+    public static function get(string|null $key = null): string|array|null
     {
         if (!$key) return $_SESSION;
         return !empty($_SESSION[$key])?$_SESSION[$key]: null;
