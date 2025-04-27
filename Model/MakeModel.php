@@ -2,7 +2,7 @@
 namespace Pet\Model;
 class MakeModel
 {
-    protected static $DIR = ROOT. DS . APP;
+    protected static $DIR = ROOT. DS . PUBLIC_DIR . DS . APP;
     protected static $nameFolder = "Model";
     public function __construct($name)
     {
