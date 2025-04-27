@@ -8,7 +8,7 @@ use Pet\Command\Console\Console;
 class Build {
      public $isAllReplace = false;
      public $isPetWarning = false;
-     const APPNAME = 'APP';
+     const APPNAME = APP;
     function __construct() {
        if(!defined('ROOT')) define('ROOT', $this->search_dir_vendor());
 

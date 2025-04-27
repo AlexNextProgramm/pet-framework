@@ -5,6 +5,7 @@ HOSTS = '/etc/hosts'
 #Внутрении директории
 PUBLIC_DIR = dist
 MIGRATE_DIR = 'dist/APP/Migration'
+APP = APP
 
 #Настройки базы
 DB_TYPE = mysql
