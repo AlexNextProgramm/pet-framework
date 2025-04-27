@@ -150,4 +150,6 @@ abstract class DB {
             $array[$i] = $this->DB->quote($v);
         }
     }
+
+    public function esi
 }

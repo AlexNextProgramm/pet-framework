@@ -131,6 +131,4 @@ trait Select
     public function max($column = 'id'){
         return  $this->q("SELECT MAX(`$column`) FROM `{$this->table}`")->fetch()['MAX(`id`)'];
     }
-
-   
 }

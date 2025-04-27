@@ -6,11 +6,12 @@ use Pet\DataBase\Delete;
 use Pet\DataBase\Update;
 use Pet\DataBase\Select;
 use Pet\DataBase\Insert;
+use Pet\Tools\Tools;
 
 abstract class Model extends DB
 {
     use  Select, Update, Delete, Insert;
-
+    public array $hidden = [];
     public function __construct($data)
     {
         parent::__construct($data);
@@ -67,5 +68,22 @@ abstract class Model extends DB
             return $this->update($data)->whereId($this->v('id'))->execute();
         }
         return false;
+    }
+
+    public function exist():bool
+    {
+        return $this->isInfo();
+    }
+
+    public function data() : array
+    {
+        $result = [];
+        if ($this->isInfo()) {
+            $result = Tools::is_assos($this->info) ? $this->info : $this->info[0];
+            foreach ($this->hidden as $col) {
+                unset($result[$col]);
+            }
+        }
+        return $result;
     }
 }
