@@ -107,20 +107,27 @@ abstract class DB {
 
     private function get($id): array
     {
+        if (empty($id)) {
+            return [];
+        }
+        $pdoStatment = null;
         if (gettype($id) == 'string' || gettype($id) == 'integer') {
-            return $id != '' ? $this->q("SELECT * FROM {$this->table} WHERE id='$id';")->fetchAll(PDO::FETCH_ASSOC) : [];
+            $pdoStatment = $this->q("SELECT * FROM {$this->table} WHERE id='$id';");
         }
 
         if (gettype($id) == 'array' && !empty($id)) {
             $ids = !empty($id['id']) ? $id['id'] : null;
             if ($ids) {
-                return $this->q("SELECT * FROM {$this->table} WHERE id='$ids';")->fetchAll(PDO::FETCH_ASSOC);
+                $pdoStatment =  $this->q("SELECT * FROM {$this->table} WHERE id='$ids';");
             } else {
                 $where = Tools::array_implode(", AND ", $id, "[key]='[val]'");
-                return $this->q("SELECT * FROM {$this->table} WHERE $where;")->fetchAll(PDO::FETCH_ASSOC);
+                $pdoStatment =  $this->q("SELECT * FROM {$this->table} WHERE $where;");
             }
         }
-
+        $result = $pdoStatment->fetchAll(PDO::FETCH_ASSOC);
+        if (count($result) == 1) {
+            return  $result[0];
+        }
         return [];
     }
 
@@ -131,7 +138,10 @@ abstract class DB {
 
     public function v($key): string|null
     {
-        return !empty($this->info[0][$key]) ? $this->info[0][$key] : null;
+        if ($this->isInfo()) {
+            Tools::is_assos($this->info) ? $this->info[$key] : $this->info[0][$key];
+        }
+        return null;
     }
 
     public function arrayQuote(&$array)
