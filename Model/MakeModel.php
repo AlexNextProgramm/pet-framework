@@ -24,6 +24,6 @@ class MakeModel
             $name,
             self::$nameFolder
         ], $sample);
-        file_put_contents(self::$DIR . DS . $name . "php", $sample);
+        file_put_contents(self::$DIR . DS . self::$nameFolder. ".php", $sample);
     }
 }
