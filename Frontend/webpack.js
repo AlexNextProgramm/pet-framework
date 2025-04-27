@@ -1,29 +1,31 @@
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
-
-export class Setting {
+class Setting {
     path;
-    fs
+    fs;
     pages = {
         html: [],
         entry: { root: "./root.tsx" }
     };
     IsImages = null;
-    dir = '/'
-    classes = { 
-        MiniCssExtractPlugin,
-        CssMinimizerPlugin,
-        TerserWebpackPlugin,
-        HTMLWebpackPlugin,
-        CleanWebpackPlugin,
-        CopyWebpackPlugin
+    dir = '/';
+    classes = {
+      // MiniCssExtractPlugin,
+      // CssMinimizerPlugin,
+      // TerserWebpackPlugin,
+      // HTMLWebpackPlugin,
+      // CleanWebpackPlugin,
+      // CopyWebpackPlugin
+    };
+    isDev = false;
+    isProd = false;
+    constructor() { 
+      
     }
-    isDev;
-    isProd;
-    constructor() {
+    init() {
         this.getPage();
         this.getIsImages();
     }
-
 
     getPage() {
         const dir = this.path.resolve( this.dir, "dist/view/page")
@@ -38,7 +40,7 @@ export class Setting {
                     template: './head.php',
                     entry: this.path.join(this.dir, "src/page", `${name}.ts`),
                     chunks: ['root', name],
-                    minify: { collapseWhitespace: isProd }
+                    minify: { collapseWhitespace: this.isProd }
                 })
             }
         })
@@ -75,9 +77,9 @@ export class Setting {
         
           return config;
     }
-    cssLoaders() { 
+    cssLoaders(extra = null) { 
         const loaders = [
-            MiniCssExtractPlugin.loader,
+            this.classes.MiniCssExtractPlugin.loader,
             "css-loader",
           ];
         
@@ -99,7 +101,7 @@ export class Setting {
         const basePlugins = [
             ...this.pages.html.map(page => new this.classes.HTMLWebpackPlugin(page)),
             
-            new this.classes.CleanWebpackPlugin({
+            new CleanWebpackPlugin({
               cleanOnceBeforeBuildPatterns: [
                 'view/CSS/**',
                 'view/JS/**'
@@ -115,8 +117,8 @@ export class Setting {
           ];
         
           // Добавляем IsImages только если он не равен null
-          if (IsImages) {
-            basePlugins.push(IsImages);
+          if (this.IsImages) {
+            basePlugins.push(this.IsImages);
           }
         
           return basePlugins;
@@ -135,7 +137,7 @@ export class Setting {
         const loaders = [
           {
             loader: "babel-loader",
-            options: babelOptions(),
+            options: this.babelOptions(),
           },
         ];
       
@@ -145,21 +147,55 @@ export class Setting {
       };
 
     rules() { 
-        return [
-            { test: /\.css$/, use: this.cssLoaders() },
-            { test: /\.less$/, use: this.cssLoaders("less-loader") },
-            { test: /\.s[ac]ss$/, use: [...cssLoaders('sass-loader')] },
-            { test: /\.(png|jpg|svg|gif)$/, type: "asset/resource" },
-            { test: /\.(ttf|woff|woff2|eot)$/, use: ["file-loader"] },
-            { test: /\.xml$/, use: ["xml-loader"] },
-            { test: /\.csv$/, use: ["csv-loader"] },
-            { test: /\.js$/, exclude:/node_modules/, use : this.jsLoaders() },
-            { 
-              test:/\.(ts|tsx|jsx)?$/,
-              exclude:/node_modules/,
-              loader:"ts-loader",
-              options:{ configFile:"tsconfig.json" }
-            },
-          ],
+      return [
+        { test: /\.css$/, use: this.cssLoaders() },
+        { test: /\.less$/, use: this.cssLoaders("less-loader") },
+        { test: /\.s[ac]ss$/, use: [...this.cssLoaders('sass-loader')] },
+        { test: /\.(png|jpg|svg|gif)$/, type: "asset/resource" },
+        { test: /\.(ttf|woff|woff2|eot)$/, use: ["file-loader"] },
+        { test: /\.xml$/, use: ["xml-loader"] },
+        { test: /\.csv$/, use: ["csv-loader"] },
+        { test: /\.js$/, exclude: /node_modules/, use: this.jsLoaders() },
+        {
+          test: /\.(ts|tsx|jsx)?$/,
+          exclude: /node_modules/,
+          loader: "ts-loader",
+          options: { configFile: "tsconfig.json" }
+        },
+      ];
     }
+}
+const web = new Setting();
+web.fs = require("fs");
+web.path = require("path");
+web.dir = __dirname+"/../../../../"
+web.classes = {
+ 
+  HTMLWebpackPlugin: require("html-webpack-plugin"),
+  CssMinimizerPlugin: require("css-minimizer-webpack-plugin"),
+  TerserWebpackPlugin: require("terser-webpack-plugin"),
+  MiniCssExtractPlugin: require("mini-css-extract-plugin"),
+  CopyWebpackPlugin:require("copy-webpack-plugin"),
+}
+
+web.isDev = process.env.NODE_ENV === "development";
+web.isProd = !web.isDev;
+web.init();
+
+const modulesW = {
+  context: web.path.resolve(web.dir , "src"),
+  mode: web.isDev ? "development" : "production",
+  entry: web.pages.entry,
+  output: {
+    filename: "view/JS/[name]_[hash].js",
+    path: web.path.resolve(web.dir, "dist"),
+    assetModuleFilename: "view/images/[name][ext][query]",
+  },
+  resolve: web.resolve(),
+  optimization:  web.optimization(),
+  plugins: web.plugins(),
+  module: { rules:web.rules()}
+};
+module.exports = {
+ webpack:modulesW
 }
