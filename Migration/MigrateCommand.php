@@ -20,7 +20,7 @@ class MigrateCommand extends Model
     public $table = 'migrate';
 
     public function __construct() {
-        $this->DIR = ROOT . DS . env('MIGRATE_DIR');
+        $this->DIR = ROOT . DS . MIGRATE_DIR;
         if (!is_dir($this->DIR)) {
             mkdir($this->DIR, 0777);
         }
