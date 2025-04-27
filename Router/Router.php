@@ -60,8 +60,9 @@ class Router extends Middleware
 
         foreach (Router::$Route as $Rout) {
              //Прямое направление через event при ajax
-            if ($result = self::ajax($request) && in_array($request->getMethod(), self::$ajaxtype)) {
-                Response::die($result);
+            $resultAjax = 'Нет ответных данных';
+            if (self::ajax($request, $resultAjax) && in_array($request->getMethod(), self::$ajaxtype)) {
+                Response::die($resultAjax);
             }
             if ($Rout['method'] != $request->getMethod()) continue;
             if ($control) continue;
@@ -89,11 +90,12 @@ class Router extends Middleware
         if (!$control) http_response_code('404');
     }
 
-    private static function ajax($request) : mixed
+    private static function ajax($request, &$result) : bool
     {
         foreach (self::$event as $key => $action) {
             if (!empty($request->header[$key])) {
-                return (new EssenceClass())->open($action, $request);
+                $result = (new EssenceClass())->open($action, $request);
+                return true;
             }
         }
         return false;

@@ -1,14 +1,16 @@
 <?php
 namespace Pet\Router;
 
+use Pet\Errors\Errors;
 use Pet\Request\Request;
 use Pet\Tools\Tools;
 
 class Response
 {
-    const TYPE_JSON = "Content-type: application\json;";
+    const TYPE_JSON = "Content-type: application/json;";
+    private static $type = 'Content-type: text/html;';
 
-    static function redirect($path, $arg = [])
+    public static function redirect($path, $arg = []): void
     {
         header("Location: $path");
         $ret = (new Request());
@@ -16,15 +18,19 @@ class Response
         echo print_r($arg);
     }
 
-    public static function die($data, $type = self::TYPE_JSON)
+    public static function die($data)
     {
         if (gettype($data) == 'string') {
             die($data);
         } else {
-            header($type);
-            if ($type == self::TYPE_JSON) {
+            if (self::$type == self::TYPE_JSON) {
+                header(self::$type);
                 die(json_encode($data));
             }
         }
+    }
+    public static function set($responseHeader): void
+    { 
+        Response::$type = $responseHeader;
     }
 }
