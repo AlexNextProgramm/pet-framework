@@ -117,6 +117,11 @@ trait Select
         return $this;
     }
 
+    public function whereId($id): Model
+    {
+        $this->strWhere = "WHERE `{$this->table}`.`id` = '$id'";
+    }
+
     public function limit($limit = 100, $DESC = "DESC", $cl = 'id'){
         $this->strWhere .= "ORDER BY $cl $DESC LIMIT $limit;";
         return $this;
@@ -125,4 +130,6 @@ trait Select
     public function max($column = 'id'){
         return  $this->q("SELECT MAX(`$column`) FROM `{$this->table}`")->fetch()['MAX(`id`)'];
     }
+
+   
 }

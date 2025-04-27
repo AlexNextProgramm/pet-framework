@@ -22,7 +22,7 @@ abstract class DB {
     public $strWhere = "";
     public $isSoftRemoval = false;
     public $strJoin = '';
-    public $info = [];
+    protected $info = [];
     public $table;
     public $tableChanged;
     public $column = [];

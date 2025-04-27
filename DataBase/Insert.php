@@ -31,7 +31,8 @@ trait Insert
      *
      * @return bool
      */
-    public function execute(): bool {
+    public function execute(): bool
+    {
         return $this->DB->prepare($this->strQuery)->execute();
     }
 

@@ -60,4 +60,11 @@ abstract class Model extends DB
     {
         return !empty($this->q("SHOW TABLES FROM `".$this->db_name."` LIKE 'migrate' ; ")->fetch());
     }
+
+    public function set(array $data)
+    {
+        if ($this->isInfo()) {
+            return $this->update($data)->whereId($this->v('id'));
+        }
+    }
 }
