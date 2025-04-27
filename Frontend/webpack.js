@@ -1,4 +1,5 @@
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const webpack  = require("webpack");
 
 class Setting {
     path;
@@ -9,7 +10,7 @@ class Setting {
     };
     IsImages = null;
     dir = '/';
-    classes = {
+  classes = {
       // MiniCssExtractPlugin,
       // CssMinimizerPlugin,
       // TerserWebpackPlugin,
@@ -80,7 +81,12 @@ class Setting {
     cssLoaders(extra = null) { 
         const loaders = [
             this.classes.MiniCssExtractPlugin.loader,
-            "css-loader",
+            {
+              loader: 'css-loader',
+              options: {
+                importLoaders: 1,
+              },
+            }
           ];
         
           if (extra) loaders.push(extra);
@@ -112,8 +118,9 @@ class Setting {
               filename: "./view/CSS/[name][hash].css",
             }),
         
-            // Uncomment for bundle analysis in production mode
-            // ...(isProd ? [new BundleAnalyzerPlugin()] : []),
+           new webpack.IgnorePlugin({
+              resourceRegExp: /legacy-js-api/
+            })
           ];
         
           // Добавляем IsImages только если он не равен null
@@ -150,7 +157,16 @@ class Setting {
       return [
         { test: /\.css$/, use: this.cssLoaders() },
         { test: /\.less$/, use: this.cssLoaders("less-loader") },
-        { test: /\.s[ac]ss$/, use: [...this.cssLoaders('sass-loader')] },
+        {
+          test: /\.s[ac]ss$/, use: [...this.cssLoaders({
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                quietDeps: true,// Отключает предупреждения о депрекации
+                implementation: require('sass'),
+              }
+            }
+          })]},
         { test: /\.(png|jpg|svg|gif)$/, type: "asset/resource" },
         { test: /\.(ttf|woff|woff2|eot)$/, use: ["file-loader"] },
         { test: /\.xml$/, use: ["xml-loader"] },
