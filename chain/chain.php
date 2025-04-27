@@ -25,6 +25,15 @@ function attr(string|null $name = null): string|array|null
 {
     return request()->input($name);
 }
+/**
+ * attrs
+  * @return array
+ */
+
+function attrs(): array
+{
+    return request()->attribute;
+}
 
 /**
  * request
@@ -60,4 +69,5 @@ function supple(string $key = null):null|array|string
     }
     return $parametr;
 }
+
 ?>

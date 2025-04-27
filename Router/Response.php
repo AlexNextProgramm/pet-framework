@@ -25,7 +25,7 @@ class Response
         } else {
             if (self::$type == self::TYPE_JSON) {
                 header(self::$type);
-                die(json_encode($data));
+                die(json_encode($data, JSON_UNESCAPED_UNICODE));
             }
         }
     }

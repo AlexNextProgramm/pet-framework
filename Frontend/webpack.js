@@ -34,16 +34,18 @@ class Setting {
         page.forEach((fileAndDir) => {
             const file = dir + '/' + fileAndDir;
             if (this.fs.statSync(file).isDirectory()) {
-                const name = fileAndDir
-                this.pages.entry[name] = `./page/${name}.ts`;
-                this.pages.html.push({
-                    filename: './view/page/' + `${name}/head.php`,
-                    template: './head.php',
-                    entry: this.path.join(this.dir, "src/page", `${name}.ts`),
-                    chunks: ['root', name],
-                    minify: { collapseWhitespace: this.isProd }
-                })
-            }
+              const name = fileAndDir
+              const entrydir = this.path.join(this.dir, "src/page", `${name}.ts`);
+              let ext = this.fs.existsSync(entrydir) ? 'ts' : 'tsx';
+              this.pages.entry[name] = `./page/${name}.${ext}`;
+              this.pages.html.push({
+                  filename: './view/page/' + `${name}/head.php`,
+                  template: './head.php',
+                  entry: this.path.join(this.dir, "src/page", `${name}.${ext}`),
+                  chunks: ['root', name],
+                  minify: { collapseWhitespace: this.isProd }
+              })
+          }
         })
     }
 
