@@ -13,6 +13,7 @@ class Router extends Middleware
     public static $Route = [];
     public static int $id = 0;
     public static $event = [];
+    private static $ajaxtype = ['POST'];
     public function __construct() {
     }
 
@@ -58,6 +59,10 @@ class Router extends Middleware
         $control = false;
 
         foreach (Router::$Route as $Rout) {
+             //Прямое направление через event при ajax
+            if ($result = self::ajax($request) && in_array($request->getMethod(), self::$ajaxtype)) {
+                Response::die($result);
+            }
             if ($Rout['method'] != $request->getMethod()) continue;
             if ($control) continue;
 
@@ -73,11 +78,6 @@ class Router extends Middleware
                 if ($resultMiddleware === false) break;
             }
 
-            //Прямое направление через action при ajax
-            if ($result = self::ajax($Rout, $request)) {
-                Response::die($result);
-            }
-
             $controller = (new EssenceClass())->open($Rout['callback'], $request);
 
             // если контроллер что-то хочет вернуть
@@ -89,7 +89,7 @@ class Router extends Middleware
         if (!$control) http_response_code('404');
     }
 
-    private static function ajax(&$Rout, $request):bool
+    private static function ajax($request):bool
     {
         foreach (self::$event as $key => $action) {
             if (!empty($request->header[$key])) {
