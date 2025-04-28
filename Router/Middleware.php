@@ -38,6 +38,6 @@ abstract class Middleware
     private static function isMany($data)
     {
         self::$isManyMiddle = count($data) > 2;
-        if(self::$isManyMiddle) $data = $data[0];
+        if(!self::$isManyMiddle) $data = $data[0];
     }
 }
