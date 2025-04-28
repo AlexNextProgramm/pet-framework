@@ -35,9 +35,9 @@ abstract class Middleware
         }
     }
 
-    private static function isMany($data)
+    private static function isMany(&$data)
     {
-        self::$isManyMiddle = count($data) > 2;
+        self::$isManyMiddle = count($data) > 1;
         if(!self::$isManyMiddle) $data = $data[0];
     }
 }
