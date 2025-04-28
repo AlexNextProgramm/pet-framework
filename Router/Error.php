@@ -2,9 +2,11 @@
 
 namespace Pet\Router;
 
+use Pet\Router\HTTP;
+
 class Error
 {
-    const FORBIDDEN = 403;
+    const STATUS_HTTP = HTTP::class;
     public static $events = [];
 
     public static function setHttp($code, $massange = null)

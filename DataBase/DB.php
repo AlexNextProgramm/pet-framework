@@ -2,31 +2,41 @@
 
 namespace Pet\DataBase;
 
+use Error;
 use PDO;
 use Exception;
+use PDOException;
 use PDOStatement;
 use Pet\Command\Console\Console;
+use Pet\Errors\AppException;
 use Pet\Tools\Tools;
 
-abstract class DB {
+abstract class DB
+{
 
-    private $db_type = DB_TYPE;
-    private $db_host = DB_HOST;
-    protected $db_name = DB_NAME;
-    private $db_port = DB_PORT;
-    private $db_user = DB_USER;
-    private $db_password = DB_PASSWORD;
+    private string $db_type = DB_TYPE;
+    private string $db_host = DB_HOST;
+    protected string $db_name = DB_NAME;
+    private string|int $db_port = DB_PORT;
+    private string $db_user = DB_USER;
+    private string $db_password = DB_PASSWORD;
 
 
-    public $strQuery = "";
-    public $strWhere = "";
-    public $isSoftRemoval = false;
-    public $strJoin = '';
+    protected string $strQuery = "";
+    protected string $strWhere = "";
+    protected string $strOrders = "";
+    protected string $strJoin = "";
+    protected string $strGrops = "";
+    protected string $strLimit = "";
+
+    protected $SUB = "";
+
     protected $info = [];
-    public $table;
-    public $tableChanged;
-    public $column = [];
-    public PDO|null $DB = null;
+
+    protected string $table = "";
+    protected $column = [];
+    protected $error = [];
+    private PDO|null $DB = null;
 
     /**
      * __construct
@@ -34,9 +44,10 @@ abstract class DB {
      * @param array|string $id
      * @return void
      */
-    public function __construct(array|string|null $id = null) {
+    public function __construct(array|string|null $id = null)
+    {
         $this->conn();
-        $this->info = $this->get($id);
+         $this->setInfoId($id);
     }
 
     /**
@@ -44,18 +55,25 @@ abstract class DB {
      *
      * @return array
      */
-    public function fetch()
+    public function fetch($many = true) : array
     {
-        $this->complecte();
-        $this->info = $this->q($this->strQuery)->fetchAll(PDO::FETCH_ASSOC);
-        return $this->info;
+        $query = $this->toString();
+        $this->clearQuery();
+        if ($many) {
+            return $this->q($query)->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            return $this->q($query)->fetch(PDO::FETCH_ASSOC);
+        }
     }
 
-    public function complecte()
+    public function toString(): string
     {
-        $this->strQuery = $this->strQuery . $this->strJoin . $this->strWhere;
-        $this->strJoin  = $this->strJoin = $this->strWhere = '';
-        $this->whereSyntax($this->strQuery);
+        return $this->strQuery . $this->strJoin . $this->strWhere . $this->strGrops . $this->strOrders.$this->strLimit;
+    }
+
+    private function clearQuery():void
+    {
+        $this->strQuery = $this->strJoin = $this->strWhere =  $this->strGrops = $this->strOrders = $this->strLimit = '';
     }
 
      /**
@@ -65,89 +83,110 @@ abstract class DB {
      */
     public function execute(): bool
     {
-        $this->complecte();
-        return $this->DB->prepare($this->strQuery)->execute();
+        try {
+
+            $query = $this->toString();
+            $this->clearQuery();
+            return $this->DB->prepare($query)->execute();
+        } catch (PDOException $q) {
+            $this->error[] = $q->errorInfo;
+            return false;
+        }
     }
 
 
-    private function conn() {
+    private function conn()
+    {
         try {
             $this->DB = new PDO("{$this->db_type}:host={$this->db_host}:{$this->db_port};dbname={$this->db_name}", $this->db_user, $this->db_password);
         } catch (\PDOException $e) {
-            Console::text("ERROR DB: " . $e->getMessage(), 'red');
+            throw new AppException($e->errorInfo[2], $e->errorInfo[1]);
         }
     }
 
-
-    public function q($query): PDOStatement|null
+    /**
+     * q
+     *
+     * @param  mixed $query
+     * @return PDOStatement
+     */
+    public function q(string $query): PDOStatement
     {
-        if ($this->DB != null) {
-            return $this->DB->query($query, PDO::FETCH_ASSOC);
-        } else {
-            Console::text("NOT CONNECT DB", 'red');
-            exit;
+        if (!$this->DB) {
+            throw new AppException('NO CONNECT DB');
         }
+        return $this->DB->query($query, PDO::FETCH_ASSOC);
     }
 
-
-
-    private function whereSyntax(&$query)
-    {
-        $str =  explode('WHERE', $query);
-        if (count($str) == 2 && trim($str[1]) == '') {
-            $query = $str[0] . 'WHERE 1';
-        } else {
-            $str = explode('ORDER BY', $str[1]);
-            if (count($str) == 2 && trim($str[0]) == '') {
-                $query = str_replace('WHERE', '', $query);
-            }
-        }
-    }
-
-
-    private function get($id): array
+    /**
+     * setInfoId
+     *
+     * @param  mixed $id
+     * @return void
+     */
+    public function setInfoId(array|int|string $id): void
     {
         if (empty($id)) {
-            return [];
+            return;
         }
         $pdoStatment = null;
         if (gettype($id) == 'string' || gettype($id) == 'integer') {
             $pdoStatment = $this->q("SELECT * FROM {$this->table} WHERE id='$id';");
         }
 
-        if (gettype($id) == 'array' && !empty($id)) {
-            $ids = !empty($id['id']) ? $id['id'] : null;
-            if ($ids) {
-                $pdoStatment =  $this->q("SELECT * FROM {$this->table} WHERE id='$ids';");
+        if (gettype($id) == 'array') {
+            $isId = $id['id'] ?? null;
+            if ($isId) {
+                $pdoStatment =  $this->q("SELECT * FROM {$this->table} WHERE id='$isId';");
             } else {
-                $where = Tools::array_implode(", AND ", $id, "[key]='[val]'");
-                $pdoStatment =  $this->q("SELECT * FROM {$this->table} WHERE $where;");
+                $data = implode(" AND ", Tools::filter($id, fn($k, $v) => "{$this->table}.$k = '$v' "));
+                $pdoStatment =  $this->q("SELECT * FROM {$this->table} WHERE $data LIMIT 2;");
             }
         }
-        $result = $pdoStatment->fetchAll(PDO::FETCH_ASSOC);
-        if (count($result) == 1) {
-            return  $result[0];
-        }
-        return [];
+        $result = $pdoStatment ? $pdoStatment->fetchAll(PDO::FETCH_ASSOC):[];
+            $this->info = count($result) == 1 ? $result[0] : []; // не должно в этом условии быть множества
     }
 
+    /**
+     * isInfo
+     *
+     * @return bool
+     */
     public function isInfo(): bool
     {
         return !empty($this->info);
     }
 
-    public function v($key): string|null
+    /**
+     * get
+     *
+     * @param  string|int $field
+     * @return string|null
+     */
+    public function get(string|int $field): string|null
     {
         if ($this->isInfo()) {
-            Tools::is_assos($this->info) === 'assos'  ? $this->info[$key] : $this->info[0][$key];
+            return $this->info[$field] ?? null;
         }
         return null;
     }
 
-    public function arrayQuote(&$array)
+    public function arrayQuote(&$array): void
     {
+        if (!$this->DB) {
+            $this->conn();
+        }
         foreach ($array as $i => $v) {
             $array[$i] = $this->DB->quote($v);
         }
+    }
+
+    public function endError(): null
+    {
+        return $this->error[array_key_last($this->error)] ?? null;
+    }
+    public function getInfo(): array
+    {
+        return $this->info ?? [];
     }
 }

@@ -96,4 +96,13 @@ class Tools {
         if ($save) file_put_contents($save, $file);
         return $file;
     }
+
+
+    public static function filter(array $data, callable $callback): array
+    {
+        foreach ($data as $k => $v){
+            $data[$k] = $callback($k, $v);
+        }
+        return $data;
+    }
 }

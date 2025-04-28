@@ -12,49 +12,27 @@ abstract class Model extends DB
 {
     use  Select, Update, Delete, Insert;
     public array $hidden = [];
-    public function __construct($data)
+
+    public function __construct(array|null $data = null, bool $isNotExistCreate = false)
     {
-        parent::__construct($data);
-    }
-    /**
-     * find
-     *
-     * @param  array $searh
-     * @param  array $column
-     * @param  int $limit
-     * @return array
-     */
-    public function find($searh = [], $column = [], $limit = null): array
-    {
-        if ($limit) {
-            return  $this->select($column)->And($searh)->limit($limit)->fetch();
-        } else {
-            return  $this->select($column)->And($searh)->fetch();
+            parent::__construct($data);
+        if (!$this->exist() && $isNotExistCreate) {
+             $id = $this->create($data);
+             $this->setInfoId($id);
         }
     }
 
-    /**
-     * isRow
-     *
-     * @param  mixed $searh
-     * @return bool
-     */
-    public function isRow($searh): bool
+    public function find($fields = null, callable|null $callback = null) : array
     {
-        return $this->find($searh, [], 1) != [];
-    }
-
-
-    public function setUp($find, $value)
-    {
-        if (gettype($find) == 'string') {
-            $find = [$find => $value[$find]];
+        $this->select();
+        if ($fields) {
+            $fields = Tools::filter($fields, fn($k, $v)=> "{$this->table}.$k = '$v' ");
+            $this->where(implode(' AND ', $fields));
         }
-        if ($this->isRow($find)) {
-            $this->update($value)->and($find)->fetch();
-        } else {
-            $this->set($value);
+        if ($callback) {
+            $callback($this);
         }
+        return $this->fetch();
     }
 
     public function isTable(): bool
@@ -62,6 +40,12 @@ abstract class Model extends DB
         return !empty($this->q("SHOW TABLES FROM `".$this->db_name."` LIKE 'migrate' ; ")->fetch());
     }
 
+    /**
+     * set
+     *
+     * @param  mixed $data
+     * @return bool
+     */
     public function set(array $data): bool
     {
         if ($this->isInfo()) {
@@ -70,11 +54,21 @@ abstract class Model extends DB
         return false;
     }
 
+    /**
+     * exist
+     *
+     * @return bool
+     */
     public function exist():bool
     {
         return $this->isInfo();
     }
 
+    /**
+     * data
+     *
+     * @return array
+     */
     public function data() : array
     {
         $result = [];

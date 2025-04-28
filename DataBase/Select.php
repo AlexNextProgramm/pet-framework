@@ -11,96 +11,65 @@ trait Select
 {
 
     public $strSelect = '';
+    private $join = "";
+    private $or = "";
 
     /**
      * select
      *
-     * @param  mixed $ArrayColumnAndValue
+     * @param  $str
      * @return Select
      */
-    public function select(array $ArrayColumnAndValue = [], $AS = []): Model
+    public function select(string|null ...$column): Model
     {
-        $strColumn =  Tools::is_assos($ArrayColumnAndValue) == 'assos' ?
-            array_keys($ArrayColumnAndValue) : $ArrayColumnAndValue;
-        if (count($this->column) != 0) {
-            if (count(array_diff($ArrayColumnAndValue, $this->column)) != 0) {
-                $strColumn = $this->column;
-            }
+        $strSelect = "{$this->table}.* ";
+        if (!empty($column)) {
+            $column = Tools::filter($column, function ($k, $v) {
+                if (preg_match("/^[\S]*[ ]{1}[\S]*$/", $v)) {
+                    $v = str_replace(' ', ' as ', $v);
+                }
+                return $v;
+            });
+            $strSelect = implode(',', $column);
         }
-         $strSelect = '*';
-        if (count($strColumn) == 0) {
-            $strSelect = "{$this->table}.*";
-        } else {
-            $strSelect .=  Tools::array_implode(",", $strColumn, "`{$this->table}`.`[val]`");
-        }
-        if (count($AS) > 0) {
-            $strSelect .= ", " . Tools::array_implode(",", $AS, "[key] AS [val]");
-        }
-        $table = $this->tableChanged ?? $this->table;
-
-        $this->strQuery = "SELECT {$strSelect} FROM `$table` ";
+        $this->strQuery = "SELECT {$strSelect} FROM `{$this->table}` ";
+        $this->SUB = "SELECT";
         return  $this;
     }
 
-
     /**
-     * or
+     * join
      *
-     * @param  mixed $assos
-     * @param  mixed $tie
+     * @param  mixed $table
+     * @param  mixed $select
      * @return Select
      */
-    public function or($assos, $tie = ''): Model {
-        if (!str_contains($this->strWhere, 'WHERE')) $this->strWhere = " WHERE ";
-        $this->strWhere .= "(" . Tools::array_implode(' OR ', $assos, "`[key]`='[val]'") . ") $tie ";
+    public function join(string $table, string $type = "LEFT" ) : Model
+    {
+        $this->join = "$type JOIN $table ON ";
+        $this->SUB = "JOIN";
         return $this;
     }
 
-    public function orn($name, $array , $tie = ''){
-        if (!str_contains($this->strWhere, 'WHERE')) $this->strWhere = " WHERE ";
-        foreach($array as $k => $v) if(count($array) != $k + 1 ) $array[$k] = $v." OR ";
-        $this->strWhere .= "($name =".implode("$name =", $array).")" . $tie;
-        return $this;
-    }
-    /**
-     * and
-     *
-     * @param  mixed $assos
-     * @param  mixed $tie
-     * @return Select
-     */
-    public function and($assos,  $tie = ''): Model {
-        if (!str_contains($this->strWhere, 'WHERE')) $this->strWhere = " WHERE ";
-        if (count($assos) != 0) {
-            $str = Tools::array_implode(' AND ', $assos, "`{$this->table}`.`[key]` = '[val]'");
-            $str = count($assos) > 1 ? "( $str ) " : $str;
-            $this->strWhere .= " $str $tie ";
-        } else {
-            $this->strWhere .= " $tie ";
+    public function on(string|array ...$select)
+    {
+        if ($this->join != '' ) {
+            foreach ($select as $ons) {
+                $this->strJoin  .= "{$this->join}(";
+                if (is_array($ons)) {
+                    $this->strJoin .= $ons[0]. $ons[2] ?? "=". $ons[1];
+                }
+
+                if (in_array(strtoupper(trim($ons)), ["AND", "OR"])) {
+                    $this->strJoin .= " $ons ";
+                } elseif (gettype($ons) == 'string') {
+                    $this->strJoin .=  $ons ;
+                }
+                $this->strJoin  .= ")";
+            }
+            $this->join = '';
         }
-        return $this;
-    }
-
-    /**
-     * join
-     *
-     * @param  mixed $table
-     * @param  mixed $select
-     * @return Select
-     */
-    public function join(string $table, array $select): Model {
-        $this->strJoin .= "JOIN $table ON " . Tools::array_implode(' AND ', $select, "`{$this->table}`.`[key]` = `{$table}`.`[val]`");
-        return $this;
-    }
-     /**
-     * join
-     *
-     * @param  mixed $table
-     * @param  mixed $select
-     * @return Select
-     */
-    public function leftJoin(string $table, array $select): Model {
-        $this->strJoin .= "LEFT JOIN $table ON " . Tools::array_implode(' AND ', $select, "`{$this->table}`.`[key]` = `{$table}`.`[val]`");
+        $this->SUB = "ON";
         return $this;
     }
 
@@ -108,27 +77,101 @@ trait Select
     /**
      * where
      *
-     * @param  mixed $str
-     * @return Select
+     * @param string $str
+     * @return Model
      */
-    public function where($str = ''): Model {
-
-        $this->strWhere = "WHERE $str";
-        return $this;
-    }
-
-    public function whereId($id): Model
+    public function where(string $str = ''): Model
     {
-        $this->strWhere = "WHERE `{$this->table}`.`id` = '$id'";
+        $this->strWhere = " WHERE $str";
+        $this->SUB = "WHERE";
         return $this;
     }
 
-    public function limit($limit = 100, $DESC = "DESC", $cl = 'id'){
-        $this->strWhere .= "ORDER BY $cl $DESC LIMIT $limit;";
+    /**
+     * and
+     *
+     * @param string $str
+     * @return Model
+     */
+    public function and(string $str): Model
+    {
+        $this->conditions($str, " AND ");
         return $this;
     }
 
-    public function max($column = 'id'){
-        return  $this->q("SELECT MAX(`$column`) FROM `{$this->table}`")->fetch()['MAX(`id`)'];
+    /**
+     * or
+     *
+     * @param string $str
+     * @return Model
+     */
+    public function or(string $str): Model
+    {
+        $this->conditions($str, " OR ");
+        return $this;
+    }
+
+    /**
+     * orderBy
+     *
+     * @param string $str
+     * @return Model
+     */
+    public function orderBy(string $str = ""): Model
+    {
+        $this->strOrders = " ORDER BY $str";
+        $this->SUB = " ORDER BY";
+        return $this;
+    }
+
+    /**
+     * groupBy
+     *
+     * @param string $str
+     * @return Model
+     */
+    public function groupBy(string $str = ""): Model
+    {
+        $this->strGroups = " GROUP BY $str";
+        $this->SUB = "GROUP BY";
+        return $this;
+    }
+
+    /**
+     * whereId
+     *
+     * @param string|int $id
+     * @return Model
+     */
+    public function whereId(string|int $id): Model
+    {
+        $this->strWhere = " WHERE `{$this->table}`.`id` = '$id'";
+        $this->SUB = "WHERE";
+        return $this;
+    }
+
+    /**
+     * limit
+     *
+     * @param  mixed $str
+     * @return Model
+     */
+    public function limit(string|int $str = ""): Model
+    {
+        $this->strLimit .= " LIMIT $str";
+        $this->SUB = "LIMIT";
+        return $this;
+    }
+
+    public function max(string $field = 'id')
+    {
+        return $this->select("MAX(`$field`) max")->fetch(false)['max'];
+    }
+
+    private function conditions($str, $conds): void
+    {
+        if ($this->SUB = "WHERE") {
+            $this->strWhere .= " $conds $str";
+        }
     }
 }

@@ -40,7 +40,7 @@ class MigrateCommand extends Model
     private function up()
     {
         // проверить существование таблцы
-        if (!$this->isTable()) {
+        if (!empty($this->q("SHOW TABLES FROM `".$this->db_name."` LIKE 'migrate' ; ")->fetch())) {
             $this->q(
                 "CREATE TABLE `migrate` (
                     `id` INT NOT NULL AUTO_INCREMENT ,

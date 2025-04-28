@@ -18,36 +18,11 @@ trait Delete
      * @param  bool $returnThis default false
      * @return Delete
      */
-    public function del(array $ArrayColumnAndValue = [], $returnThis = false): Model|bool
+    public function delele():Model
     {
-        $this->strQuery =  "DELETE FROM `{$this->table}` WHERE " . Tools::array_implode(" AND ", $ArrayColumnAndValue, "`[key]` = '[val]'");
-        $this->strQuery = $this->delSoft($ArrayColumnAndValue);
-        return $returnThis ? $this : $this->DB->prepare($this->strQuery)->execute();
+        $this->strQuery =  "DELETE FROM `{$this->table}`";
+        $this->SUB = "DELETE";
+        return $this;
     }
 
-    /**
-     * delOr
-     *
-     * @param  array $ArrayColumnAndValue
-     * @param  bool $returnThis default false
-     * @return Delete
-     */
-    public function delOr(array $ArrayColumnAndValue = [], $returnThis = false): Model|bool
-    {
-        $this->strQuery =  "DELETE FROM `{$this->table}` WHERE " . Tools::array_implode(" OR ", $ArrayColumnAndValue, "`[key]` = '[val]'");
-        $this->strQuery = $this->delSoft($ArrayColumnAndValue);
-        return $returnThis ? $this : $this->DB->prepare($this->strQuery)->execute();
-    }
-
-    /**
-     * delSoft
-     *
-     * @param array $ArrayColumnAndValue
-     * @return string
-     */
-    private function delSoft(array $ArrayColumnAndValue): string
-    {
-        return !$this->isSoftRemoval ?
-            $this->strQuery : ""; // подумать о мягком удалении
-    }
 }

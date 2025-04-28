@@ -2,6 +2,8 @@
 
 namespace Pet\DataBase;
 
+use PDOException;
+
 trait Insert
 {
 
@@ -22,19 +24,13 @@ trait Insert
         $value = array_values($ArrayColumnAndValue);
         $this->arrayQuote($value);
         $this->strQuery = "INSERT INTO `{$this->table}` ( " . implode(' , ', $key) . " ) VALUES ( " . implode(", ", $value) . ")";
-
-        return  $this->DB->prepare($this->strQuery)->execute();
+        $this->SUB = "INSERT";
+        return  $this->execute();
     }
 
-    /**
-     * set
-     *  вернет последний id после установки значения
-     * @param  mixed $value
-     * @return string
-     */
-    public function set(array $value): string
+    public function create($data)
     {
-        $this->insert($value);
-        return $this->DB->lastInsertId();
+            $this->insert($data);
+            return $this->DB->lastInsertId();
     }
 }
