@@ -49,7 +49,7 @@ abstract class Model extends DB
     public function set(array $data): bool
     {
         if ($this->isInfo()) {
-            return $this->update($data)->whereId($this->v('id'))->execute();
+            return $this->update($data)->whereId($this->get('id'))->execute();
         }
         return false;
     }
