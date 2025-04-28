@@ -18,25 +18,25 @@ class Router extends Middleware
     }
 
 
-    public static function get($path, $callback): Router {
+    public static function get($path, ...$callback): Router {
         Router::$Route[] = ["path" => $path, "method" => 'GET', "callback" => $callback];
         Router::$id = array_key_last(Router::$Route);
         return new Router();
     }
 
-    public static function post($path, $callback): Router {
+    public static function post($path, ...$callback): Router {
         Router::$Route[] = ["path" => $path, "method" => 'POST', "callback" => $callback];
         Router::$id = array_key_last(Router::$Route);
         return new Router();
     }
 
-    public static function delete($path, $callback): Router {
+    public static function delete($path, ...$callback): Router {
         Router::$Route[] = ["path" => $path, "method" => 'DELETE', "callback" => $callback];
         Router::$id = array_key_last(Router::$Route);
         return new Router();
     }
 
-    public static function put($path, $callback): Router {
+    public static function put($path, ...$callback): Router {
         Router::$Route[] = ["path" => $path, "method" => 'PUT', "callback" => $callback];
         Router::$id = array_key_last(Router::$Route);
         return new Router();
@@ -75,14 +75,30 @@ class Router extends Middleware
 
             //Заглушка в middleware
             if (key_exists('middleware', $Rout)) {
-                $resultMiddleware = (new EssenceClass())->open($Rout['middleware'], $request);
+                if (key_exists('isManyMiddle', $Rout)) {
+
+                    foreach ($Rout['middleware'] as $middleware) {
+                        $resultMiddleware = (new EssenceClass())->open($middleware, $request);
+                        if ($resultMiddleware === false) break;
+                    }
+                } else {
+                    $resultMiddleware = (new EssenceClass())->open($Rout['middleware'], $request);
+                }
                 if ($resultMiddleware === false) break;
             }
-
-            $controller = (new EssenceClass())->open($Rout['callback'], $request);
+            $controller = [];
+            if (count($Rout['callback']) == 1) {
+                $controller[] = (new EssenceClass())->open($Rout['callback'][0], $request);
+            } elseif (count($Rout['callback']) > 1) {
+                foreach ($Rout['callback'] as $callbackRout) {
+                    $controller[] = (new EssenceClass())->open($callbackRout, $request);
+                }
+            }
 
             // если контроллер что-то хочет вернуть
-            if (!empty($controller) || gettype($controller) == 'array') echo json_encode($controller, JSON_UNESCAPED_UNICODE);
+            if (!empty($controller)){
+                echo json_encode(count($controller) == 1 ? $controller[0] : $controller, JSON_UNESCAPED_UNICODE);
+            }
             $control = true;
         }
 

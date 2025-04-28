@@ -2,12 +2,10 @@
 
 namespace Pet\View;
 
-use Pet\Territory;
-
 class View
 {
     const DIR_VIEW = PUBLIC_DIR . DS . 'view';
-    private $argument;
+    private static $argument = [];
     /**
      * open
      * @param  string $viewName
@@ -18,6 +16,7 @@ class View
     {
         $this->path($viewName);
         if (!is_dir(self::DIR_VIEW) || !file_exists(self::DIR_VIEW . "/$viewName.php")) die("Нет файла или дериктории в view $viewName.php");
+        $argument += self::$argument;
         foreach ($argument as $key => $val) {
             ${$key} = $val;
         }
@@ -27,5 +26,9 @@ class View
     {
         $path = implode(DS, explode(".", $path));
         return $path;
+    }
+
+    public static function append(array $data){
+        self::$argument += $data;
     }
 }
