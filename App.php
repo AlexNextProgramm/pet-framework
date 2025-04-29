@@ -1,22 +1,26 @@
 <?php
+
 namespace Pet;
 
-
+use Pet\Errors\AppException;
 use Pet\Errors\Errors;
 use Pet\Request\Request;
 use Pet\Router\Router;
 use Pet\Session\Session;
+use Pet\Tools\Tools;
 
 class App
 {
 
-    const PUBLIC_DIR = PUBLIC_DIR;
+    public const PUBLIC_DIR = PUBLIC_DIR;
+    public const ROUTER_DIR = PUBLIC_DIR . DS . 'router';
     public $router;
     public $request;
     public $session;
+
     public function __construct() {
         (new Errors());
-        $this->htExits();
+        self::isHtaccess();
         $this->session = new Session();
         $this->request = new Request();
         $this->router = new Router();
@@ -28,45 +32,53 @@ class App
      * @param  mixed $router_dir
      * @return void
      */
-    public static function init($router_dir = self::PUBLIC_DIR . "/router")
+    public static function init()
     {
-        $GLOBALS['app'] = $app = new App();
-        self::initProjectFile();
-        $app->includeRouter($router_dir);
-        $app->router::init();
+        $GLOBALS['app'] = new App();
+        self::initClass();
+        self::initRouter(self::ROUTER_DIR);
+        Router::init();
     }
 
-    private function htExits()
+    /**
+     * isHtaccess
+     *
+     * @return void
+     */
+    private static function isHtaccess(): void
     {
         if (!file_exists(self::PUBLIC_DIR . '/.htaccess')) {
-            file_put_contents(
-                self::PUBLIC_DIR . '/.htaccess',
-                "RewriteEngine On \nRewriteBase / \nRewriteCond %{REQUEST_FILENAME} !-f \nDirectoryIndex index.php \n "
-            );
+            throw new AppException("Not file .htaccess", E_ERROR);
         }
     }
 
-    private function includeRouter($path) {
-
-        if (!is_dir($path)) echo "Not Folder router";
-
-        foreach (scandir($path) as $dir) {
-            if ($dir == ".." || $dir == '.') continue;
-            $dir = "$path/$dir";
-            if (is_dir($dir)) {
-                $this->includeRouter($dir);
-            } else {
-
-                if (is_readable($dir)) {
-                    if (pathinfo($dir, PATHINFO_EXTENSION) === 'php') {
-                        include_once($dir);
-                    }
-                }
+    /**
+     * initRouter
+     * Запуск Роутеров
+     * @param  mixed $path
+     * @return void
+     */
+    public static function initRouter(string $path): void
+    {
+        if (!is_dir($path)) {
+            throw new AppException("Not Folder router", E_ERROR);
+        }
+        Tools::scan($path, function ($dir, $file) {
+            if (!empty($file) && pathinfo($dir, PATHINFO_EXTENSION) === 'php'){
+                include_once($file);
             }
-        }
+            if (!empty($dir)) {
+                self::initRouter($dir);
+            }
+        }, true);
     }
 
-    public static function initProjectFile()
+    /**
+     * initClass
+     * Запуск класоов проекта
+     * @return void
+     */
+    public static function initClass()
     {
         spl_autoload_register(function ($class) {
             $file = str_replace('\\', DS, $class) . '.php';
@@ -94,5 +106,3 @@ class App
         }
     }
 }
-
-?>

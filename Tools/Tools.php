@@ -57,7 +57,7 @@ class Tools {
             array_keys($arrKeyValue)
         ));
     }
-    
+
     /**
      * is_assos
      *
@@ -104,5 +104,20 @@ class Tools {
             $data[$k] = $callback($k, $v);
         }
         return $data;
+    }
+
+    public static function scan(string $path, callable $callback, $isPath = false):void
+    {
+        foreach (scandir($path) as $file) {
+            if (in_array($path, ['..', '.'])) continue;
+            $name =  $path . DS . $file;
+            if ($isPath) {
+                if (is_dir($name)) $callback($name, false);
+                if (file_exists($name) && is_readable($name)) $callback(false, $name);
+            } else {
+                if (is_dir($name)) $callback($file, false);
+                if (file_exists($name) && is_readable($name)) $callback(false, $file);
+            }
+        }
     }
 }

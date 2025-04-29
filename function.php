@@ -22,28 +22,30 @@ function search_include_class($path, $class = '') {
 function env($constans = null, $default = null) : ?string
 {
     if(!$constans) return null;
-    if (!file_exists(ROOT . '/.env')) echo 'Нет файла .env в корне проекта';
+    if (!file_exists(ROOT . '/.env')) {
+        throw new Exception("There is no .env file in the project root");
+    }
 
     $env = file(ROOT . '/.env');
 
     foreach ($env as $str) {
         if (str_contains(trim($str), '#') && strpos(trim($str), "#") == 0) continue;
-        if (str_contains($str, '=')) {
-
-            $param = explode('=', $str);
-
-            if (trim($param[0]) == trim($constans)) {
-               $param = trim(str_replace([';', '"', "'",], '', $param[1]));
-               return $param == ''? $default: $param;
-            }
+        if (!str_contains($str, '=')) continue;
+        $param = explode('=', $str);
+        if (trim($param[0]) == trim($constans)) {
+            $param = trim(str_replace([';', '"', "'",], '', $param[1]));
+            return $param == '' ? $default : $param;
         }
     }
     return $default;
 }
 
 
-function setConstantEnv($ROOT){
-    if (!file_exists($ROOT . '/.env')) echo 'Нет файла .env в корне проекта';
+function setConstantEnv($ROOT): void 
+{
+    if (!file_exists($ROOT . '/.env')) {
+        throw new Exception("There is no .env file in the project root");
+    }
     $env = file($ROOT . '/.env');
     foreach ($env as $str) {
         if (str_contains(trim($str), '#') && strpos(trim($str), "#") == 0) continue;
@@ -51,7 +53,7 @@ function setConstantEnv($ROOT){
             $param = explode('=', $str);
             $value= trim(str_replace([';', '"', "'",], '', $param[1]));
 
-            if(!defined(trim($param[0]))){
+            if (!defined(trim($param[0]))) {
                 define(trim($param[0]), ($value == '' ? null :  $value));
             }
         }
