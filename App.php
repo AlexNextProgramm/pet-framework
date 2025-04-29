@@ -18,7 +18,8 @@ class App
     public $request;
     public $session;
 
-    public function __construct() {
+    public function __construct()
+    {
         (new Errors());
         self::isHtaccess();
         $this->session = new Session();
@@ -64,7 +65,7 @@ class App
             throw new AppException("Not Folder router", E_ERROR);
         }
         Tools::scan($path, function ($dir, $file) {
-            if (!empty($file) && pathinfo($dir, PATHINFO_EXTENSION) === 'php'){
+            if (!empty($file) && pathinfo($file, PATHINFO_EXTENSION) === 'php'){
                 include_once($file);
             }
             if (!empty($dir)) {

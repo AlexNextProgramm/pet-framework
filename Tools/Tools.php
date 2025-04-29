@@ -109,7 +109,7 @@ class Tools {
     public static function scan(string $path, callable $callback, $isPath = false):void
     {
         foreach (scandir($path) as $file) {
-            if (in_array($path, ['..', '.'])) continue;
+            if (in_array($file, ['..', '.'])) continue;
             $name =  $path . DS . $file;
             if ($isPath) {
                 if (is_dir($name)) $callback($name, false);
