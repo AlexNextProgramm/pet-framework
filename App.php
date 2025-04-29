@@ -76,6 +76,22 @@ class App
             }
             return false;
         });
+
+        //Export external
+        if (defined('EXTERNAL_MODULE')) {
+            spl_autoload_register(function ($class) {
+                foreach (explode("||", EXTERNAL_MODULE) as $module) {
+                    $path = ROOT . DS . "$module". DS;
+
+                    $file = $path.str_replace('\\', DS, $class) . '.php';
+                    if (file_exists($file)) {
+                        require_once $file;
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        }
     }
 }
 
