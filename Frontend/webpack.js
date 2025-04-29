@@ -7,7 +7,7 @@ class Setting {
   clear = ['view/assets/**'];
   img = "view/assets/img";
   font = "view/assets/fonts";
-  template
+  template = "./head.php";
     path;
     fs;
     pages = {
