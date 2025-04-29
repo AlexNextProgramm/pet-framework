@@ -2,14 +2,20 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const webpack  = require("webpack");
 
 class Setting {
+  js = "";
+  css = "";
+  clear = ['view/assets/**'];
+  img = "view/assets/img";
+  font = "view/assets/fonts";
+  template
     path;
     fs;
     pages = {
         html: [],
         entry: { root: "./root.tsx" }
     };
-    IsImages = null;
-    dir = '/';
+  IsImages = null;
+  dir = '/';
   classes = {
       // MiniCssExtractPlugin,
       // CssMinimizerPlugin,
@@ -28,8 +34,37 @@ class Setting {
         this.getIsImages();
     }
 
+  getENV() {
+    const ENV = {};
+      const fileENV = this.fs.readFileSync(this.path.resolve(this.dir, ".env"), {encodeding:"utf8", flag:'r'});
+      fileENV.toString().split("\n").forEach((row)=>{
+        if (row.trim().indexOf("#") == 0 || row.trim() == "" || row.trim().indexOf("\n") == 0) {
+        } else {
+          if(row.split("=").length > 1){
+                let conf = row.split("=");
+                conf[1] = conf[1].replace('"',"");
+                conf[1] = conf[1].replace('"', "");
+                conf[1] = conf[1].replace("'", "");
+                conf[1] = conf[1].replace("'", "");
+                ENV[conf[0].trim()] = conf[1].replaceAll(["\"","\'", "\r", "\n"], "").trim()
+          }
+        }
+      })
+    console.log(ENV);
+      ['JS', 'CSS', 'IMG', 'FONT', 'TEMPLATE'].forEach((key) => { 
+        if (ENV[key]) {
+          this[key.toLowerCase()] = ENV[key];
+          console.log("env get param "+key+": " + ENV[key])
+        }
+      })
+    if (ENV['CLEAR']) {
+          console.log("env get param CLEAR: " +ENV['CLEAR'])
+          this.clear = ENV['CLEAR'].split("||");
+      }
+    }
+
     getPage() {
-        const dir = this.path.resolve( this.dir, "dist/view/page")
+        const dir = this.path.resolve(this.dir, "dist/view/page")
         const page = this.fs.readdirSync(dir);
         page.forEach((fileAndDir) => {
             const file = dir + '/' + fileAndDir;
@@ -40,7 +75,7 @@ class Setting {
               this.pages.entry[name] = `./page/${name}.${ext}`;
               this.pages.html.push({
                   filename: './view/page/' + `${name}/head.php`,
-                  template: './head.php',
+                  template: this.template,
                   entry: this.path.join(this.dir, "src/page", `${name}.${ext}`),
                   chunks: ['root', name],
                   minify: { collapseWhitespace: this.isProd }
@@ -59,12 +94,11 @@ class Setting {
                 {
                     context: this.path.resolve(this.dir, "src/images"),
                     from: "*.*",
-                    to: "view/images",
+                    to: this.img,
                 },
                 ],
             });
             }
-
         }
     }
     optimization() { 
@@ -110,14 +144,11 @@ class Setting {
             ...this.pages.html.map(page => new this.classes.HTMLWebpackPlugin(page)),
             
             new CleanWebpackPlugin({
-              cleanOnceBeforeBuildPatterns: [
-                'view/CSS/**',
-                'view/JS/**'
-              ],
+              cleanOnceBeforeBuildPatterns:this.clear
             }),
             
             new this.classes.MiniCssExtractPlugin({
-              filename: "./view/CSS/[name][hash].css",
+              filename: this.css,
             }),
         
            new webpack.IgnorePlugin({
@@ -168,9 +199,15 @@ class Setting {
                 implementation: require('sass'),
               }
             }
-          })]},
+          })]
+        },
         { test: /\.(png|jpg|svg|gif)$/, type: "asset/resource" },
-        { test: /\.(ttf|woff|woff2|eot)$/, use: ["file-loader"] },
+        {
+          test: /\.(ttf|woff|woff2|eot)$/, type: "asset/resource",
+          generator: {
+            filename: `${this.font}/[name][ext]`, // Путь к папке fonts
+          },
+        },
         { test: /\.xml$/, use: ["xml-loader"] },
         { test: /\.csv$/, use: ["csv-loader"] },
         { test: /\.js$/, exclude: /node_modules/, use: this.jsLoaders() },
@@ -186,7 +223,8 @@ class Setting {
 const web = new Setting();
 web.fs = require("fs");
 web.path = require("path");
-web.dir = __dirname+"/../../../../"
+web.dir = __dirname + "/../../../../";
+web.getENV();
 web.classes = {
  
   HTMLWebpackPlugin: require("html-webpack-plugin"),
@@ -205,9 +243,9 @@ const modulesW = {
   mode: web.isDev ? "development" : "production",
   entry: web.pages.entry,
   output: {
-    filename: "view/JS/[name]_[hash].js",
+    filename: "view/assets/js/[name]_[hash].js",
     path: web.path.resolve(web.dir, "dist"),
-    assetModuleFilename: "view/images/[name][ext][query]",
+    assetModuleFilename: "view/assets/img/[name][ext][query]",
   },
   resolve: web.resolve(),
   optimization:  web.optimization(),
