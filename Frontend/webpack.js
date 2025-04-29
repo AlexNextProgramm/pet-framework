@@ -50,7 +50,6 @@ class Setting {
           }
         }
       })
-    console.log(ENV);
       ['JS', 'CSS', 'IMG', 'FONT', 'TEMPLATE'].forEach((key) => { 
         if (ENV[key]) {
           this[key.toLowerCase()] = ENV[key];
