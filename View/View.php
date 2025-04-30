@@ -16,11 +16,11 @@ class View
     {
         $this->path($viewName);
         if (!is_dir(self::DIR_VIEW) || !file_exists(self::DIR_VIEW . "/$viewName.php")) die("Нет файла или дериктории в view $viewName.php");
-        $argument += self::$argument;
-        foreach ($argument as $key => $val) {
+        self::$argument += $argument;
+        foreach (self::$argument as $key => $val) {
             ${$key} = $val;
         }
-        include_once(self::DIR_VIEW . "/$viewName.php");
+        include(self::DIR_VIEW . "/$viewName.php");
     }
     private function path(&$path)
     {
