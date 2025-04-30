@@ -95,6 +95,7 @@ function dd(...$vars)
 
 function svg($name): void
 {
+    if (empty($name)) return;
     $name = str_replace(".", DS, $name);
     $name = SVG.DS.$name.'.svg';
     if (!file_exists($name)){
