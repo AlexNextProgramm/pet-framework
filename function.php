@@ -93,9 +93,11 @@ function dd(...$vars)
     die();
 }
 
-// function svg($path){
-//     include PUBLIC_DIR.V.DS.SVG.DS
-// }
+function svg($name): void
+{
+    $name = str_replace(".", DS, $name);
+    include SVG.DS.$name.'svg';
+}
 
 
 /**
