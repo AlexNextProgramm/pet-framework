@@ -96,7 +96,11 @@ function dd(...$vars)
 function svg($name): void
 {
     $name = str_replace(".", DS, $name);
-    include SVG.DS.$name.'svg';
+    $name = SVG.DS.$name.'.svg';
+    if (!file_exists($name)){
+        throw new Exception("Not search file svg path: $name");
+    }
+    include $name;
 }
 
 
