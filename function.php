@@ -41,7 +41,7 @@ function env($constans = null, $default = null) : ?string
 }
 
 
-function setConstantEnv($ROOT): void 
+function setConstantEnv($ROOT): void
 {
     if (!file_exists($ROOT . '/.env')) {
         throw new Exception("There is no .env file in the project root");
@@ -51,13 +51,30 @@ function setConstantEnv($ROOT): void
         if (str_contains(trim($str), '#') && strpos(trim($str), "#") == 0) continue;
         if (str_contains($str, '=')) {
             $param = explode('=', $str);
-            $value= trim(str_replace([';', '"', "'",], '', $param[1]));
-
+            $value = trim(str_replace([';', '"', "'",], '', $param[1]));
+            $value = serializeenv($value);
             if (!defined(trim($param[0]))) {
                 define(trim($param[0]), ($value == '' ? null :  $value));
             }
         }
     }
+}
+
+function serializeenv(string $valueEnv){
+    preg_match_all("/\[[\w]{1,}\]/", $valueEnv, $mathes);
+    $complect = $mathes[0];
+    if (!empty($complect)) {
+        $res = $valueEnv;
+        foreach ($complect as $str) {
+            $nameConst = str_replace(['[', ']'], '', $str);
+            if (defined($nameConst)) {
+                $valueConst = constant($nameConst);
+                $res = str_replace('['.$nameConst.']', $valueConst, $res);
+            }
+        }
+        return $res;
+    }
+    return $valueEnv;
 }
 
 /**
@@ -75,6 +92,10 @@ function dd(...$vars)
     echo '</pre>';
     die();
 }
+
+// function svg($path){
+//     include PUBLIC_DIR.V.DS.SVG.DS
+// }
 
 
 /**
