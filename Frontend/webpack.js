@@ -35,31 +35,46 @@ class Setting {
     }
 
   getENV() {
-    const ENV = {};
-      const fileENV = this.fs.readFileSync(this.path.resolve(this.dir, ".env"), {encodeding:"utf8", flag:'r'});
-      fileENV.toString().split("\n").forEach((row)=>{
-        if (row.trim().indexOf("#") == 0 || row.trim() == "" || row.trim().indexOf("\n") == 0) {
-        } else {
-          if(row.split("=").length > 1){
-                let conf = row.split("=");
-                conf[1] = conf[1].replace('"',"");
-                conf[1] = conf[1].replace('"', "");
-                conf[1] = conf[1].replace("'", "");
-                conf[1] = conf[1].replace("'", "");
-                ENV[conf[0].trim()] = conf[1].replaceAll(["\"","\'", "\r", "\n"], "").trim()
+          const ENV = {};
+          try {
+          const fileENV = this.fs.readFileSync(this.path.resolve(this.dir, ".env"), { encoding: "utf8", flag: 'r' });
+
+          fileENV.split("\n").forEach((row) => {
+            const line = row.trim();
+
+            // Пропускаем пустые строки и комментарии
+            if (!line || line.startsWith("#")) return;
+
+            // Разбиваем по первому =
+            const index = line.indexOf("=");
+            if (index === -1) return;
+
+            const key = line.substring(0, index).trim();
+            let value = line.substring(index + 1).trim();
+
+            // Убираем кавычки вокруг значения (одинарные или двойные)
+            if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+              value = value.slice(1, -1);
+            }
+
+            // Убираем возможные символы переноса строки и возврата каретки внутри значения
+            value = value.replace(/[\r\n]/g, "").trim();
+
+            ENV[key] = value;
+          });
+            ['JS', 'CSS', 'IMG', 'FONT', 'TEMPLATE'].forEach((key) => { 
+              if (ENV[key]) {
+                this[key.toLowerCase()] = ENV[key];
+                console.log("env get param "+key+": " + ENV[key])
+              }
+            })
+          if (ENV['CLEAR']) {
+                console.log("env get param CLEAR: " +ENV['CLEAR'])
+                this.clear = ENV['CLEAR'].split("||");
           }
+        } catch (err) {
+          console.error("Error reading .env file:", err);
         }
-      })
-      ['JS', 'CSS', 'IMG', 'FONT', 'TEMPLATE'].forEach((key) => { 
-        if (ENV[key]) {
-          this[key.toLowerCase()] = ENV[key];
-          console.log("env get param "+key+": " + ENV[key])
-        }
-      })
-    if (ENV['CLEAR']) {
-          console.log("env get param CLEAR: " +ENV['CLEAR'])
-          this.clear = ENV['CLEAR'].split("||");
-      }
     }
 
     getPage() {
