@@ -16,8 +16,7 @@ class MigrateCommand extends Model
     public $isParam = false;
     public $param = false;
     public $endFile = '';
-
-    public $table = 'migrate';
+    protected string $table = 'migrate';
 
     public function __construct() {
         $this->DIR = ROOT . DS . MIGRATE_DIR;
@@ -39,8 +38,8 @@ class MigrateCommand extends Model
 
     private function up()
     {
-        // проверить существование таблцы
-        if (!empty($this->q("SHOW TABLES FROM `".$this->db_name."` LIKE 'migrate' ; ")->fetch())) {
+        $table = $this->q("SHOW TABLES FROM `".$this->db_name."` LIKE 'migrate' ; ")->fetch();
+        if (empty($table)) {
             $this->q(
                 "CREATE TABLE `migrate` (
                     `id` INT NOT NULL AUTO_INCREMENT ,
@@ -50,7 +49,7 @@ class MigrateCommand extends Model
                     PRIMARY KEY (`id`)  
                     ) ENGINE = InnoDB;"
             );
-        }
+    }
 
         $cq = 0;
         dirEach($this->DIR, callFile: function ($name) use (&$cq){
