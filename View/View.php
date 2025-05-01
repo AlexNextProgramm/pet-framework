@@ -19,7 +19,7 @@ class View
         if (!is_dir(self::DIR_VIEW)) {
             throw new AppException("not directory view", E_ERROR);
         }
-        if (!file_exists(self::DIR_VIEW . DS . $viewName . p)) {
+        if (!file_exists(self::DIR_VIEW . DS . $viewName)) {
             throw new AppException("Not file in class view", E_ERROR);
         }
         self::$argument += $argument;
