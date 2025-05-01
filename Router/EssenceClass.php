@@ -18,7 +18,7 @@ class EssenceClass {
             throw new AppException("Class not found " . $class, E_ERROR);
         }
         if ($method && !method_exists($class, $method)) {
-            throw new AppException("method not found " . $class, E_ERROR);
+            throw new AppException("method not found $method in class " . $class, E_ERROR);
         }
 
         if ($this->isCallable($class, $method)) {
@@ -30,7 +30,7 @@ class EssenceClass {
             }
         }
 
-        throw new AppException('Undefintd class else function '  . $class, E_ERROR);
+        throw new AppException("Undefind class else function $method"  . $class, E_ERROR);
     }
 
     private function isArrayClass(&$class, &$method)
