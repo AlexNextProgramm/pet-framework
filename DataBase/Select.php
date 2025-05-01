@@ -13,7 +13,7 @@ trait Select
     public $strSelect = '';
     private $join = "";
     private $or = "";
-
+    public $tableAlias = null;
     /**
      * select
      *
@@ -32,7 +32,9 @@ trait Select
             });
             $strSelect = implode(',', $column);
         }
-        $this->strQuery = "SELECT {$strSelect} FROM `{$this->table}` ";
+
+        $from = "FROM `{$this->table}` ".($this->tableAlias? " AS {$this->tableAlias}": "");
+        $this->strQuery = "SELECT {$strSelect} $from";
         $this->SUB = "SELECT";
         return  $this;
     }
