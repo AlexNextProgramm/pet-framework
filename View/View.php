@@ -39,8 +39,8 @@ class View
      * @param  mixed $path
      * @return void
      */
-    public static function gp(string $path): string
+    public static function gp(string $path, string $exp = ".php"): string
     {
-        return str_replace(".", "/", $path);
+        return str_replace(".", "/", $path)."$exp";
     }
 }
