@@ -13,31 +13,28 @@ class EssenceClass {
         unset($argm[0]);
         $this->isArrayClass($class, $method);
 
-        // // проверка сушествования класса и метода; код остановить 
+        //проверка сушествования класса и метода;
         if (gettype($class) == 'string' && !class_exists($class)) {
             throw new AppException("Class not found " . $class, E_ERROR);
         }
-        if ($method && !method_exists($class, $method)) die("Not method: $method in class: $class");
+        if ($method && !method_exists($class, $method)) {
+            throw new AppException("method not found " . $class, E_ERROR);
+        }
 
         if ($this->isCallable($class, $method)) {
-
-            if ($method)  return call_user_func([$class, $method], ...$argm);
-            return call_user_func($class, ...$argm);
+            return call_user_func($method ? [$class, $method] : $class, ...$argm);
         } else {
-
             $classNew  = new $class();
-
             if ($this->isCallable($classNew, $method)) {
-
-                if ($method) return call_user_func([$classNew, $method], ...$argm);
-                return call_user_func($classNew, ...$argm);
+                return call_user_func($method ? [$classNew, $method] : $classNew, ...$argm);
             }
         }
 
         throw new AppException('Undefintd class else function '  . $class, E_ERROR);
     }
 
-    private function isArrayClass(&$class, &$method) {
+    private function isArrayClass(&$class, &$method)
+    {
         $value = $class;
 
         if (gettype($value) == 'array') {
@@ -52,7 +49,15 @@ class EssenceClass {
     }
 
 
-    public function isCallable($class, string $method = null): bool {
+    /**
+     * isCallable
+     *
+     * @param  mixed $class
+     * @param  mixed $method
+     * @return bool
+     */
+    public function isCallable($class, string|null $method = null): bool
+    {
 
         if ($method && is_callable([$class, $method])) return true;
 
