@@ -28,6 +28,7 @@ abstract class DB
     protected string $strJoin = "";
     protected string $strGrops = "";
     protected string $strLimit = "";
+    protected string $strOffset = "";
 
     protected $SUB = "";
 
@@ -68,12 +69,12 @@ abstract class DB
 
     public function toString(): string
     {
-        return $this->strQuery . $this->strJoin . $this->strWhere . $this->strGrops . $this->strOrders.$this->strLimit;
+        return $this->strQuery . $this->strJoin . $this->strWhere . $this->strGrops . $this->strOrders.$this->strLimit. $this->strOffset;
     }
 
     private function clearQuery():void
     {
-        $this->strQuery = $this->strJoin = $this->strWhere =  $this->strGrops = $this->strOrders = $this->strLimit = '';
+        $this->strQuery = $this->strJoin = $this->strWhere =  $this->strGrops = $this->strOrders = $this->strOffset = $this->strLimit = '';
     }
 
      /**

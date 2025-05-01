@@ -163,6 +163,13 @@ trait Select
         return $this;
     }
 
+    public function offset(string|int $str = ""): Model
+    {
+        $this->strOffset = "OFFSET $str";
+        $this->SUB = "LIMIT";
+        return $this;
+    }
+
     public function max(string $field = 'id')
     {
         return $this->select("MAX(`$field`) max")->fetch(false)['max'];
