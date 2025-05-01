@@ -183,4 +183,15 @@ trait Select
             $this->strWhere .= " $conds $str";
         }
     }
+
+    public function getJoin():string
+    {
+        return $this->strJoin;
+    }
+
+    public function getWhere():string
+    {
+        return $this->strWhere;
+    }
+
 }
