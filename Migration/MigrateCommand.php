@@ -45,7 +45,8 @@ class MigrateCommand extends Model
                     `id` INT NOT NULL AUTO_INCREMENT ,
                     `name` VARCHAR(500) NULL DEFAULT NULL , 
                     `hash`  VARCHAR(500) NULL DEFAULT NULL , 
-                    `cdate` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+                    `cdate` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    `sql_str`  TEXT NULL DEFAULT NULL,
                     PRIMARY KEY (`id`)  
                     ) ENGINE = InnoDB;"
             );
@@ -68,6 +69,7 @@ class MigrateCommand extends Model
                         $Query = $this->q($q);
                         if ($Query) {
                             $Query->fetch();
+                            $this->set(['sql_str'=> $q]);
                             Console::text(($cq + 1) . ") Выполнен: " . str_replace("\n", "", iconv_substr(trim($q), 0, 50, 'UTF-8')), Console::GREEN);
                         }
                     } catch (Error | Exception $e) {

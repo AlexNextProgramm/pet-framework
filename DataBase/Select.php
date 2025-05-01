@@ -167,8 +167,8 @@ trait Select
 
     public function offset(string|int $str = ""): Model
     {
-        $this->strOffset = "OFFSET $str";
-        $this->SUB = "LIMIT";
+        $this->strOffset = " OFFSET $str";
+        $this->SUB = "OFFSET";
         return $this;
     }
 
