@@ -2,17 +2,21 @@
 
 namespace Pet\Router;
 
+use Pet\Errors\AppException;
+
 class EssenceClass {
 
 
-    function open($class, $argm = []) {
+    public function open($class, $argm = []) {
         $argm = func_get_args();
 
         unset($argm[0]);
         $this->isArrayClass($class, $method);
 
         // // проверка сушествования класса и метода; код остановить 
-        if (gettype($class) == 'string' && !class_exists($class)) die('Not class' . $class);
+        if (gettype($class) == 'string' && !class_exists($class)) {
+            throw new AppException("Class not found " . $class, E_ERROR);
+        }
         if ($method && !method_exists($class, $method)) die("Not method: $method in class: $class");
 
         if ($this->isCallable($class, $method)) {
@@ -28,12 +32,9 @@ class EssenceClass {
                 if ($method) return call_user_func([$classNew, $method], ...$argm);
                 return call_user_func($classNew, ...$argm);
             }
-
-
-            return 'Undefintd class else function ' . print_r($class, true);
         }
 
-        return 'Undefintd class else function ' . print_r($class, true);
+        throw new AppException('Undefintd class else function '  . $class, E_ERROR);
     }
 
     private function isArrayClass(&$class, &$method) {

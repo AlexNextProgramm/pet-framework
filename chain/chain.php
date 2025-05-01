@@ -13,7 +13,7 @@ use Pet\View\View;
  */
 function view(string $name, array $argument = [])
 {
-    (new View())->open($name, $argument);
+     View::open($name, $argument);
 }
 
 /**

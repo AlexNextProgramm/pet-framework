@@ -2,6 +2,8 @@
 
 namespace Pet\View;
 
+use Pet\Errors\AppException;
+
 class View
 {
     const DIR_VIEW = PUBLIC_DIR . DS . 'view';
@@ -12,20 +14,19 @@ class View
      * @param  array $argument
      * @return void
      */
-    public function open(string $viewName, array $argument = []): void
-    {
-        $this->path($viewName);
-        if (!is_dir(self::DIR_VIEW) || !file_exists(self::DIR_VIEW . "/$viewName.php")) die("Нет файла или дериктории в view $viewName.php");
+    public static function open(string $viewName, array $argument = []): void {
+        $viewName = implode(DS, explode(".", $viewName)) . ".php";
+        if (!is_dir(self::DIR_VIEW)) {
+            throw new AppException("not directory view", E_ERROR);
+        }
+        if (!file_exists(self::DIR_VIEW . DS . $viewName . p)) {
+            throw new AppException("Not file in class view", E_ERROR);
+        }
         self::$argument += $argument;
         foreach (self::$argument as $key => $val) {
             ${$key} = $val;
         }
-        include(self::DIR_VIEW . "/$viewName.php");
-    }
-    private function path(&$path)
-    {
-        $path = implode(DS, explode(".", $path));
-        return $path;
+        include self::DIR_VIEW . DS . "$viewName";
     }
 
     public static function append(array $data){
