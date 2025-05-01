@@ -125,7 +125,7 @@ abstract class DB
      * @param  mixed $id
      * @return void
      */
-    public function setInfoId(array|int|string $id): void
+    public function setInfoId(mixed $id): void
     {
         if (empty($id)) {
             return;
