@@ -32,4 +32,15 @@ class View
     public static function append(array $data){
         self::$argument += $data;
     }
+
+    /**
+     * getPath
+     *
+     * @param  mixed $path
+     * @return void
+     */
+    public static function gp(string $path): string
+    {
+        return str_replace(".", "/", $path);
+    }
 }
