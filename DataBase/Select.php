@@ -33,7 +33,7 @@ trait Select
             $strSelect = implode(',', $column);
         }
 
-        $from = "FROM `{$this->table}` ".($this->tableAlias? " AS {$this->tableAlias}": "");
+        $from = "FROM `{$this->table}` ".($this->tableAlias? " AS {$this->tableAlias} ": "");
         $this->strQuery = "SELECT {$strSelect} $from";
         $this->SUB = "SELECT";
         return  $this;
@@ -105,11 +105,7 @@ trait Select
     public function whereAdd(string $str = '', $sign = "AND"): Model
     {
         $where = $this->getWhere();
-        if (empty($where)) {
-            $this->strWhere = " WHERE $str";
-        } else {
-            $this->strWhere .=  " $where $sign $str";
-        }
+        $this->strWhere = empty($where) ? " WHERE $str" :  " $where $sign $str" ;
         $this->SUB = "WHERE";
         return $this;
     }
