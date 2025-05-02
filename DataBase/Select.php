@@ -93,6 +93,14 @@ trait Select
         $this->SUB = "WHERE";
         return $this;
     }
+
+    /**
+     * whereAdd
+     *
+     * @param  string $str
+     * @param  string $sign
+     * @return Model
+     */
     public function whereAdd(string $str = '', $sign = "AND"): Model
     {
         $where = $this->getWhere();
