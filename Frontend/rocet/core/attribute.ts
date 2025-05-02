@@ -6,7 +6,7 @@ import { replaceAll } from "./string"
 
 
 
-const exception:any= {
+export const exception:any= {
  className:'class',
  class:'class',
  name:'name',
@@ -24,7 +24,7 @@ const exception:any= {
  href:'href',
  value:"value"
 }
-const universal:any = {
+export const universal:any = {
      value:"value"
 }
 
