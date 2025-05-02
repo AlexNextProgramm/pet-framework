@@ -53,6 +53,14 @@ trait Select
         return $this;
     }
 
+    /**
+     * on
+     * Пример 1  "table1.id = table2.table_id"
+     * Пример 2  ["table1.id", "table2.table_id", "="]
+     * пример 3  "table1.id = table2.table_id", "AND",  ["table1.id", "table2.table_id", "="]
+     * @param  mixed $select
+     * @return void
+     */
     public function on(string|array ...$select)
     {
         if ($this->join != '' ) {
@@ -61,10 +69,7 @@ trait Select
                 if (is_array($ons)) {
                     $this->strJoin .= $ons[0]. $ons[2] ?? "=". $ons[1];
                 }
-
-                if (in_array(strtoupper(trim($ons)), ["AND", "OR"])) {
-                    $this->strJoin .= " $ons ";
-                } elseif (gettype($ons) == 'string') {
+                if (gettype($ons) == 'string') {
                     $this->strJoin .=  $ons ;
                 }
                 $this->strJoin  .= ")";
@@ -85,6 +90,17 @@ trait Select
     public function where(string $str = ''): Model
     {
         $this->strWhere = " WHERE $str";
+        $this->SUB = "WHERE";
+        return $this;
+    }
+    public function whereAdd(string $str = '', $sign = "AND"): Model
+    {
+        $where = $this->getWhere();
+        if (empty($where)) {
+            $this->strWhere = " WHERE $str";
+        } else {
+            $this->strWhere =  " WHERE $where $sign $str";
+        }
         $this->SUB = "WHERE";
         return $this;
     }
