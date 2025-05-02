@@ -108,7 +108,7 @@ trait Select
         if (empty($where)) {
             $this->strWhere = " WHERE $str";
         } else {
-            $this->strWhere =  " WHERE $where $sign $str";
+            $this->strWhere .=  " $where $sign $str";
         }
         $this->SUB = "WHERE";
         return $this;
