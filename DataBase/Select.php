@@ -89,7 +89,7 @@ trait Select
      */
     public function where(string $str = ''): Model
     {
-        if(empty($str)) return $this;
+        if (empty($str)) return $this;
         $this->strWhere = " WHERE $str";
         $this->SUB = "WHERE";
         return $this;
