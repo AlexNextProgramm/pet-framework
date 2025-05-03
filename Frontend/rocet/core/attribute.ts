@@ -62,7 +62,7 @@ export function setAttributeElement(Element:HTMLElement|any, props:atribute, Nam
 
      try {
           if (NameAttribute.startsWith('on')) {
-               const eventName = NameAttribute.slice(2).toLowerCase();
+               const eventName = NameAttribute.toLowerCase();
                if (typeof props[NameAttribute] === 'function') {
                     Element[eventName] = props[NameAttribute];
                }
