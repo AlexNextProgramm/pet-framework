@@ -50,7 +50,7 @@ export function setStyle(e: HTMLElement | any, p: atribute, n: string) {
 }
 export function setBoolean(e: HTMLElement | any, p: atribute, n: string){ 
      if (p[n] == true) {
-          e.setAttribute(n, n);
+          e.setAttribute(n, '');
      } else { 
           e.removeAttribute(n, n);
      }

@@ -42,7 +42,6 @@ export class UI{
             const observer = new MutationObserver(() => {
                 UI.Elements = Array.from(document.querySelectorAll(selector));
                 if (UI.Elements.length != 0) {
-                    console.log(UI.Elements)
                     UI.render(UI.renderObserver);
                 }
             });
