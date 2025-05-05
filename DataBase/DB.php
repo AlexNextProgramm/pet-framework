@@ -136,13 +136,8 @@ abstract class DB
         }
 
         if (gettype($id) == 'array') {
-            $isId = $id['id'] ?? null;
-            if ($isId) {
-                $pdoStatment =  $this->q("SELECT * FROM {$this->table} WHERE id='$isId';");
-            } else {
-                $data = implode(" AND ", Tools::filter($id, fn($k, $v) => "{$this->table}.$k = '$v' "));
-                $pdoStatment =  $this->q("SELECT * FROM {$this->table} WHERE $data LIMIT 2;");
-            }
+            $data = implode(" AND ", Tools::filter($id, fn($k, $v) => "{$this->table}.$k = '$v' "));
+            $pdoStatment =  $this->q("SELECT * FROM {$this->table} WHERE $data LIMIT 2;");
         }
         $result = $pdoStatment ? $pdoStatment->fetchAll(PDO::FETCH_ASSOC):[];
             $this->info = count($result) == 1 ? $result[0] : []; // не должно в этом условии быть множества
