@@ -48,6 +48,7 @@ trait Select
      */
     public function join(string $table, string $type = "LEFT" ) : Model
     {
+        $table = implode(" as ", explode(" ", $table));
         $this->join = "$type JOIN $table ON ";
         $this->SUB = "JOIN";
         return $this;
@@ -67,7 +68,8 @@ trait Select
             foreach ($select as $ons) {
                 $this->strJoin  .= "{$this->join}(";
                 if (is_array($ons)) {
-                    $this->strJoin .= $ons[0]. $ons[2] ?? "=". $ons[1];
+                    $sign = $ons[2] ?? "=";
+                    $this->strJoin .= $ons[0]. " $sign ". $ons[1];
                 }
                 if (gettype($ons) == 'string') {
                     $this->strJoin .=  $ons ;

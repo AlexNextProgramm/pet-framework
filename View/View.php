@@ -22,7 +22,7 @@ class View
         if (!file_exists(self::DIR_VIEW . DS . $viewName)) {
             throw new AppException("Not file in class view", E_ERROR);
         }
-        self::$argument += $argument;
+        self::$argument = array_merge(self::$argument, $argument);
         foreach (self::$argument as $key => $val) {
             ${$key} = $val;
         }
@@ -30,7 +30,7 @@ class View
     }
 
     public static function append(array $data){
-        self::$argument += $data;
+        self::$argument = array_merge(self::$argument, $data);
     }
 
     /**
