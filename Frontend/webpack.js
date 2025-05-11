@@ -86,7 +86,6 @@ class Setting {
               const name = fileAndDir
               const entrydir = this.path.join(this.dir, "src/page", `${name}.ts`);
               let ext = this.fs.existsSync(entrydir) ? 'ts' : 'tsx';
-              if (this.fs.existsSync(`./page/${name}.${ext}`)) { 
                 this.pages.entry[name] = `./page/${name}.${ext}`;
                 this.pages.html.push({
                     filename: './view/page/' + `${name}/head.php`,
@@ -95,7 +94,6 @@ class Setting {
                     chunks: ['root', name],
                     minify: { collapseWhitespace: this.isProd }
                 })
-              }
           }
         })
     }
