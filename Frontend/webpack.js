@@ -86,14 +86,16 @@ class Setting {
               const name = fileAndDir
               const entrydir = this.path.join(this.dir, "src/page", `${name}.ts`);
               let ext = this.fs.existsSync(entrydir) ? 'ts' : 'tsx';
-              this.pages.entry[name] = `./page/${name}.${ext}`;
-              this.pages.html.push({
-                  filename: './view/page/' + `${name}/head.php`,
-                  template: this.template,
-                  entry: this.path.join(this.dir, "src/page", `${name}.${ext}`),
-                  chunks: ['root', name],
-                  minify: { collapseWhitespace: this.isProd }
-              })
+              if (this.fs.existsSync(`./page/${name}.${ext}`)) { 
+                this.pages.entry[name] = `./page/${name}.${ext}`;
+                this.pages.html.push({
+                    filename: './view/page/' + `${name}/head.php`,
+                    template: this.template,
+                    entry: this.path.join(this.dir, "src/page", `${name}.${ext}`),
+                    chunks: ['root', name],
+                    minify: { collapseWhitespace: this.isProd }
+                })
+              }
           }
         })
     }
