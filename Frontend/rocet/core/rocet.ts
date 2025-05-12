@@ -51,15 +51,25 @@ export class Rocet {
 
     
     if(!this.RocetVirtualNode){
-      if(this.Element.children.length != 0) this.Element.innerHTML = ''
-      this.Element.replaceWith(this.create(NewVirtualNode));
-      this.Element = typeof this.id == 'string'? this.open(this.id): this.id
+      const newElm = this.create(NewVirtualNode)
+      this.Element.replaceWith(newElm);
+      this.Element = newElm
     } else {
       this.compare( this.Element, NewVirtualNode, this.RocetVirtualNode );
     }
 
     this.RocetVirtualNode = NewVirtualNode; // Должна присваиваться После
     this.execure()
+  }
+
+  public add(jsx: any, selector: string | null = null) {
+    if (selector) {
+      this.Element.querySelector(selector).append(this.create(jsx))
+    } else {
+      console.log(this.create(jsx))
+      console.log(this.Element)
+      this.Element.append(this.create(jsx))
+    }
   }
 
   compare(elem: HTMLElement | ElementEvent, NewRVN: rocet, RVN: rocet){
@@ -191,5 +201,11 @@ export class Rocet {
               func()
             })
           }
+  }
+
+  public delete(selector:string) { 
+    this.Element.querySelectorAll(selector).forEach((el) => {
+      el.remove();
+    })
   }
 }

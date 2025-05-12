@@ -48,4 +48,16 @@ export class UI{
             observer.observe(document.body, { childList: true, subtree: true });
         });
     }
+    static selector(selector:string ) {
+         return new Promise((resolve) => {
+            const observer = new MutationObserver(() => {
+                const el = document.querySelector(selector);
+                if (el) {
+                    resolve(el)
+                    observer.disconnect();
+                }
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+        });
+    }
 }

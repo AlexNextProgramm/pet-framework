@@ -91,7 +91,7 @@ class Setting {
                     filename: './view/page/' + `${name}/head.php`,
                     template: this.template,
                     entry: this.path.join(this.dir, "src/page", `${name}.${ext}`),
-                    chunks: ['root', name],
+                    chunks: ['root', name ],
                     minify: { collapseWhitespace: this.isProd }
                 })
           }
