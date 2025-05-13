@@ -1,6 +1,6 @@
 import { EventChange } from "../config.rocet";
 import { EventChangeValue, attribute, settingRocet } from "../interface";
-import { exception} from "./attribute";
+import { exception } from "./attribute";
 import { RocetElement, RocetNode } from "./RocetNode";
 
 
@@ -16,106 +16,127 @@ export class Rocet {
 
 
   public ExecAfter: Array<Function> = [];
-  public Element: HTMLElement;
+  public Elements: Array<HTMLElement>;
 
 
   constructor(data: string | HTMLElement | RocetElement) {
-    if (data instanceof RocetNode) { 
-      this.Element = this.create(data)
+    if (data instanceof RocetNode) {
+      this.Elements.push(this.create(data))
     }
     if (data instanceof HTMLElement) {
-      this.Element = data;
+      this.Elements.push(data)
     }
-    if (typeof data == 'string') { 
-      this.Element = this.getIt(data);
+    if (typeof data == 'string') {
+       this.getIt(data);
     }
   }
 
-  public getIt(id: string): HTMLElement
-  {
-    let element = <HTMLElement|null>document.querySelector(id);
-    if (element instanceof HTMLElement) {
-      this.Element = element;
+  public getIt(id: string){
+    let element = <NodeListOf<Element>>document.querySelectorAll(id);
+    if (element.length != 0) {
+      element.forEach((el:HTMLElement) => { 
+        this.Elements.push(el);
+      })
     } else {
       console.error("Error: Element not found Rocet assembly not possible");
     }
-    return element;
   }
 
-  public render(rocet:RocetElement|Function) {
+  public render(rocet: RocetElement | Function) {
     if (typeof rocet == 'function') rocet = rocet();
     if (rocet instanceof RocetNode) {
       const newElm = this.create(rocet)
-      this.Element.replaceWith(newElm);
-      this.Element = newElm
+      const arr:Array<HTMLElement> = [];
+      this.Elements.forEach((el:HTMLElement) => {
+        el.replaceWith(newElm);
+        arr.push(newElm);
+      })
+      this.Elements = arr
       this.execure()
     }
   }
 
   public add(jsx: any, selector: string | null = null) {
     if (selector) {
-      this.Element.querySelector(selector).append(this.create(jsx))
+      this.Elements.forEach((el) => { 
+        el.querySelector(selector).append(this.create(jsx))
+      })
     } else {
-      this.Element.append(this.create(jsx))
+       this.Elements.forEach((el) => { 
+        el.append(this.create(jsx))
+      })
     }
   }
 
   public create(rocet: RocetNode): HTMLElement | ElementEvent {
 
-      const NewCreateElement = <HTMLElement>document.createElement(rocet.tag);
-    
-        for (let key in rocet.props)
+    const NewCreateElement = <HTMLElement>document.createElement(rocet.tag);
+
+    for (let key in rocet.props)
       this.setAttribute(NewCreateElement, key, rocet.props[key]);
-    
-        rocet.children.forEach((RocetElement: RocetNode) => {
-           NewCreateElement.append(this.create(RocetElement));
-        });
-      rocet.elem = NewCreateElement
-      return NewCreateElement;
+
+    rocet.children.forEach((RocetElement: RocetNode) => {
+      NewCreateElement.append(this.create(RocetElement));
+    });
+    rocet.elem = NewCreateElement
+
+    return NewCreateElement;
   }
 
-  private setAttribute(Element: HTMLElement|any, name: string, value:Function|string) { 
+  private setAttribute(Element: HTMLElement | any, name: string, value: Function | string) {
     try {
-       
-          if (name.startsWith('on')) {
-               const eventName = name.toLowerCase();
-               if (typeof value === 'function') {
-                     Element[eventName] = value;
-               }
-               return;
-          }
-          if (exception[name]) {
-               if (typeof exception[name] == 'function') { 
-                    return exception[name](Element, name, value)
-               }
-          }
-          if (value) { 
-               Element.setAttribute(name, value)
-          }
-     } catch (err) {
-          console.error(`Error: It was not possible to assign the attribute ${name} to the element ${Element.tagName} : ${err}`)
-     }
+
+      if (name.startsWith('on')) {
+        const eventName = name.toLowerCase();
+        if (typeof value === 'function') {
+          Element[eventName] = value;
+        }
+        return;
+      }
+      if (exception[name]) {
+        if (typeof exception[name] == 'function') {
+          return exception[name](Element, name, value)
+        }
+      }
+      if (value) {
+        Element.setAttribute(name, value)
+      }
+    } catch (err) {
+      console.error(`Error: It was not possible to assign the attribute ${name} to the element ${Element.tagName} : ${err}`)
+    }
   }
 
-
-  private execure(){
-          if(this.ExecAfter.length != 0){
-            this.ExecAfter.forEach((func:Function)=>{
-              func()
-            })
-          }
-  }
-
-  public delete(selector:string) { 
-      this.Element.querySelectorAll(selector).forEach((el) => {
-        el.remove();
+  private execure() {
+    if (this.ExecAfter.length != 0) {
+      this.ExecAfter.forEach((func: Function) => {
+        func()
       })
+    }
+  }
+
+  public remove(selector: string|null = null) {
+    this.Elements.forEach((el: HTMLElement) => {
+      if (selector) {
+        el.querySelectorAll(selector).forEach((chil) => chil.remove());
+      } else { 
+        el.remove()
+      }
+
+    })
   }
 
   public attr(name: string, value: string | null = null) {
-    if (value) { 
-      return this.Element.setAttribute(name, value)
+    if (value) {
+      this.Elements.forEach((el: HTMLElement) => {
+        el.setAttribute(name, value)
+      })
     }
-    return this.Element.getAttribute(name)
+    return this.Elements[0]?.getAttribute(name)
+  }
+
+  public on(type: string, callback: any) {
+    this.Elements.forEach((el: HTMLElement) => { 
+      el.addEventListener('on' + type, callback);
+    })
   }
 }
