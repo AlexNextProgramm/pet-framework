@@ -1,5 +1,4 @@
 import {  attribute} from "../interface"
-import { Rocet } from "./rocet";
 
 export type props = attribute | string | RocetNode | Array<RocetNode> | undefined;
 export type children = string | RocetNode| Array<RocetNode> | undefined;
@@ -16,7 +15,6 @@ export class RocetNode
     public elem?:HTMLElement
 
     constructor(tag: string, props: props, children: children) {
-        console.log(tag, props, children)
         this.tag = tag;
         if (props) {
             this.HtmlContentStringInProps(props);
@@ -24,7 +22,6 @@ export class RocetNode
         }
         this.HtmlContentStringChildren(children);
         this.RocetNodeContentChildren(children);
-        console.log(this)
     }
         
     private HtmlContentStringInProps(props: props) {
@@ -44,18 +41,37 @@ export class RocetNode
     }
 
     private RocetNodeContentChildren(children: children ) {
-        if (children instanceof RocetNode) {
-            this.children.push(children)
+        if (this.isPrototypeStructure(children))
+        {
+            this.children.push(children as RocetNode)
         }
         if (Array.isArray(children)) {
             children.forEach((el) => { 
                 this.HtmlContentStringChildren(el)
-                if (el instanceof RocetNode) {
-                    this.children.push(el)
+                if (this.isPrototypeStructure(el)) {
+                    this.children.push(el as RocetNode)
                 }
             })
         }
+    }
 
+    private isPrototypeStructure(obj: any): boolean
+    {
+        if (typeof obj != 'object') return false;
+        const proto = Object.getPrototypeOf(obj);
+        const protoProps = Object.getOwnPropertyNames(RocetNode);
+        const objProps = Object.keys(obj);
+
+        const dataProtoProps = protoProps.filter(prop => {
+            const descriptor = Object.getOwnPropertyDescriptor(proto, prop);
+            return descriptor && typeof descriptor.value !== 'function';
+        });
+        for (const prop of dataProtoProps) {
+            if (!objProps.includes(prop)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private HtmlContentStringChildren(children:children) {

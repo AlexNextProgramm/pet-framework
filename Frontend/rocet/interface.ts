@@ -70,7 +70,7 @@ export interface attribute  {
     title?:string
     selected?:boolean
     required?: boolean
-    rows?:string
+    rows?:string|number
     cols?:string
     draggable?:boolean
     outerHTML?:string
