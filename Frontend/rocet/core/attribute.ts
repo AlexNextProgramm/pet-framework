@@ -9,7 +9,7 @@ interface exception {
 
 
 export const exception:exception = {
-     className: (e: HTMLElement | any, p: attribute, n: string) => { e.setAttribute('class', p[n]) },
+     className: (e: HTMLElement | any, k:string, n: string) => { e.setAttribute('class', n) },
      class: 'class',
      name: 'name',
      selected: setBoolean,
