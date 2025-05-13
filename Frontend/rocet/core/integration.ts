@@ -1,4 +1,4 @@
-import { attribute, rocet } from "../interface"
+import { attribute} from "../interface"
 import { Rocet } from "./rocet"
 import { RocetNode } from "./RocetNode"
 
