@@ -16,7 +16,7 @@ export class Rocet {
 
 
   public ExecAfter: Array<Function> = [];
-  public Elements: Array<HTMLElement>;
+  public Elements: Array<HTMLElement> = [];
 
 
   constructor(data: string | HTMLElement | RocetElement) {
