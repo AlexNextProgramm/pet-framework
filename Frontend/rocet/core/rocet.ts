@@ -1,10 +1,9 @@
 import { EventChange } from "../config.rocet";
-import { EventChangeValue, atribute, rocet, settingRocet } from "../interface";
-import { removeAttribute, setAttributeElement } from "./attribute";
+import { EventChangeValue, attribute, settingRocet } from "../interface";
+import { exception} from "./attribute";
+import { RocetElement, RocetNode } from "./RocetNode";
 
-export const NAME: { [name: string]: ElementEvent } = {};
-export const ID: { [name: string]: HTMLElement } = {};
-export const VALUE: { [name: string]: string } = {};
+
 
 
 type ElementEvent =
@@ -16,184 +15,88 @@ type ElementEvent =
 export class Rocet {
 
 
-  public ExecAfter:Array<Function>
-  Element: HTMLElement;
-  RocetVirtualNode: rocet | undefined;
-  private RocetVirtualFunction: Function | undefined;
-  private id:string|HTMLElement
+  public ExecAfter: Array<Function> = [];
+  public Element: HTMLElement;
 
-  constructor(id: string | HTMLElement = "body") {
-    if (id === null) id = "body";
-    this.Element = typeof id == 'string'? this.open(id): id;
-    this.RocetVirtualNode;
-    this.id = id
-    this.ExecAfter = []
 
+  constructor(data: string | HTMLElement | RocetElement) {
+    if (data instanceof RocetNode) { 
+      this.Element = this.create(data)
+    }
+    if (data instanceof HTMLElement) {
+      this.Element = data;
+    }
+    if (typeof data == 'string') { 
+      this.Element = this.getIt(data);
+    }
   }
 
-  private open(id: string): HTMLElement {
+  public getIt(id: string): HTMLElement
+  {
     let element = <HTMLElement|null>document.querySelector(id);
-    if(!element)element = <HTMLElement>document.querySelector("#" + id)
-    if(!element)element = <HTMLElement>document.querySelector("." + id);
-    
-      if(!element){
-           console.error("Error: Element not found Rocet assembly not possible");
-      }else{
-          return element;
-      }
+    if (element instanceof HTMLElement) {
+      this.Element = element;
+    } else {
+      console.error("Error: Element not found Rocet assembly not possible");
+    }
+    return element;
   }
 
-  public render(rocet: Function|undefined = undefined) {
-    if(this.Element == undefined) return console.error("Error: Element not found Rocet assembly not possible");
-    
-    if (typeof rocet == 'function') this.RocetVirtualFunction = rocet
-    const NewVirtualNode = this.RocetVirtualFunction(this)
-
-    
-    if(!this.RocetVirtualNode){
-      const newElm = this.create(NewVirtualNode)
+  public render(rocet:RocetElement|Function) {
+    if (typeof rocet == 'function') rocet = rocet();
+    if (rocet instanceof RocetNode) {
+      const newElm = this.create(rocet)
       this.Element.replaceWith(newElm);
       this.Element = newElm
-    } else {
-      this.compare( this.Element, NewVirtualNode, this.RocetVirtualNode );
+      this.execure()
     }
-
-    this.RocetVirtualNode = NewVirtualNode; // Должна присваиваться После
-    this.execure()
   }
 
   public add(jsx: any, selector: string | null = null) {
     if (selector) {
       this.Element.querySelector(selector).append(this.create(jsx))
     } else {
-      console.log(this.create(jsx))
-      console.log(this.Element)
       this.Element.append(this.create(jsx))
     }
   }
 
-  compare(elem: HTMLElement | ElementEvent, NewRVN: rocet, RVN: rocet){
+  public create(rocet: RocetNode): HTMLElement | ElementEvent {
 
-    
-    NewRVN.elem = elem
-    if (elem.localName != NewRVN.tag){
-
-        elem.replaceWith(this.create(NewRVN));
-
-    }else{
-
-        const lenNew = Object.keys(NewRVN.props);
-        const lenOld: Array<string> = Object.keys(RVN.props);
-
-        lenNew.forEach((key: string) => { setAttributeElement(elem, NewRVN.props, key); });
-        lenOld.forEach((key: string) => { if(!lenNew.includes(key))  removeAttribute(elem, key); })
-
-        if(NewRVN.children.length >= RVN.children.length){
-
-            NewRVN.children.forEach((ch, i)=>{
-
-              if(RVN.children[i]){
-
-                if(RVN.children[i].elem){
-                  this.compare(<HTMLElement>RVN.children[i].elem, NewRVN.children[i], RVN.children[i])
-                }else{
-                  console.error(`Error: No Element:${RVN.children[i].elem}`)
-                }
-              }else{
-                elem.insertAdjacentElement("beforeend",this.create(ch))
-              }
-            })
-
-        }
-
-        if(NewRVN.children.length < RVN.children.length){
-            RVN.children.forEach((ch, i)=>{
-                if(NewRVN.children[i]){
-                   this.compare(<HTMLElement>RVN.children[i].elem, NewRVN.children[i], RVN.children[i])
-                }else{
-                   RVN.children[i].elem.remove()
-                }
-              })
-        }
-      }
-
-  }
-
-  private create(rocet: rocet): HTMLElement | ElementEvent {
-   
-
-    try{
       const NewCreateElement = <HTMLElement>document.createElement(rocet.tag);
     
-      if (Object.keys(rocet.props).length != 0) {
         for (let key in rocet.props)
-          setAttributeElement(NewCreateElement, rocet.props, key);
-
-        if (EventChange.tagElement.includes(rocet.tag))
-          this.events(rocet.props, <ElementEvent>NewCreateElement);
-        if (NewCreateElement.hasAttribute("name"))
-          NAME[<string>rocet.props.name] = <ElementEvent>NewCreateElement;
-        if (NewCreateElement.hasAttribute("name"))
-          ID[<string>rocet.props.id] = NewCreateElement;
-      }
-
-      if (rocet.children.length != 0) {
-        rocet.children.forEach((RocetElement: rocet) => {
-          if(!RocetElement?.tag){
-            NewCreateElement.innerHTML += RocetElement
-          }else{
-              NewCreateElement.append(this.create(RocetElement));
-            }
+      this.setAttribute(NewCreateElement, key, rocet.props[key]);
+    
+        rocet.children.forEach((RocetElement: RocetNode) => {
+           NewCreateElement.append(this.create(RocetElement));
         });
-      }
       rocet.elem = NewCreateElement
       return NewCreateElement;
-    }catch(err){
-      
-      console.error(`Error: Rocet.create => {tag:${rocet.tag}, props:${rocet.props}, children:[${rocet.children}]}`+ err);
-    }
   }
 
-
-
-  private events(props: atribute, element: ElementEvent | any) {
-        try {
-
-        EventChange.event.forEach((event: any) => {
-            element[event] = (ev: Event) => {
-            VALUE[<any>props.name] = element.value;
-            if (props[event]) <Function>props[event](ev);
-            };
-        });
-
-        } catch (err) {
-        console.error("Error: Rocet.events => " + err);
-        }
+  private setAttribute(Element: HTMLElement|any, name: string, value:Function|string) { 
+    try {
+       
+          if (name.startsWith('on')) {
+               const eventName = name.toLowerCase();
+               if (typeof value === 'function') {
+                     Element[eventName] = value;
+               }
+               return;
+          }
+          if (exception[name]) {
+               if (typeof exception[name] == 'function') { 
+                    return exception[name](Element, name, value)
+               }
+          }
+          if (value) { 
+               Element.setAttribute(name, value)
+          }
+     } catch (err) {
+          console.error(`Error: It was not possible to assign the attribute ${name} to the element ${Element.tagName} : ${err}`)
+     }
   }
 
-
- static DeleteGlobalVALUE(name:string){
-    delete VALUE[name]
-    delete NAME[name]
-  }
-
-  State(WatchObject:{[name:string]:any}|undefined){
-
-    let DOM = this
-
-    if(WatchObject){
-          return new Proxy(WatchObject,{
-              set: function(target:any, props:any, newValue:any){
-                  target[props] = newValue
-                  DOM.render()
-                  return true
-              }
-          })
-    }else{
-      DOM.render()
-    }
-    console.log(DOM)
-  }
 
   private execure(){
           if(this.ExecAfter.length != 0){
@@ -204,8 +107,15 @@ export class Rocet {
   }
 
   public delete(selector:string) { 
-    this.Element.querySelectorAll(selector).forEach((el) => {
-      el.remove();
-    })
+      this.Element.querySelectorAll(selector).forEach((el) => {
+        el.remove();
+      })
+  }
+
+  public attr(name: string, value: string | null = null) {
+    if (value) { 
+      return this.Element.setAttribute(name, value)
+    }
+    return this.Element.getAttribute(name)
   }
 }

@@ -1,11 +1,5 @@
 
 
-export interface  rocet{
-    tag:string
-    props:atribute
-    children:Array<rocet>
-    elem?:HTMLElement
-}
 
 export interface settingRocet{
     EventChengeValue:EventChangeValue
@@ -20,7 +14,7 @@ export interface EventChangeValue{
 // Подстраиваем под свои аттрибуты 
 // Нужно описать интерфейс style
 declare module "react" {
-    interface Attributes extends atribute{
+    interface Attributes extends attribute{
      style?:any
     }
 }
@@ -33,7 +27,7 @@ declare global {
     }
   }
 
-export interface atribute  {
+export interface attribute  {
     [name: string ]: any;
     className?: string;
     id?: string;
@@ -81,3 +75,4 @@ export interface atribute  {
     draggable?:boolean
     outerHTML?:string
 }
+
