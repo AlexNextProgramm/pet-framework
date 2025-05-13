@@ -32,7 +32,7 @@ export class UI{
                 this.callback(context);
             }
             context.ExecAfter = this.events;
-            context.render(renderFunction);
+            context.render(()=>renderFunction(context));
         });
     }
 
