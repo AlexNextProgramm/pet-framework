@@ -50,7 +50,7 @@ export class Rocet {
             this.renderObserver = ()=> typeof rocet == "function" ? rocet(this): rocet;
             return;
         }
-    if (typeof rocet == 'function') rocet = rocet();
+    if (typeof rocet == 'function') rocet = rocet(this);
     if (rocet instanceof RocetNode) {
       const newElm = this.create(rocet)
       const arr:Array<HTMLElement> = [];
