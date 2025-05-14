@@ -47,7 +47,7 @@ export class Rocet {
 
   public render(rocet: RocetElement | Function) {
       if (this.Elements.length == 0) { 
-            this.renderObserver = ()=> typeof rocet == "function" ? rocet(): rocet;
+            this.renderObserver = ()=> typeof rocet == "function" ? rocet(this): rocet;
             return;
         }
     if (typeof rocet == 'function') rocet = rocet();
