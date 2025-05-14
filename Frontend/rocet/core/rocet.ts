@@ -35,14 +35,7 @@ export class Rocet {
   }
 
   public getIt(id: string){
-    let element = <NodeListOf<Element>>document.querySelectorAll(id);
-    if (element.length != 0) {
-      element.forEach((el:HTMLElement) => { 
-        this.Elements.push(el);
-      })
-    } else {
-      console.error("Error: Element not found Rocet assembly not possible");
-    }
+    this.Elements = Array.from(document.querySelectorAll(id));
   }
 
   public render(rocet: RocetElement | Function) {
