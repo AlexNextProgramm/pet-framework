@@ -136,7 +136,7 @@ export class Rocet {
 
   public on(type: string, callback: any) {
     this.Elements.forEach((el: HTMLElement) => { 
-      el.addEventListener('on' + type, callback);
+      el.addEventListener(type, callback);
     })
   }
 
