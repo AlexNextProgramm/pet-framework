@@ -17,7 +17,7 @@ export class Rocet {
 
   public ExecAfter: Array<Function> = [];
   public Elements: Array<HTMLElement> = [];
-
+  private renderObserver:Function = null;
 
   constructor(data: string | HTMLElement | RocetElement) {
     if (data instanceof RocetNode) {
@@ -28,6 +28,9 @@ export class Rocet {
     }
     if (typeof data == 'string') {
        this.getIt(data);
+       if (this.Elements.length == 0) { 
+         this.watchElement(data)
+       }
     }
   }
 
@@ -43,6 +46,10 @@ export class Rocet {
   }
 
   public render(rocet: RocetElement | Function) {
+      if (this.Elements.length == 0) { 
+            this.renderObserver = ()=> typeof rocet == "function" ? rocet(): rocet;
+            return;
+        }
     if (typeof rocet == 'function') rocet = rocet();
     if (rocet instanceof RocetNode) {
       const newElm = this.create(rocet)
@@ -139,4 +146,17 @@ export class Rocet {
       el.addEventListener('on' + type, callback);
     })
   }
+
+   private watchElement(selector: string) {
+
+        return new Promise((resolve) => {
+            const observer = new MutationObserver(() => {
+                this.Elements = Array.from(document.querySelectorAll(selector));
+                if (this.Elements.length != 0) {
+                    this.render(this.renderObserver);
+                }
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+        });
+    }
 }
