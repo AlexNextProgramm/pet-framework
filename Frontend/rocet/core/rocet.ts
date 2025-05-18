@@ -1,5 +1,3 @@
-import { EventChange } from "../config.rocet";
-import { EventChangeValue, attribute, settingRocet } from "../interface";
 import { exception } from "./attribute";
 import { RocetElement, RocetNode } from "./RocetNode";
 
@@ -26,7 +24,6 @@ export class Rocet {
     if (data instanceof HTMLElement) {
       this.Elements.push(data)
     }
-
 
     if (typeof data == 'string') {
        this.getIt(data);
@@ -76,20 +73,21 @@ export class Rocet {
     return this;
   }
 
-  public add(jsx: any, selector: string | null = null) {
-    if (selector) {
-      this.Elements.forEach((el) => { 
-        el.querySelector(selector).append(this.create(jsx))
+  public add(element: RocetElement | RocetNode | HTMLElement) {
+    if (element instanceof HTMLElement) { 
+      this.Elements.forEach((el) => {
+          el.append(element)
       })
-    } else {
-       this.Elements.forEach((el) => { 
-        el.append(this.create(jsx))
+    }
+    if (element instanceof RocetNode) { 
+       this.Elements.forEach((el) => {
+          el.append(this.create(element))
       })
     }
   }
 
-  public create(rocet: RocetNode): HTMLElement | ElementEvent {
-
+  public create(rocet: RocetNode | Rocet): HTMLElement | ElementEvent {
+    if (rocet instanceof Rocet) return rocet.Elements[0];
     const NewCreateElement = <HTMLElement>document.createElement(rocet.tag);
 
     for (let key in rocet.props)
@@ -196,6 +194,9 @@ export class Rocet {
         callback(r(el), i)
     })
   }
+  public classList() { 
+    this.Elements[0].classList
+  }
 
   public clone(): Rocet
   {
@@ -223,5 +224,4 @@ export class Rocet {
 export function r(data: string | HTMLElement | RocetElement | null = null) {
   return new Rocet(data);
 }
-
 
