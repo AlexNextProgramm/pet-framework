@@ -5,7 +5,6 @@ import { RocetElement, RocetNode } from "./RocetNode";
 
 
 
-
 type ElementEvent =
   | HTMLInputElement
   | HTMLButtonElement
@@ -19,13 +18,16 @@ export class Rocet {
   public Elements: Array<HTMLElement> = [];
   private renderObserver:Function = null;
 
-  constructor(data: string | HTMLElement | RocetElement) {
+  constructor(data: string | HTMLElement | RocetElement)
+  {
     if (data instanceof RocetNode) {
       this.Elements.push(this.create(data))
     }
     if (data instanceof HTMLElement) {
       this.Elements.push(data)
     }
+
+
     if (typeof data == 'string') {
        this.getIt(data);
        if (this.Elements.length == 0) { 
@@ -34,26 +36,39 @@ export class Rocet {
     }
   }
 
-  public getIt(id: string){
+  public getIt(id: string): Rocet
+  {
     this.Elements = Array.from(document.querySelectorAll(id));
+    return this;
+  }
+  public find(selector: string): Rocet | null
+  {
+    const find = this.Elements[0].querySelector(selector)
+    if (find instanceof HTMLElement) { 
+      return new Rocet(find);
+    }
+    return null;
   }
 
-  public render(rocet: RocetElement | Function) {
-      if (this.Elements.length == 0) { 
-            this.renderObserver = ()=> typeof rocet == "function" ? rocet(this): rocet;
-            return;
+  public render(rocet: RocetElement | Function): Rocet
+  {
+    if (this.Elements.length == 0) {
+        this.renderObserver = typeof rocet == "function"? rocet : () => rocet;
+        return;
+    }
+    const arr: Array<HTMLElement> = [];
+    this.Elements.forEach((el: HTMLElement, i) => {
+      let RNode: RocetNode;
+      if (typeof rocet == 'function') RNode = rocet(this, i);
+      if (RNode instanceof RocetNode) {
+        const newElm = this.create(RNode)
+          el.replaceWith(newElm);
+          arr.push(newElm);
+          this.execure()
         }
-    if (typeof rocet == 'function') rocet = rocet(this);
-    if (rocet instanceof RocetNode) {
-      const newElm = this.create(rocet)
-      const arr:Array<HTMLElement> = [];
-      this.Elements.forEach((el:HTMLElement) => {
-        el.replaceWith(newElm);
-        arr.push(newElm);
       })
       this.Elements = arr
-      this.execure()
-    }
+    return this;
   }
 
   public add(jsx: any, selector: string | null = null) {
@@ -89,7 +104,7 @@ export class Rocet {
       if (name.startsWith('on')) {
         const eventName = name.toLowerCase();
         if (typeof value === 'function') {
-          Element[eventName] = value;
+          r(Element).on(eventName.substring(2, eventName.length), value)
         }
         return;
       }
@@ -151,5 +166,45 @@ export class Rocet {
             });
             observer.observe(document.body, { childList: true, subtree: true });
         });
+  }
+  public addAttributeJSX(Element: RocetElement, item:number = 0): RocetElement
+  {
+    const el = this.Elements[item]
+      for (let i = 0; i < el.attributes.length; i++) {
+        const attr = el.attributes[i];
+        Element.props[attr.name] = attr.value;
+      }
+    return Element;
+  }
+  public item(key: number = 0): HTMLElement
+  { 
+    return this.Elements[key];
+  }
+
+  public clone(): Rocet
+  {
+    const el = new Rocet(this.Elements[0].cloneNode(true) as HTMLElement);
+    el.cloneEvent(this.Elements[0], el.Elements[0]);
+    return el;
+  }
+
+  private cloneEvent(el: HTMLElement, chahgeElement: HTMLElement) {
+    const eventList: any = el.getEventListeners()
+    if (eventList) {
+      Object.keys(eventList).forEach((type: string) => {
+        eventList[type].forEach((eventObject: any) => {
+          if (eventObject.type.startsWith('on')) eventObject.type = eventObject.type.toLowerCase().substring(2, type.length);
+          r(chahgeElement).on(eventObject.type, eventObject.listener);
+        })
+      })
     }
+    for (let i = 0; i < el.children.length; i++) {
+      this.cloneEvent(el.children[i] as HTMLElement, chahgeElement.children[i] as HTMLElement);
+    }
+  }
 }
+
+export function r(data: string | HTMLElement | RocetElement) {
+  return new Rocet(data);
+}
+

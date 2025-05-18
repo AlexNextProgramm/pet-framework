@@ -12,8 +12,8 @@ export class RocetNode
     public tag: string
     public props: attribute = {}
     public children: Array<RocetNode> = [];
-    public elem?:HTMLElement
-
+    public elem?: HTMLElement
+    
     constructor(tag: string, props: props, children: children) {
         this.tag = tag;
         if (props) {
@@ -57,7 +57,7 @@ export class RocetNode
 
     private isPrototypeStructure(obj: any): boolean
     {
-        if (typeof obj != 'object') return false;
+        if (typeof obj != 'object' || Array.isArray(obj) || obj === null) return false;
         const proto = Object.getPrototypeOf(obj);
         const protoProps = Object.getOwnPropertyNames(RocetNode);
         const objProps = Object.keys(obj);
@@ -84,4 +84,5 @@ export class RocetNode
             }
         }
     }
+
 }
