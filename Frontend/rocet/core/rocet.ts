@@ -18,7 +18,7 @@ export class Rocet {
   public Elements: Array<HTMLElement> = [];
   private renderObserver:Function = null;
 
-  constructor(data: string | HTMLElement | RocetElement)
+  constructor(data: string | HTMLElement | RocetElement| null = null)
   {
     if (data instanceof RocetNode) {
       this.Elements.push(this.create(data))
@@ -41,14 +41,19 @@ export class Rocet {
     this.Elements = Array.from(document.querySelectorAll(id));
     return this;
   }
-  public find(selector: string): Rocet | null
+  public find(selector: string): Rocet
   {
-    const find = this.Elements[0].querySelector(selector)
-    if (find instanceof HTMLElement) { 
-      return new Rocet(find);
-    }
-    return null;
+    const $rocket =  r()
+    this.Elements.forEach((el:HTMLElement) => { 
+      const find:NodeListOf<HTMLElement> = el.querySelectorAll(selector)
+      find.forEach((findElm:HTMLElement) => {
+        $rocket.Elements.push(findElm);
+      });
+    })
+    return $rocket;
   }
+
+
 
   public render(rocet: RocetElement | Function): Rocet
   {
@@ -180,6 +185,17 @@ export class Rocet {
   { 
     return this.Elements[key];
   }
+  public closest(selector: string): Rocet
+  { 
+    return new Rocet(this.Elements[0].closest(selector) as HTMLElement)
+  }
+
+  public each(callback: Function): void
+  { 
+    this.Elements.forEach((el:HTMLElement, i) => { 
+        callback(r(el), i)
+    })
+  }
 
   public clone(): Rocet
   {
@@ -204,7 +220,8 @@ export class Rocet {
   }
 }
 
-export function r(data: string | HTMLElement | RocetElement) {
+export function r(data: string | HTMLElement | RocetElement | null = null) {
   return new Rocet(data);
 }
+
 
