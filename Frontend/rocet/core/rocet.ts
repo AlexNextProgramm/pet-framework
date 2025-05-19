@@ -1,5 +1,6 @@
 import { exception } from "./attribute";
 import { RocetElement, RocetNode } from "./RocetNode";
+import { RocetObject } from "./RocetObject";
 
 
 
@@ -9,15 +10,15 @@ type ElementEvent =
   | HTMLSelectElement
   | HTMLTextAreaElement;
 
-export class Rocet {
+export class Rocet extends RocetObject
+{
 
 
   public ExecAfter: Array<Function> = [];
   public Elements: Array<HTMLElement> = [];
-  private renderObserver:Function = null;
-
-  constructor(data: string | HTMLElement | RocetElement| null = null)
-  {
+  private renderObserver: Function = null;
+  constructor(data: string | HTMLElement | RocetElement | null = null) {
+    super()
     if (data instanceof RocetNode) {
       this.Elements.push(this.create(data))
     }
@@ -26,37 +27,50 @@ export class Rocet {
     }
 
     if (typeof data == 'string') {
-       this.getIt(data);
-       if (this.Elements.length == 0) { 
-         this.watchElement(data)
-       }
+      this.getIt(data);
+      if (this.Elements.length == 0) {
+        this.watchElement(data)
+      }
     }
+
+    return new Proxy(this, {
+      get(target: any, prop: string | symbol, receiver) {
+        if (typeof prop === 'string') {
+          const protoProps = Object.getOwnPropertyNames(Object.getPrototypeOf(target));
+          if (protoProps.includes(prop)) {
+            const value = target[prop];
+            return typeof value === 'function' ? value.bind(target as Rocet) : value
+          }
+          if (target[prop]) return (target as Rocet).Elements
+          if (target.Elements && target.Elements.length > 0) {
+            return (target.Elements[0] as any)[prop];
+          }
+        }
+        return undefined;
+      }
+    });
   }
 
-  public getIt(id: string): Rocet
-  {
+  public getIt(id: string): Rocet {
     this.Elements = Array.from(document.querySelectorAll(id));
     return this;
   }
-  public find(selector: string): Rocet
-  {
-    const $rocket =  r()
-    this.Elements.forEach((el:HTMLElement) => { 
-      const find:NodeListOf<HTMLElement> = el.querySelectorAll(selector)
-      find.forEach((findElm:HTMLElement) => {
+
+  public find(selector: string): Rocet {
+    const $rocket = r()
+    this.Elements.forEach((el: HTMLElement) => {
+      const find: NodeListOf<HTMLElement> = el.querySelectorAll(selector)
+      find.forEach((findElm: HTMLElement) => {
         $rocket.Elements.push(findElm);
       });
     })
     return $rocket;
   }
 
-
-
-  public render(rocet: RocetElement | Function): Rocet
-  {
+  public render(rocet: RocetElement | Function): Rocet {
     if (this.Elements.length == 0) {
-        this.renderObserver = typeof rocet == "function"? rocet : () => rocet;
-        return;
+      this.renderObserver = typeof rocet == "function" ? rocet : () => rocet;
+      return;
     }
     const arr: Array<HTMLElement> = [];
     this.Elements.forEach((el: HTMLElement, i) => {
@@ -64,24 +78,24 @@ export class Rocet {
       if (typeof rocet == 'function') RNode = rocet(this, i);
       if (RNode instanceof RocetNode) {
         const newElm = this.create(RNode)
-          el.replaceWith(newElm);
-          arr.push(newElm);
-          this.execure()
-        }
-      })
-      this.Elements = arr
+        el.replaceWith(newElm);
+        arr.push(newElm);
+        this.execure()
+      }
+    })
+    this.Elements = arr
     return this;
   }
 
   public add(element: RocetElement | RocetNode | HTMLElement) {
-    if (element instanceof HTMLElement) { 
+    if (element instanceof HTMLElement) {
       this.Elements.forEach((el) => {
-          el.append(element)
+        el.append(element)
       })
     }
-    if (element instanceof RocetNode) { 
-       this.Elements.forEach((el) => {
-          el.append(this.create(element))
+    if (element instanceof RocetNode) {
+      this.Elements.forEach((el) => {
+        el.append(this.create(element))
       })
     }
   }
@@ -132,11 +146,11 @@ export class Rocet {
     }
   }
 
-  public remove(selector: string|null = null) {
+  public remove(selector: string | null = null) {
     this.Elements.forEach((el: HTMLElement) => {
       if (selector) {
         el.querySelectorAll(selector).forEach((chil) => chil.remove());
-      } else { 
+      } else {
         el.remove()
       }
 
@@ -152,54 +166,59 @@ export class Rocet {
     return this.Elements[0]?.getAttribute(name)
   }
 
+  public val(value: string | null = null) {
+    if (value) {
+      this.Elements.forEach((el: ElementEvent) => {
+        el.value = value
+      })
+    } else {
+      return this.value
+    }
+  }
+
   public on(type: string, callback: any) {
-    this.Elements.forEach((el: HTMLElement) => { 
+    this.Elements.forEach((el: HTMLElement) => {
       el.addEventListener(type, callback);
     })
   }
 
-   private watchElement(selector: string) {
+  private watchElement(selector: string) {
 
-        return new Promise((resolve) => {
-            const observer = new MutationObserver(() => {
-                this.Elements = Array.from(document.querySelectorAll(selector));
-                if (this.Elements.length != 0) {
-                    this.render(this.renderObserver);
-                }
-            });
-            observer.observe(document.body, { childList: true, subtree: true });
-        });
+    return new Promise((resolve) => {
+      const observer = new MutationObserver(() => {
+        this.Elements = Array.from(document.querySelectorAll(selector));
+        if (this.Elements.length != 0) {
+          this.render(this.renderObserver);
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    });
   }
-  public addAttributeJSX(Element: RocetElement, item:number = 0): RocetElement
-  {
+
+  public addAttributeJSX(Element: RocetElement, item: number = 0): RocetElement {
     const el = this.Elements[item]
-      for (let i = 0; i < el.attributes.length; i++) {
-        const attr = el.attributes[i];
-        Element.props[attr.name] = attr.value;
-      }
+    for (let i = 0; i < el.attributes.length; i++) {
+      const attr = el.attributes[i];
+      Element.props[attr.name] = attr.value;
+    }
     return Element;
   }
-  public item(key: number = 0): HTMLElement
-  { 
+
+  public item(key: number = 0): HTMLElement {
     return this.Elements[key];
   }
-  public closest(selector: string): Rocet
-  { 
+
+  public closest(selector: string): Rocet {
     return new Rocet(this.Elements[0].closest(selector) as HTMLElement)
   }
 
-  public each(callback: Function): void
-  { 
-    this.Elements.forEach((el:HTMLElement, i) => { 
-        callback(r(el), i)
+  public each(callback: Function): void {
+    this.Elements.forEach((el: HTMLElement, i) => {
+      callback(r(el), i)
     })
   }
-  public classList() { 
-    this.Elements[0].classList
-  }
 
-  public clone(): Rocet
-  {
+  public clone(): Rocet {
     const el = new Rocet(this.Elements[0].cloneNode(true) as HTMLElement);
     el.cloneEvent(this.Elements[0], el.Elements[0]);
     return el;

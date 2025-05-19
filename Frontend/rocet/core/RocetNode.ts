@@ -1,21 +1,21 @@
 import {  attribute} from "../interface"
+import { Rocet } from "./rocet";
 
 export type props = attribute | string | RocetNode | Array<RocetNode> | undefined;
 export type children = string | RocetNode| Array<RocetNode> | undefined;
 
-export interface RocetElement extends JSX.Element { 
+export interface RocetElement extends JSX.Element {}
 
-}
-
-export class RocetNode
+export class RocetNode implements RocetElement
 {
-    public tag: string
     public props: attribute = {}
     public children: Array<RocetNode> = [];
+    public type: any;
+    public key: string;
     public elem?: HTMLElement
-    
+
     constructor(tag: string, props: props, children: children) {
-        this.tag = tag;
+        this.type = tag;
         if (props) {
             this.HtmlContentStringInProps(props);
             this.isObjectProps(props);
@@ -84,5 +84,4 @@ export class RocetNode
             }
         }
     }
-
 }
