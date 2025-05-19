@@ -26,7 +26,7 @@ abstract class DB
     protected string $strWhere = "";
     protected string $strOrders = "";
     protected string $strJoin = "";
-    protected string $strGrops = "";
+    protected string $strGroups = "";
     protected string $strLimit = "";
     protected string $strOffset = "";
 
@@ -61,20 +61,20 @@ abstract class DB
         $query = $this->toString();
         $this->clearQuery();
         if ($many) {
-            return $this->q($query)->fetchAll(PDO::FETCH_ASSOC);
+            return $this->q($query)->fetchAll(PDO::FETCH_ASSOC)?:[];
         } else {
-            return $this->q($query)->fetch(PDO::FETCH_ASSOC);
+            return $this->q($query)->fetch(PDO::FETCH_ASSOC)?:[];
         }
     }
 
     public function toString(): string
     {
-        return $this->strQuery . $this->strJoin . $this->strWhere . $this->strGrops . $this->strOrders.$this->strLimit. $this->strOffset;
+        return $this->strQuery . $this->strJoin . $this->strWhere . $this->strGroups . $this->strOrders.$this->strLimit. $this->strOffset;
     }
 
     private function clearQuery():void
     {
-        $this->strQuery = $this->strJoin = $this->strWhere =  $this->strGrops = $this->strOrders = $this->strOffset = $this->strLimit = '';
+        $this->strQuery = $this->strJoin = $this->strWhere =  $this->strGroups = $this->strOrders = $this->strOffset = $this->strLimit = '';
     }
 
      /**
