@@ -102,7 +102,7 @@ export class Rocet extends RocetObject
 
   public create(rocet: RocetNode | Rocet): HTMLElement | ElementEvent {
     if (rocet instanceof Rocet) return rocet.Elements[0];
-    const NewCreateElement = <HTMLElement>document.createElement(rocet.tag);
+    const NewCreateElement = <HTMLElement>document.createElement(rocet.type);
 
     for (let key in rocet.props)
       this.setAttribute(NewCreateElement, key, rocet.props[key]);
@@ -238,9 +238,17 @@ export class Rocet extends RocetObject
       this.cloneEvent(el.children[i] as HTMLElement, chahgeElement.children[i] as HTMLElement);
     }
   }
+  isAttr(attr: string):boolean
+  { 
+    return this.Elements[0].hasAttribute(attr);
+  }
 }
 
 export function r(data: string | HTMLElement | RocetElement | null = null) {
   return new Rocet(data);
 }
+export function $(data: string | HTMLElement | RocetElement | null = null) {
+  return new Rocet(data);
+}
+
 

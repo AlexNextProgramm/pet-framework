@@ -1,4 +1,10 @@
-export class RocetObject { 
+interface RocetObjectInterface { 
+    [name: string]: any
+}
+
+export class RocetObject implements RocetObjectInterface{ 
     classList: DOMTokenList
-    value :string
+    value: string
+    className: string
+    checked:boolean
 }
