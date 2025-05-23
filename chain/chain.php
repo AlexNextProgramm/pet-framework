@@ -32,7 +32,7 @@ function attr(string|null $name = null): string|array|null
 
 function attrs(): array
 {
-    return request()->attribute;
+    return Request::$attribute;
 }
 
 /**

@@ -9,10 +9,10 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        view('page.home', $request->attribute);
+        view('page.home', Request::$attribute);
     }
     public function documentation(Request $request)
     {
-        view('page.documentation', $request->attribute);
+        view('page.documentation',Request::$attribute);
     }
 }
