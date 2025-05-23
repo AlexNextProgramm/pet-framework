@@ -6,15 +6,15 @@ use Pet\Tools\Tools;
 
 class Request
 {
-    public $attribute = [];
-    public $parametr = [];
+    public static array $attribute = [];
+    public static array $parametr = [];
     public $header = [];
     public $path;
 
 
     public function __construct()
     {
-        $this->attribute = $this->input();
+        self::$attribute = $this->input();
         $this->path = $this->getURI();
         $this->parsingHeaders();
     }
@@ -40,6 +40,9 @@ class Request
      */
     public function input(string|null $name = null): array|string|null
     {
+        if(!empty(self::$attribute)){
+            return key_exists($name, self::$attribute) ? self::$attribute[$name]: null;
+        }
         $REQUEST = $this->parsing();
         if (!$name) return $REQUEST;
         return key_exists($name, $REQUEST) ? $REQUEST[$name] : null;
@@ -48,7 +51,7 @@ class Request
 
     private function parsing()
     {
-        $REQUEST = array_merge($_GET, $_POST);
+        $REQUEST = array_merge($_GET, $_POST, $_FILES);
         $decode = [];
         $input = file_get_contents('php://input');
         if (($_SERVER['CONTENT_TYPE'] ?? null) === 'application/json' && !empty($input)) $decode = Tools::jsonDe($input);
