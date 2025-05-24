@@ -18,7 +18,8 @@ trait Update {
 
         $this->arrayQuote($arrayKeyAndValue);
         $str = Tools::array_implode(',', $arrayKeyAndValue, "`[key]`=[val]");
-        $this->strQuery  = "UPDATE `{$this->table}` SET $str";
+        $from = $this->fromTable("");
+        $this->strQuery  = "UPDATE $from SET $str";
         $this->SUB = "UPDATE";
         return $this;
     }

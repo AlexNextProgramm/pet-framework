@@ -2,6 +2,7 @@
 
 namespace Pet\Router;
 
+use Pet\Request\Request;
 use Pet\Router\Middleware;
 
 use function PHPSTORM_META\type;
@@ -131,7 +132,7 @@ class Router extends Middleware
 
             if (preg_match("|$regular|", request()->path, $result, PREG_UNMATCHED_AS_NULL)) {
                 foreach ($matches[1] as $key => $value) {
-                    request()->parametr[$value] = $result[$key + 1];
+                    Request::$parametr[$value] = $result[$key + 1];
                 }
                 return trim($result[0]);
             }

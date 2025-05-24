@@ -20,7 +20,8 @@ trait Delete
      */
     public function delele():Model
     {
-        $this->strQuery =  "DELETE FROM `{$this->table}`";
+        $from =$this->fromTable();
+        $this->strQuery =  "DELETE $from";
         $this->SUB = "DELETE";
         return $this;
     }

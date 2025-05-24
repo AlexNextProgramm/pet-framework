@@ -13,7 +13,6 @@ trait Select
     public $strSelect = '';
     private $join = "";
     private $or = "";
-    public $tableAlias = null;
     /**
      * select
      *
@@ -33,8 +32,7 @@ trait Select
             $strSelect = implode(',', $column);
         }
 
-        $from = "FROM `{$this->table}` ".($this->tableAlias? " AS {$this->tableAlias} ": "");
-        $this->strQuery = "SELECT {$strSelect} $from";
+        $this->strQuery = "SELECT {$strSelect}" .$this->fromTable();
         $this->SUB = "SELECT";
         return  $this;
     }
@@ -170,7 +168,8 @@ trait Select
      */
     public function whereId(string|int $id): Model
     {
-        $this->strWhere = " WHERE `{$this->table}`.`id` = '$id'";
+        $table = $this->getTableName();
+        $this->strWhere = " WHERE `$table`.`id` = '$id'";
         $this->SUB = "WHERE";
         return $this;
     }

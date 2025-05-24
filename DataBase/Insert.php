@@ -23,7 +23,8 @@ trait Insert
         $key = array_keys($ArrayColumnAndValue);
         $value = array_values($ArrayColumnAndValue);
         $this->arrayQuote($value);
-        $this->strQuery = "INSERT INTO `{$this->table}` ( " . implode(' , ', $key) . " ) VALUES ( " . implode(", ", $value) . ")";
+        $from = $this->fromTable("");
+        $this->strQuery = "INSERT INTO $from ( " . implode(' , ', $key) . " ) VALUES ( " . implode(", ", $value) . ")";
         $this->SUB = "INSERT";
         return  $this->execute();
     }

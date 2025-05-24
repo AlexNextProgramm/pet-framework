@@ -50,7 +50,7 @@ function request(): Request
  * @param  string $name
  * @return void
  */
-function files(string $name = null): array|string|null
+function files(string|null $name = null): array|string|null
 {
     return request()->file($name);
 }
@@ -61,9 +61,9 @@ function files(string $name = null): array|string|null
  * @param  string $key
  * @return null|array|string
  */
-function supple(string $key = null):null|array|string
+function supple(string|null $key = null):null|array|string
 {
-    $parametr = request()->parametr;
+    $parametr = Request::$parametr;
     if($key) {
         return !empty($parametr[$key]) ? $parametr[$key] : null;
     }

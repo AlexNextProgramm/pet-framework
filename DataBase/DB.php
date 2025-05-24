@@ -35,6 +35,7 @@ abstract class DB
     protected $info = [];
 
     protected string $table = "";
+    protected string|false $tableAlias = false;
     protected $column = [];
     protected $error = [];
     private PDO|null $DB = null;
@@ -105,6 +106,19 @@ abstract class DB
         }
     }
 
+    /**
+     * FromTable
+     *
+     * @param  mixed $from
+     * @return string
+     */
+    public function FromTable(string $from = "FROM"):string
+    {
+       return " $from `{$this->table}` ".($this->tableAlias? " AS {$this->tableAlias} ": "");
+    }
+    public function getTableName(){
+        $this->tableAlias?: $this->table;
+    }
     /**
      * q
      *
