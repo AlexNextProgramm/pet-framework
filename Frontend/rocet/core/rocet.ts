@@ -224,6 +224,16 @@ export class Rocet extends RocetObject
     return el;
   }
 
+  public getObjectAttr() {
+    const el = this.Elements[0];
+    const attrs:any = {};
+    for (let i = 0; i < el.attributes.length; i++) {
+      const attr = el.attributes[i];
+      attrs[attr.name] = attr.value;
+    }
+    return attrs
+  }
+
   private cloneEvent(el: HTMLElement, chahgeElement: HTMLElement) {
     const eventList: any = el.getEventListeners()
     if (eventList) {
