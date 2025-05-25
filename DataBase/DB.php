@@ -120,7 +120,7 @@ abstract class DB
        return " $from `{$this->table}` ".($this->tableAlias? " AS {$this->tableAlias} ": "");
     }
     public function getTableName(){
-        $this->tableAlias?: $this->table;
+       return $this->table;
     }
     /**
      * q

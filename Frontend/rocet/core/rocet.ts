@@ -170,9 +170,10 @@ export class Rocet extends RocetObject
     if (typeof value == 'string') {
       this.Elements.forEach((el: ElementEvent) => {
         el.value = value
+        el.setAttribute('value', value);
       })
     } else {
-      return this.value
+      return this.value || this.Elements[0].getAttribute('value')
     }
   }
 
