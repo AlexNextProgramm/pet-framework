@@ -158,7 +158,7 @@ export class Rocet extends RocetObject
   }
 
   public attr(name: string, value: string | null = null) {
-    if (value) {
+    if (typeof value == 'string') {
       this.Elements.forEach((el: HTMLElement) => {
         el.setAttribute(name, value)
       })
@@ -167,7 +167,7 @@ export class Rocet extends RocetObject
   }
 
   public val(value: string | null = null) {
-    if (value) {
+    if (typeof value == 'string') {
       this.Elements.forEach((el: ElementEvent) => {
         el.value = value
       })

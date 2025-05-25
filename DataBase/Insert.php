@@ -23,15 +23,16 @@ trait Insert
         $key = array_keys($ArrayColumnAndValue);
         $value = array_values($ArrayColumnAndValue);
         $this->arrayQuote($value);
-        $from = $this->fromTable("");
-        $this->strQuery = "INSERT INTO $from ( " . implode(' , ', $key) . " ) VALUES ( " . implode(", ", $value) . ")";
+        $this->strQuery = "INSERT INTO {$this->table} ( " . implode(' , ', $key) . " ) VALUES ( " . implode(", ", $value) . ")";
         $this->SUB = "INSERT";
         return  $this->execute();
     }
 
-    public function create($data)
-    {
-            $this->insert($data);
-            return $this->DB->lastInsertId();
+    public function create($data) {
+        if ($this->insert($data)) {
+            $id = $this->pdo()->lastInsertId();
+            $this->setInfoId($id);
+            return $id;
+        }
     }
 }

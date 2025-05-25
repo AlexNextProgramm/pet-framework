@@ -62,17 +62,14 @@ class Router extends Middleware
         foreach (Router::$Route as $Rout) {
              //Прямое направление через event при ajax
             $resultAjax = 'Нет ответных данных';
-            if (self::ajax($request, $resultAjax) && in_array($request->getMethod(), self::$ajaxtype)) {
+            if (in_array($request->getMethod(), self::$ajaxtype) && self::ajax($request, $resultAjax)) {
                 Response::die($resultAjax);
             }
             if ($Rout['method'] != $request->getMethod()) continue;
             if ($control) continue;
 
             // Проверка на гибкие ссылки
-            $fLink = Router::flexibleLink($Rout['path']);
-            $isFlexLink  = $fLink ? $fLink === $request->path : false;
-
-            if ($request->path != $Rout['path'] && !$isFlexLink) continue;
+            if (self::isLinkRouter($request,$Rout)) continue;
 
             //Заглушка в middleware
             if (key_exists('middleware', $Rout)) {
@@ -111,15 +108,26 @@ class Router extends Middleware
 
     private static function ajax($request, &$result) : bool
     {
-        foreach (self::$event as $key => $action) {
-            if (!empty($request->header[$key])) {
-                $result = (new EssenceClass())->open($action, $request);
-                return true;
+        // Проверка роутера на ложный запрос. ajax не может выполнен 
+        foreach (Router::$Route as $Rout) {
+            if ($Rout['method'] != "GET") continue;
+            if (self::isLinkRouter($request, $Rout)) continue;
+            foreach (self::$event as $key => $action) {
+                if (!empty($request->header[$key])) {
+                    $result = (new EssenceClass())->open($action, $request);
+                    return true;
+                }
             }
         }
         return false;
     }
 
+    private static function isLinkRouter($request, $Rout):bool
+    {
+        $fLink = Router::flexibleLink($Rout['path']);
+        $isFlexLink  = $fLink ? $fLink === $request->path : false;
+        return $request->path != $Rout['path'] && !$isFlexLink;
+    }
     private static function flexibleLink($flex)
     {
 

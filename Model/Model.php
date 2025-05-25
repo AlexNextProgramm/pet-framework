@@ -17,8 +17,7 @@ abstract class Model extends DB
     {
             parent::__construct($data);
         if (!$this->exist() && $isNotExistCreate) {
-             $id = $this->create($data);
-             $this->setInfoId($id);
+            $this->create($data);
         }
     }
 

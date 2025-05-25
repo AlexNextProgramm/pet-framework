@@ -40,6 +40,9 @@ abstract class DB
     protected $error = [];
     private PDO|null $DB = null;
 
+    protected function pdo() {
+        return $this->DB;
+    }
     /**
      * __construct
      *

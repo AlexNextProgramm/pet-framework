@@ -41,7 +41,7 @@ class Request
     public function input(string|null $name = null): array|string|null
     {
         if(!empty(self::$attribute)){
-            return key_exists($name, self::$attribute) ? self::$attribute[$name]: null;
+            return key_exists($name, self::$attribute) ? self::$attribute[$name]: self::$attribute;
         }
         $REQUEST = $this->parsing();
         if (!$name) return $REQUEST;
