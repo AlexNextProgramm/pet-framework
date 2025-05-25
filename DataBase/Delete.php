@@ -18,11 +18,14 @@ trait Delete
      * @param  bool $returnThis default false
      * @return Delete
      */
-    public function delele():Model
+    public function delete():Model
     {
-        $from =$this->fromTable();
-        $this->strQuery =  "DELETE $from";
+        $this->strQuery =  "DELETE {$this->table}";
         $this->SUB = "DELETE";
+        if ($this->isInfo()){
+            $this->whereId($this->get('id'));
+            $this->fetch();
+        }
         return $this;
     }
 
