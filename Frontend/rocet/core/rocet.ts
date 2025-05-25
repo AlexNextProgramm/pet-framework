@@ -42,6 +42,7 @@ export class Rocet extends RocetObject
             return typeof value === 'function' ? value.bind(target as Rocet) : value
           }
           if (target[prop]) return (target as Rocet).Elements
+          if (prop == 'length') return (target as Rocet).Elements.length
           if (target.Elements && target.Elements.length > 0) {
             return (target.Elements[0] as any)[prop];
           }
