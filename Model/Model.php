@@ -6,6 +6,7 @@ use Pet\DataBase\Delete;
 use Pet\DataBase\Update;
 use Pet\DataBase\Select;
 use Pet\DataBase\Insert;
+use Pet\Errors\AppException;
 use Pet\Tools\Tools;
 
 abstract class Model extends DB
@@ -21,7 +22,40 @@ abstract class Model extends DB
         }
     }
 
-    public function find($fields = null, callable|null $callback = null) : array
+    /**
+     * __get
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function __get(string $name): mixed
+    {
+        return $this->info[$name];
+    }
+
+    /**
+     * __set
+     * при установки значений закидываем в таблицу update
+     * @param  string $name
+     * @param  int|float|string|bool $value
+     * @return void
+     */
+    public function __set(string $name, int|float|string|bool $value)
+    {
+        if (!$this->isInfo() || empty($this->info['id'])){
+            throw new AppException("not info in model or not id in info");
+        }
+       return $this->update([$name => $value])->whereId($this->info['id'])->fetch();
+    }
+
+    /**
+     * find
+     * Возвращает массив
+     * @param  array|null $fields
+     * @param  callable|null $callback
+     * @return array
+     */
+    public function find(array|null $fields = null, callable|null $callback = null) : array
     {
         $this->select();
         if ($fields) {
@@ -35,6 +69,35 @@ abstract class Model extends DB
         return $this->fetch();
     }
 
+    /**
+     * findM
+     * Возвразает массив моделей
+     * @param  mixed $fields
+     * @param  mixed $callback
+     * @return array
+     */
+    public function findM(array|null $fields = null, callable|null $callback = null): array
+    {
+        $results = $this->find($fields, $callback);
+        return array_map(fn($data)=>(new self())->setInfo($data), $results);
+    }
+
+    /**
+     * setInfo
+     * устанавливет info только для модели 
+     * @param array $data
+     * @return Model
+     */
+    private function setInfo(array $data):Model
+    {
+        $this->info = $data;
+        return $this;
+    }
+
+    /**
+     * isTable
+     * @return bool
+     */
     public function isTable(): bool
     {
         return !empty($this->q("SHOW TABLES FROM `".$this->db_name."` LIKE 'migrate' ; ")->fetch());
@@ -42,8 +105,8 @@ abstract class Model extends DB
 
     /**
      * set
-     *
-     * @param  mixed $data
+     * принимает ассоциативный массив
+     * @param  array $data
      * @return bool
      */
     public function set(array $data): bool
@@ -56,7 +119,6 @@ abstract class Model extends DB
 
     /**
      * exist
-     *
      * @return bool
      */
     public function exist():bool
@@ -66,7 +128,7 @@ abstract class Model extends DB
 
     /**
      * data
-     *
+     * одает и обрабатывает скрытые поля
      * @return array
      */
     public function data() : array
@@ -80,4 +142,5 @@ abstract class Model extends DB
         }
         return $result;
     }
+   
 }
