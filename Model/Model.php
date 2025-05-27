@@ -154,6 +154,18 @@ abstract class Model extends DB
         return $this;
     }
 
+    public function ifExistDelete(array|int|string|null $whereElseId = null):bool {
+        if(!empty($whereElseId)){
+            $this->setInfo($whereElseId);
+        }
+
+        if ($this->exist()) {
+            $this->delete();
+            return true;
+        }
+        return false;
+    }
+
     /**
      * data
      * одает и обрабатывает скрытые поля
