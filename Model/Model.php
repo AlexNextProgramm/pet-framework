@@ -127,6 +127,31 @@ abstract class Model extends DB
     }
 
     /**
+     * ifExistSetOrCreate
+     * Создать если не сущестнцует
+     * @param  mixed $data
+     * @param  mixed $where
+     * @return void
+     */
+    public function ifExistSetOrCreate(array $data, array|int|string|null $whereElseId = null): Model
+    {
+        if (!empty($whereElseId)) {
+            $this->setInfoId($whereElseId);
+        } else {
+            ($data['id'] ?? false) ?
+                $this->setInfoId((int) $data['id']):
+                $this->setInfoId($data);
+        }
+        if ($this->exist()) {
+            $this->set($data);
+        }else{
+            $this->create($data);
+        }
+
+        return $this;
+    }
+
+    /**
      * data
      * одает и обрабатывает скрытые поля
      * @return array

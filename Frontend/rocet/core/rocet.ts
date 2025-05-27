@@ -180,7 +180,7 @@ export class Rocet extends RocetObject
         el.setAttribute('value', value);
       })
     } else {
-      return this.value || this.Elements[0].getAttribute('value')
+      return $(this.item(0)).value || this.Elements[0].getAttribute('value')
     }
   }
 
@@ -212,7 +212,7 @@ export class Rocet extends RocetObject
     return Element;
   }
 
-  public item(key: number = 0): HTMLElement {
+  public item(key: number = 0): HTMLElement|ElementEvent {
     return this.Elements[key];
   }
 
