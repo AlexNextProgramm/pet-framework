@@ -138,9 +138,12 @@ abstract class Model extends DB
         if (!empty($whereElseId)) {
             $this->setInfoId($whereElseId);
         } else {
-            ($data['id'] ?? false) ?
-                $this->setInfoId((int) $data['id']):
+            if (($data['id'] ?? false)) {
+                $this->setInfoId((int) $data['id']);
+                unset($data['id']);
+            } else {
                 $this->setInfoId($data);
+            }
         }
         if ($this->exist()) {
             $this->set($data);
