@@ -296,6 +296,22 @@ export class Rocet extends RocetObject
       el.attr('style', style + 'display: none;')
     })
   }
+
+  public show() { 
+    this.each((el: Rocet) => {
+      const style = el.attr('style') || '';
+      const styles = style.split(';').map(s => s.trim());
+      const filteredStyles = styles.filter(s => {
+        if (s === '') return false;
+        return !s.toLowerCase().startsWith('display');
+      });
+      if (filteredStyles.length > 0) {
+        el.item(0).setAttribute('style', filteredStyles.join('; ') + ';');
+      } else {
+        el.item(0).removeAttribute('style');
+      }
+    })
+  }
 }
 
 export function r(data: string | HTMLElement | RocetElement | null = null) {
