@@ -8,5 +8,6 @@ export class RocetObject implements RocetObjectInterface{
     className: string
     checked: boolean
     tagName: string
-    onclick:Function|null
+    onclick: Function | null
+    length: number
 }
