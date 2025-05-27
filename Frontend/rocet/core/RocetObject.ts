@@ -6,5 +6,7 @@ export class RocetObject implements RocetObjectInterface{
     classList: DOMTokenList
     value: string
     className: string
-    checked:boolean
+    checked: boolean
+    tagName: string
+    onclick:Function|null
 }

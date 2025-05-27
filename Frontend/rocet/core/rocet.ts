@@ -15,6 +15,7 @@ export class Rocet extends RocetObject
 
 
   public ExecAfter: Array<Function> = [];
+  public ExecElements: Array<Function> = [];
   public Elements: Array<HTMLElement> = [];
   private renderObserver: Function = null;
   constructor(data: string | HTMLElement | RocetElement | null = null) {
@@ -81,10 +82,11 @@ export class Rocet extends RocetObject
         const newElm = this.create(RNode)
         el.replaceWith(newElm);
         arr.push(newElm);
-        this.execure()
+        this.execureElements($(newElm), i)
       }
     })
     this.Elements = arr
+    this.execure()
     return this;
   }
 
@@ -138,11 +140,15 @@ export class Rocet extends RocetObject
       console.error(`Error: It was not possible to assign the attribute ${name} to the element ${Element.tagName} : ${err}`)
     }
   }
+  private execureElements($RocketElem: Rocet, i: any) {
+    if(this.ExecElements[i])
+      this.ExecElements[i]($RocketElem)
+  }
 
   private execure() {
     if (this.ExecAfter.length != 0) {
       this.ExecAfter.forEach((func: Function) => {
-        func()
+        func(this)
       })
     }
   }
@@ -215,9 +221,11 @@ export class Rocet extends RocetObject
   }
 
   public each(callback: Function): void {
-    this.Elements.forEach((el: HTMLElement, i) => {
-      callback(r(el), i)
-    })
+    for (const [i, v] of this.Elements.entries()) { 
+      if (callback($(v), i) === false) { 
+        break;
+      }
+    }
   }
 
   public clone(): Rocet {
@@ -250,9 +258,43 @@ export class Rocet extends RocetObject
       this.cloneEvent(el.children[i] as HTMLElement, chahgeElement.children[i] as HTMLElement);
     }
   }
-  isAttr(attr: string):boolean
+
+  public isAttr(attr: string):boolean
   { 
     return this.Elements[0].hasAttribute(attr);
+  }
+
+  Exec(func: Function, i:any = null)
+  {
+    if (i !== null) {
+      this.ExecElements[i] = func;
+    } else {
+      let isFun = false
+      this.ExecAfter.forEach((fun: Function) => {
+        if (!isFun)
+          isFun = fun.toString() == func.toString(); // поиск одинаковых функций
+      });
+      if (!isFun) this.ExecAfter.push(func);
+    }
+  }
+
+  isVisible(): boolean
+  { 
+    const el = this.item()
+    if (!el) return false;
+    const style = window.getComputedStyle(el);
+    const isDisplayed = style.display !== 'none';
+    const isVisible = style.visibility !== 'hidden' && style.opacity !== '0';
+    const rect = el.getBoundingClientRect();
+    const inDocument = rect.width > 0 && rect.height > 0;
+    return isDisplayed && isVisible && inDocument;
+  }
+
+  hide() {
+    this.each((el: Rocet) => {
+      const style = el.attr('style') || '';
+      el.attr('style', style + 'display: none;')
+    })
   }
 }
 
