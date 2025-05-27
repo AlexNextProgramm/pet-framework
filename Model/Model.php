@@ -118,6 +118,19 @@ abstract class Model extends DB
     }
 
     /**
+     * reboot
+     * Перезагрузка значений info
+     * @return Model
+     */
+    public function reboot():Model
+    {
+        if($this->exist()){
+            $this->setInfoId((int)$this->get('id'));
+        }
+        return $this;
+    }
+
+    /**
      * exist
      * @return bool
      */
