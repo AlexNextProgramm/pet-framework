@@ -25,6 +25,7 @@ interface Element {
 
   getEventListeners(type?: string): { [type: string]: EventListenerRecord[] } | EventListenerRecord[] | undefined;
   hasEventListeners(type?: string): boolean;
+  onEventListeners(type: string):void
 }
 
 interface EventListenerObject{
@@ -88,7 +89,7 @@ Element.prototype.getEventListeners = function (
   
   return this.eventListenerList;
 };
-// getEventListeners с типами
+// hasEventListeners с типами
 Element.prototype.hasEventListeners = function (
   this: Element,
   type?: string
@@ -100,4 +101,18 @@ Element.prototype.hasEventListeners = function (
     return true;
 
   return false;
+};
+
+Element.prototype.onEventListeners = function (
+  this: Element,
+  type?: string,
+  ...arg:any
+): void
+{
+  if (this.hasEventListeners(type)) { 
+    (this.getEventListeners(type) as EventListenerRecord[]).forEach((l:EventListenerRecord) => {
+      (l.listener as unknown as Function)(...arg)
+    })
+
+    }
 };
