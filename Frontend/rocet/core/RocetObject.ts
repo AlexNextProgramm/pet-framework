@@ -10,4 +10,5 @@ export class RocetObject implements RocetObjectInterface{
     tagName: string
     onclick: Function | null
     length: number
+    offsetTop: number
 }

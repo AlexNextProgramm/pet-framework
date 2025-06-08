@@ -24,6 +24,9 @@ class View
         }
         self::$argument = array_merge(self::$argument, $argument);
         foreach (self::$argument as $key => $val) {
+            if (isset(${$key})) {
+                throw new AppException("You are trying to redefine a variable $key");
+            }
             ${$key} = $val;
         }
         include self::DIR_VIEW . DS . "$viewName";
@@ -41,6 +44,6 @@ class View
      */
     public static function gp(string $path, string $exp = ".php"): string
     {
-        return str_replace(".", "/", $path)."$exp";
+        return str_replace(".", DS, $path)."$exp";
     }
 }

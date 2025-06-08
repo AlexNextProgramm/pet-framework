@@ -25,7 +25,7 @@ interface Element {
 
   getEventListeners(type?: string): { [type: string]: EventListenerRecord[] } | EventListenerRecord[] | undefined;
   hasEventListeners(type?: string): boolean;
-  onEventListeners(type: string):void
+  onEventListeners(type: string, ...arg:any):void
 }
 
 interface EventListenerObject{
