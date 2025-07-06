@@ -60,7 +60,8 @@ abstract class Model extends DB
         $this->select();
         if ($fields) {
             $table =  $this->tableAlias ?? $this->table ;
-            $fields = Tools::filter($fields, fn($k, $v)=> "{$table}.$k = '$v' ");
+            $table = !empty($table) ? $table."." : "";
+            $fields = Tools::filter($fields, fn($k, $v)=> "{$table}$k = '$v' ");
             $this->where(implode(' AND ', $fields));
         }
         if ($callback) {
