@@ -48,15 +48,15 @@ class View
     }
 
     public static function getTemplate($filename, $params = [])
-    {
-        if (is_file(self::DIR_VIEW . DS . self::gp($filename))) {
+    {       $templatePath = self::DIR_VIEW . DS . self::gp($filename);
+        if (is_file($templatePath)) {
             ob_start();
             if (!empty($params)) {
                 extract($params, EXTR_SKIP | EXTR_REFS);
             }
 
-            include $filename;
-            ob_get_clean();
+            include $templatePath;
+            return ob_get_clean();
         }
         return false;
     }
