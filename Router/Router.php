@@ -96,7 +96,6 @@ class Router extends Middleware
             // если контроллер что-то хочет вернуть
             $controller = array_diff($controller, [null, false, '']);
             if (!empty($controller)){
-                print_r($controller);
                 echo json_encode((count($controller) == 1 ? $controller[0] : $controller), JSON_UNESCAPED_UNICODE);
             }
             $control = true;

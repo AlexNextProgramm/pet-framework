@@ -46,4 +46,18 @@ class View
     {
         return str_replace(".", DS, $path)."$exp";
     }
+
+    public static function getTemplate($filename, $params = [])
+    {
+        if (is_file(self::DIR_VIEW . DS . self::gp($filename))) {
+            ob_start();
+            if (!empty($params)) {
+                extract($params, EXTR_SKIP | EXTR_REFS);
+            }
+
+            include $filename;
+            ob_get_clean();
+        }
+        return false;
+    }
 }
