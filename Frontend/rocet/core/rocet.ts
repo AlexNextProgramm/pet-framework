@@ -14,7 +14,7 @@ export class Rocet extends RocetObject
 {
 
 
-  public ExecAfter: Array<Function> = [];
+  private ExecAfter: Array<Function> = [];
   public ExecElements: Array<Function> = [];
   public Elements: Array<HTMLElement> = [];
   private renderObserver: Function = null;
@@ -53,10 +53,17 @@ export class Rocet extends RocetObject
         }
         return undefined;
       },
-      set(target, property, value) {
-        this.Elements.forEach((el: any) => el[property] = value);
+  
+      set(target: any, prop: string | symbol, value) {
+        const protoProps = Object.getOwnPropertyNames(Object.getPrototypeOf(target));
+        if (protoProps.includes(prop as string) && typeof target[prop] != 'function') {
+          target[prop] = value;
+          return true;
+        }
+        this.Elements.forEach((el: any) => el[prop] = value);
         return true;
       }
+
     });
   }
   private isHTMLString(str: string): boolean {
@@ -185,6 +192,14 @@ export class Rocet extends RocetObject
       this.ExecAfter.forEach((func: Function) => {
         func(this)
       })
+    }
+  }
+  public addExecAll(fun: Function | Array<Function>): void
+  { 
+    if (Array.isArray(fun)) {
+      fun.forEach((f: Function) => this.addExecAll(f));
+    } else { 
+      this.ExecAfter.push(fun);
     }
   }
 
@@ -319,16 +334,20 @@ export class Rocet extends RocetObject
     return this.Elements[0].hasAttribute(attr);
   }
 
-  Exec(func: Function, i: any = null) {
-    if (i !== null) {
-      this.ExecElements[i] = func;
-    } else {
-      let isFun = false
-      this.ExecAfter.forEach((fun: Function) => {
-        if (!isFun)
-          isFun = fun.toString() == func.toString(); // поиск одинаковых функций
-      });
-      if (!isFun) this.ExecAfter.push(func);
+  Exec(func: Function | Array<Function>, i: any = null) {
+    if (Array.isArray(func)) {
+      func.forEach((f: Function) => this.Exec(func));
+    } else { 
+      if (i !== null) {
+        this.ExecElements[i] = func;
+      } else {
+        let isFun = false
+        this.ExecAfter.forEach((fun: Function) => {
+          if (!isFun)
+            isFun = fun.toString() == func.toString(); // поиск одинаковых функций
+        });
+        if (!isFun) this.ExecAfter.push(func);
+      }
     }
   }
 
