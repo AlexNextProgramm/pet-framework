@@ -242,7 +242,7 @@ export class Rocet extends RocetObject
     })
   }
 
-  public loadPage(callback: (this: Window, ev: Event) => any)
+  static loadPage(callback: (this: Window, ev: Event) => any)
   {
     window.addEventListener('load', callback);
   }
