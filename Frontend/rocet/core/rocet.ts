@@ -371,10 +371,10 @@ export class Rocet extends RocetObject
   }
 }
 
-export function r(data: string | HTMLElement | RocetElement | null = null) {
+export function r(data: string | HTMLElement | RocetElement | EventTarget| null = null) {
   return new Rocet(data);
 }
-export function $(data: string | HTMLElement | RocetElement | null = null) {
+export function $(data: string | HTMLElement | RocetElement |EventTarget| null = null) {
   return new Rocet(data);
 }
 
