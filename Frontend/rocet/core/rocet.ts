@@ -26,10 +26,6 @@ export class Rocet extends RocetObject
     if (data instanceof HTMLElement) {
       this.Elements.push(data)
     }
-    if (data instanceof EventTarget) { 
-      this.Elements.push(data as HTMLElement);
-    }
-
     if (typeof data == 'string') {
       if (this.isHTMLString(data)) {
         this.Elements[0] = this.createElementFromHTML(data);
