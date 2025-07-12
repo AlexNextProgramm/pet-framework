@@ -89,10 +89,7 @@ trait Select
      */
     public function where(string $str = ''): Model
     {
-        if (empty($str)) return $this;
-        $this->strWhere = " WHERE $str";
-        $this->SUB = "WHERE";
-        return $this;
+        return $this->whereAdd($str);
     }
 
     /**
@@ -104,6 +101,7 @@ trait Select
      */
     public function whereAdd(string $str = '', $sign = "AND"): Model
     {
+        if (empty($str)) return $this;
         $where = $this->getWhere();
         $this->strWhere = empty($where) ? " WHERE $str" :  " $where $sign $str" ;
         $this->SUB = "WHERE";
@@ -140,10 +138,20 @@ trait Select
      * @param string $str
      * @return Model
      */
-    public function orderBy(string $str = ""): Model
+    public function orderBy(string $str = "", $toSort = "ASC"): Model
     {
-        $this->strOrders = " ORDER BY $str";
         $this->SUB = " ORDER BY";
+        if ($str == "") {
+            $this->strOrders = "";
+            return $this;
+        }
+
+        if ($this->strOrders != "") {
+            $this->strOrders .= ", $str $toSort";
+        } else {
+            $this->strOrders = " ORDER BY $str";
+        }
+
         return $this;
     }
 
@@ -155,8 +163,18 @@ trait Select
      */
     public function groupBy(string $str = ""): Model
     {
-        $this->strGroups = " GROUP BY $str";
         $this->SUB = "GROUP BY";
+        if ($str == "") {
+            $this->strGroups = "";
+            return $this;
+        }
+
+        if ($this->strGroups != "") {
+            $this->strGroups .= ", $str";
+        } else {
+            $this->strGroups = " GROUP BY $str";
+        }
+
         return $this;
     }
 
