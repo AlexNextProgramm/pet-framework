@@ -108,9 +108,6 @@ function img($name, $ext = 'png'): string
     if (empty($name)) return '';
     $name = str_replace(".", DS, $name);
     $name = IMG_RELAT.DS.$name.".$ext";
-    if (!file_exists($name)){
-        throw new  Pet\Errors\AppException("Not search file png path: $name", 500);
-    }
     return $name;
 } 
 function uploads($name, $ext = 'png'): string
