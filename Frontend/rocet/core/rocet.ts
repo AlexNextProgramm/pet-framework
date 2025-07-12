@@ -18,13 +18,16 @@ export class Rocet extends RocetObject
   public ExecElements: Array<Function> = [];
   public Elements: Array<HTMLElement> = [];
   private renderObserver: Function = null;
-  constructor(data: string | HTMLElement | RocetElement | null = null) {
+  constructor(data: string | HTMLElement | RocetElement | EventTarget| null = null) {
     super()
     if (data instanceof RocetNode) {
       this.Elements.push(this.create(data))
     }
     if (data instanceof HTMLElement) {
       this.Elements.push(data)
+    }
+    if (data instanceof EventTarget) { 
+      this.Elements.push(data as HTMLElement);
     }
 
     if (typeof data == 'string') {
