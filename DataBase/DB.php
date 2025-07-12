@@ -62,12 +62,18 @@ abstract class DB
      */
     public function fetch($many = true) : array
     {
-        $query = $this->toString();
-        $this->clearQuery();
-        if ($many) {
-            return $this->q($query)->fetchAll(PDO::FETCH_ASSOC)?:[];
-        } else {
-            return $this->q($query)->fetch(PDO::FETCH_ASSOC)?:[];
+        try {
+            $query = $this->toString();
+            $this->clearQuery();
+            if ($many) {
+                return $this->q($query)->fetchAll(PDO::FETCH_ASSOC) ?: [];
+            } else {
+                return $this->q($query)->fetch(PDO::FETCH_ASSOC) ?: [];
+            }
+        } catch (PDOException|Exception $q) {
+            $this->error[] = $q->errorInfo;
+            throw new AppException($q->errorInfo[2], $q->errorInfo[1]);
+            return [];
         }
     }
 
@@ -95,6 +101,7 @@ abstract class DB
             return $this->DB->prepare($query)->execute();
         } catch (PDOException $q) {
             $this->error[] = $q->errorInfo;
+            throw new AppException($q->errorInfo[2], $q->errorInfo[1]);
             return false;
         }
     }

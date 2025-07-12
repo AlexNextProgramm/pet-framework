@@ -1,6 +1,5 @@
 <?php
 
-
 function search_include_class($path, $class = '') {
 
     foreach (scandir($path) as $dir) {
@@ -23,7 +22,7 @@ function env($constans = null, $default = null) : ?string
 {
     if(!$constans) return null;
     if (!file_exists(ROOT . '/.env')) {
-        throw new Exception("There is no .env file in the project root");
+        throw new Pet\Errors\AppException("There is no .env file in the project root");
     }
 
     $env = file(ROOT . '/.env');
@@ -44,7 +43,7 @@ function env($constans = null, $default = null) : ?string
 function setConstantEnv($ROOT): void
 {
     if (!file_exists($ROOT . '/.env')) {
-        throw new Exception("There is no .env file in the project root");
+        throw new Pet\Errors\AppException("There is no .env file in the project root");
     }
     $env = file($ROOT . '/.env');
     foreach ($env as $str) {
@@ -99,10 +98,31 @@ function svg($name): void
     $name = str_replace(".", DS, $name);
     $name = SVG.DS.$name.'.svg';
     if (!file_exists($name)){
-        throw new Exception("Not search file svg path: $name");
+        throw new Pet\Errors\AppException("Not search file svg path: $name");
     }
     include $name;
 }
+
+function img($name, $ext = 'png'): string
+{
+    if (empty($name)) return '';
+    $name = str_replace(".", DS, $name);
+    $name = IMG.DS.$name.".$ext";
+    if (!file_exists($name)){
+        throw new  Pet\Errors\AppException("Not search file png path: $name", 500);
+    }
+    return $name;
+} 
+function uploads($name, $ext = 'png'): string
+{
+    if (empty($name)) return '';
+    $name = str_replace(".", DS, $name);
+    $name = UPLOADS.DS.$name.".$ext";
+    if (!file_exists($name)){
+        throw new  Pet\Errors\AppException("Not search file png path: $name", 500);
+    }
+    return $name;
+} 
 
 
 /**

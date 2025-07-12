@@ -28,9 +28,13 @@ export class Rocet extends RocetObject
     }
 
     if (typeof data == 'string') {
-      this.getIt(data);
-      if (this.Elements.length == 0) {
-        this.watchElement(data)
+      if (this.isHTMLString(data)) {
+        this.Elements[0] = this.createElementFromHTML(data);
+      } else { 
+        this.getIt(data);
+        if (this.Elements.length == 0) {
+          this.watchElement(data)
+        }
       }
     }
 
@@ -49,10 +53,24 @@ export class Rocet extends RocetObject
           }
         }
         return undefined;
+      },
+      set(target, property, value) {
+        this.Elements.forEach((el: any) => el[property] = value);
+        return true;
       }
     });
   }
+  private isHTMLString(str: string): boolean {
+    const htmlPattern = /^\s*<([a-zA-Z]+|!)[^>]*>/;
+    return htmlPattern.test(str);
+  }
 
+  private createElementFromHTML(htmlString: string): HTMLElement | null
+  {
+    const template = document.createElement('template');
+    template.innerHTML = htmlString.trim();
+    return template.content.firstChild as HTMLElement || null;
+  }
   public getIt(id: string): Rocet {
     this.Elements = Array.from(document.querySelectorAll(id));
     return this;
@@ -90,7 +108,7 @@ export class Rocet extends RocetObject
     return this;
   }
 
-  public add(element: RocetElement | RocetNode | HTMLElement) {
+  public add(element: RocetElement | RocetNode | HTMLElement | Rocet) {
     if (element instanceof HTMLElement) {
       this.Elements.forEach((el) => {
         el.append(element)
@@ -99,6 +117,11 @@ export class Rocet extends RocetObject
     if (element instanceof RocetNode) {
       this.Elements.forEach((el) => {
         el.append(this.create(element))
+      })
+    }
+    if (element instanceof Rocet) { 
+      this.Elements.forEach((el) => { 
+        el.append(element.item(0))
       })
     }
   }
@@ -140,8 +163,21 @@ export class Rocet extends RocetObject
       console.error(`Error: It was not possible to assign the attribute ${name} to the element ${Element.tagName} : ${err}`)
     }
   }
+
+  public classAdd(name: string | null = null) {
+    if (name) {
+      this.Elements.forEach((el) => el.classList.add(name))
+    }
+  }
+  public classReplase(name: string, newname: string) {
+    this.Elements.forEach((el) => el.classList.replace(name, newname))
+  }
+  public classToggle(name: string) {
+    this.Elements.forEach((el) => el.classList.toggle(name))
+  }
+
   private execureElements($RocketElem: Rocet, i: any) {
-    if(this.ExecElements[i])
+    if (this.ExecElements[i])
       this.ExecElements[i]($RocketElem)
   }
 
@@ -189,6 +225,27 @@ export class Rocet extends RocetObject
       el.addEventListener(type, callback);
     })
   }
+  public trigger(type: string) {
+    this.Elements.forEach((el: HTMLElement) => {
+      const eventList: any = el.getEventListeners()
+      if (eventList) {
+        Object.keys(eventList).forEach((type: string) => {
+          eventList[type].forEach((eventObject: any) => {
+            if (eventObject.type == type) {
+              let event: any = new Event(type, { bubbles: true });
+              event.rocketTrigger = true;
+              el.dispatchEvent(event);
+            }
+          })
+        })
+      }
+    })
+  }
+
+  public loadPage(callback: (this: Window, ev: Event) => any)
+  {
+    window.addEventListener('load', callback);
+  }
 
   private watchElement(selector: string) {
 
@@ -212,7 +269,7 @@ export class Rocet extends RocetObject
     return Element;
   }
 
-  public item(key: number = 0): HTMLElement|ElementEvent {
+  public item(key: number = 0): HTMLElement | ElementEvent {
     return this.Elements[key];
   }
 
@@ -221,8 +278,8 @@ export class Rocet extends RocetObject
   }
 
   public each(callback: Function): void {
-    for (const [i, v] of this.Elements.entries()) { 
-      if (callback($(v), i) === false) { 
+    for (const [i, v] of this.Elements.entries()) {
+      if (callback($(v), i) === false) {
         break;
       }
     }
@@ -236,7 +293,7 @@ export class Rocet extends RocetObject
 
   public getObjectAttr() {
     const el = this.Elements[0];
-    const attrs:any = {};
+    const attrs: any = {};
     for (let i = 0; i < el.attributes.length; i++) {
       const attr = el.attributes[i];
       attrs[attr.name] = attr.value;
@@ -259,13 +316,11 @@ export class Rocet extends RocetObject
     }
   }
 
-  public isAttr(attr: string):boolean
-  { 
+  public isAttr(attr: string): boolean {
     return this.Elements[0].hasAttribute(attr);
   }
 
-  Exec(func: Function, i:any = null)
-  {
+  Exec(func: Function, i: any = null) {
     if (i !== null) {
       this.ExecElements[i] = func;
     } else {
@@ -278,8 +333,7 @@ export class Rocet extends RocetObject
     }
   }
 
-  isVisible(): boolean
-  { 
+  isVisible(): boolean {
     const el = this.item()
     if (!el) return false;
     const style = window.getComputedStyle(el);
@@ -297,7 +351,7 @@ export class Rocet extends RocetObject
     })
   }
 
-  public show() { 
+  public show() {
     this.each((el: Rocet) => {
       const style = el.attr('style') || '';
       const styles = style.split(';').map(s => s.trim());
