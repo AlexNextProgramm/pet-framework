@@ -214,6 +214,13 @@ export class Rocet extends RocetObject
     })
   }
 
+  public attrRemove(name:string) { 
+    this.Elements.forEach((el: HTMLElement) => {
+      el.removeAttribute(name)
+    })
+    return this;
+  }
+
   public attr(name: string, value: string | null = null) {
     if (typeof value == 'string') {
       this.Elements.forEach((el: HTMLElement) => {
