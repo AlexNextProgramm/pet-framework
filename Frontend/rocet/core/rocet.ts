@@ -222,6 +222,15 @@ export class Rocet extends RocetObject
     }
     return this.Elements[0]?.getAttribute(name)
   }
+  public data(name: string, value: string | null = null) {
+    const data = this.Elements[0].dataset;
+    if (typeof value == 'string') { 
+      this.Elements.forEach((el: HTMLElement) => {
+        el.setAttribute('data-'+name, value)
+      })
+    }
+    return data[name] || null;
+  }
 
   public val(value: string | null = null) {
     if (typeof value == 'string') {
