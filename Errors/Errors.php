@@ -27,7 +27,8 @@ class Errors
 
     private function set($str)
     {
-        $LOG = ">>> TIME: {date('d.m.Y H:i:s')} MESS: {$str}  \n\r";
+        $date = date('d.m.Y H:i:s');
+        $LOG = ">>> TIME: {$date} MESS: {$str}  \n\r";
         file_put_contents(self::LOG, $LOG, FILE_APPEND | LOCK_EX);
     }
 }

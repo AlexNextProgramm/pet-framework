@@ -312,6 +312,14 @@ export class Rocet extends RocetObject
       }
     })
   }
+
+   public text(str: string | null = null) {
+    if (str === null) {
+      return this.Elements[0].textContent;
+    } else { 
+      this.Elements[0].textContent = str;
+    }
+  }
 }
 
 export function r(data: string | HTMLElement | RocetElement | null = null) {
