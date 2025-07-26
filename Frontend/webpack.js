@@ -184,7 +184,8 @@ class Setting {
             alias: {
                 "@models": this.path.resolve(this.dir, "src/models"),
                 '@rocet': this.path.resolve(this.dir, 'vendor/pet/framework/Frontend/rocet/core'),
-                '@libScss': this.path.resolve(this.dir, 'vendor/pet/framework/Frontend/css/tools')
+                '@libScss': this.path.resolve(this.dir, 'vendor/pet/framework/Frontend/css/tools'),
+                '@src': path.resolve(this.dir, 'src')
             }
         }
     }
