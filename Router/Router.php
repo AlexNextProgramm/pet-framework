@@ -89,15 +89,13 @@ class Router extends Middleware
                 $controller[] = (new EssenceClass())->open($Rout['callback'][0], $request);
             } elseif (count($Rout['callback']) > 1) {
                 foreach ($Rout['callback'] as $callbackRout) {
-                    $controller[] = (new EssenceClass())->open($callbackRout, $request);
+                     $controller[]  = (new EssenceClass())->open($callbackRout, $request);
                 }
             }
 
-            // если контроллер что-то хочет вернуть
-            if (gettype($controller) == 'array') {
-                $controller = array_diff($controller, [null, false, '']);
-            }
-            if (!empty($controller)){
+            // если контроллер что-то хочет вернут
+            $controller = array_diff($controller, [null, false, '']);
+            if (!empty($controller)) {
                 echo json_encode((count($controller) == 1 ? $controller[0] : $controller), JSON_UNESCAPED_UNICODE);
             }
             $control = true;
@@ -109,7 +107,7 @@ class Router extends Middleware
 
     private static function ajax($request, &$result) : bool
     {
-        // Проверка роутера на ложный запрос. ajax не может выполнен 
+        // Проверка роутера на ложный запрос. ajax не может выполнен
         foreach (Router::$Route as $Rout) {
             if ($Rout['method'] != "GET") continue;
             if (self::isLinkRouter($request, $Rout)) continue;
