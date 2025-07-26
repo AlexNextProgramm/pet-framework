@@ -11,4 +11,6 @@ export class RocetObject implements RocetObjectInterface{
     onclick: Function | null
     length: number
     offsetTop: number
+    files: any
+    src:string
 }

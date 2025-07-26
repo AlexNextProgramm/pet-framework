@@ -8,7 +8,6 @@ class AppException extends Exception
 {
     // Дополнительные свойства
     protected $errorCode;
-
     // Конструктор
     public function __construct($message = "", $code = 0, Exception $previous = null)
     {

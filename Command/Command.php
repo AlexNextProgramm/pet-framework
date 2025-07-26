@@ -15,7 +15,7 @@ class Command {
 
     public function __construct($command)
     {
-        $this->NAME_DIR_PROJECT = env("PUBLIC_DIR", 'dist');
+        $this->NAME_DIR_PROJECT = PUBLIC_DIR;
         $this->stand($command);
     }
 
@@ -58,10 +58,10 @@ class Command {
 
     private function server()
     {
-        $host = env("URLDEV");
+        $host = URLDEV;
         $hostName = str_replace(['https://', 'http://'], '', $host);
         Console::text("Web: $host", "green");
-        exec("php -S $hostName -t {$this->NAME_DIR_PROJECT}/");
+        exec("php -S $hostName -t \"{$this->NAME_DIR_PROJECT}/\"");
     }
 
     private function make(string $type, $comm)
