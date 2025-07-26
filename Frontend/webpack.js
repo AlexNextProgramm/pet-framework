@@ -183,7 +183,8 @@ class Setting {
                 extensions: [".tsx", ".ts", ".jsx", ".js", ".json"],
             alias: {
                 "@models": this.path.resolve(this.dir, "src/models"),
-                '@rocet': this.path.resolve(this.dir, 'vendor/pet/framework/Frontend/rocet/core')
+                '@rocet': this.path.resolve(this.dir, 'vendor/pet/framework/Frontend/rocet/core'),
+                '@libScss': this.path.resolve(this.dir, 'vendor/pet/framework/Frontend/css/tools')
             }
         }
     }
