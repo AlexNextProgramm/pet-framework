@@ -1,5 +1,5 @@
 
-import { $ } from "rocet/core/rocet";
+import { $ } from "../rocet/core/rocet";
 import { Fire } from "./Fire";
 import { inputTextFormRender } from "./UI/input";
 

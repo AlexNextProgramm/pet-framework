@@ -1,7 +1,7 @@
-import { RocetElement } from "rocet/core/RocetNode";
+import { RocetElement } from "../rocet/core/RocetNode";
 import { ajax } from "./ajax";
-import { Rocet } from "rocet/core/rocet";
-import { integ } from "rocet/core/integration";
+import { Rocet } from "../rocet/core/rocet";
+import { integ } from "../rocet/core/integration";
 import './interface';
 
 interface settingDatabase {

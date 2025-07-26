@@ -1,8 +1,8 @@
 
-import { $, Rocet } from "@rocet/rocet";
-import { integ } from "@rocet/integration";
+import { integ } from "../../rocet/core/integration";
+import { $, Rocet } from "../../rocet/core/rocet";
+import { RocetNode } from "../../rocet/core/RocetNode";
 
-import { RocetNode } from "@rocet/RocetNode";
 export function inputTextFormRender(Rocet: Rocet, i: number) { 
     const el = $(Rocet.Elements[i]);
     if (el.attr('render')) return;

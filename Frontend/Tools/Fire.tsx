@@ -1,6 +1,6 @@
-import { integ } from "rocet/core/integration";
-import { $, Rocet } from "rocet/core/rocet";
-import { RocetElement } from "rocet/core/RocetNode";
+import { integ } from "../rocet/core/integration";
+import { $, Rocet } from "../rocet/core/rocet";
+import { RocetElement } from "../rocet/core/RocetNode";
 
 interface optionfire { 
     text: string
