@@ -10,15 +10,14 @@ type ElementEvent =
   | HTMLSelectElement
   | HTMLTextAreaElement;
 
-export class Rocet extends RocetObject
-{
+export class Rocet extends RocetObject {
 
 
   private ExecAfter: Array<Function> = [];
   public ExecElements: Array<Function> = [];
   public Elements: Array<HTMLElement> = [];
   private renderObserver: Function = null;
-  constructor(data: string | HTMLElement | RocetElement | EventTarget| null = null) {
+  constructor(data: string | HTMLElement | RocetElement | EventTarget | null = null) {
     super()
     if (data instanceof RocetNode) {
       this.Elements.push(this.create(data))
@@ -29,7 +28,7 @@ export class Rocet extends RocetObject
     if (typeof data == 'string') {
       if (this.isHTMLString(data)) {
         this.Elements[0] = this.createElementFromHTML(data);
-      } else { 
+      } else {
         this.getIt(data);
         if (this.Elements.length == 0) {
           this.watchElement(data)
@@ -53,7 +52,7 @@ export class Rocet extends RocetObject
         }
         return undefined;
       },
-  
+
       set(target: any, prop: string | symbol, value) {
         const protoProps = Object.getOwnPropertyNames(Object.getPrototypeOf(target));
         if (protoProps.includes(prop as string) && typeof target[prop] != 'function') {
@@ -71,8 +70,7 @@ export class Rocet extends RocetObject
     return htmlPattern.test(str);
   }
 
-  private createElementFromHTML(htmlString: string): HTMLElement | null
-  {
+  private createElementFromHTML(htmlString: string): HTMLElement | null {
     const template = document.createElement('template');
     template.innerHTML = htmlString.trim();
     return template.content.firstChild as HTMLElement || null;
@@ -125,8 +123,8 @@ export class Rocet extends RocetObject
         el.append(this.create(element))
       })
     }
-    if (element instanceof Rocet) { 
-      this.Elements.forEach((el) => { 
+    if (element instanceof Rocet) {
+      this.Elements.forEach((el) => {
         el.append(element.item(0))
       })
     }
@@ -194,11 +192,10 @@ export class Rocet extends RocetObject
       })
     }
   }
-  public addExecAll(fun: Function | Array<Function>): void
-  { 
+  public addExecAll(fun: Function | Array<Function>): void {
     if (Array.isArray(fun)) {
       fun.forEach((f: Function) => this.addExecAll(f));
-    } else { 
+    } else {
       this.ExecAfter.push(fun);
     }
   }
@@ -214,7 +211,7 @@ export class Rocet extends RocetObject
     })
   }
 
-  public attrRemove(name:string) { 
+  public attrRemove(name: string) {
     this.Elements.forEach((el: HTMLElement) => {
       el.removeAttribute(name)
     })
@@ -231,9 +228,9 @@ export class Rocet extends RocetObject
   }
   public data(name: string, value: string | null = null) {
     const data = this.Elements[0].dataset;
-    if (typeof value == 'string') { 
+    if (typeof value == 'string') {
       this.Elements.forEach((el: HTMLElement) => {
-        el.setAttribute('data-'+name, value)
+        el.setAttribute('data-' + name, value)
       })
     }
     return data[name] || null;
@@ -272,8 +269,7 @@ export class Rocet extends RocetObject
     })
   }
 
-  static loadPage(callback: (this: Window, ev: Event) => any)
-  {
+  static loadPage(callback: (this: Window, ev: Event) => any) {
     window.addEventListener('load', callback);
   }
 
@@ -353,7 +349,7 @@ export class Rocet extends RocetObject
   Exec(func: Function | Array<Function>, i: any = null) {
     if (Array.isArray(func)) {
       func.forEach((f: Function) => this.Exec(func));
-    } else { 
+    } else {
       if (i !== null) {
         this.ExecElements[i] = func;
       } else {
@@ -401,19 +397,19 @@ export class Rocet extends RocetObject
     })
   }
 
-   public text(str: string | null = null) {
+  public text(str: string | null = null) {
     if (str === null) {
       return this.Elements[0].textContent;
-    } else { 
+    } else {
       this.Elements[0].textContent = str;
     }
   }
 }
 
-export function r(data: string | HTMLElement | RocetElement | EventTarget| null = null) {
+export function r(data: string | HTMLElement | RocetElement | EventTarget | null = null) {
   return new Rocet(data);
 }
-export function $(data: string | HTMLElement | RocetElement |EventTarget| null = null) {
+export function $(data: string | HTMLElement | RocetElement | EventTarget | null = null) {
   return new Rocet(data);
 }
 
