@@ -202,5 +202,24 @@ abstract class Model extends DB
         }
         return $result;
     }
-   
+
+   /**
+    * findDelete
+    *
+    * @param array $params
+    * @param callable|null $callback
+    * @return array
+    */
+    public function findDelete(array $params, callable|null $callback = null): array
+    {
+        $result = $this->find($params, $callback);
+        foreach ($result as $r) {
+            $class = $this::class;
+            $model =  (new $class(['id' => $r['id']]));
+            if ($model->exist()) {
+                $model->delete();
+            }
+        }
+        return $result;
+    }
 }
