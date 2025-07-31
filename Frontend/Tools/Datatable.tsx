@@ -156,9 +156,9 @@ export class Datatable {
                 const value = Array.from(el.selectedOptions).map(option => option.value);
                 data[name] = sign ? { sign: sign, value: value } : value;
             }
-            el.onchange = () => {
+            $(el as HTMLElement).on('change', () => {
                 this.init();
-            }
+            });
         })
         return data;
     }
