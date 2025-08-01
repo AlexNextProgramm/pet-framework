@@ -264,7 +264,7 @@ const modulesW = {
   entry: web.pages.entry,
   output: {
     filename: "view/assets/js/[name]_[hash].js",
-    path: web.path.resolve(web.dir, this.dist),
+    path: web.path.resolve(web.dir, web.dist),
     assetModuleFilename: "view/assets/img/[name][ext][query]",
   },
   resolve: web.resolve(),
