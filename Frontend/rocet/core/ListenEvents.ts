@@ -40,7 +40,18 @@ Element.prototype.addEventListener = function (
   listener: EventListenerOrEventListenerObject,
   useCapture: boolean = false
 ): void {
- 
+  let isRepetitions = false;
+  if (this.eventListenerList && this.eventListenerList[type]) {
+    // не добавляем повторяющиеся функции
+    this.eventListenerList[type].forEach((EventListner) => {
+      if (EventListner.listener.toString() == listener.toString()) {
+        isRepetitions = true
+      }
+    });
+  }
+  if (isRepetitions) {
+    return
+  }
   (this as any)._originalAdd(type, listener, useCapture);
 
   if (!this.eventListenerList) this.eventListenerList = {};
@@ -55,6 +66,7 @@ Element.prototype.removeEventListener = function (
   listener: EventListenerOrEventListenerObject,
   useCapture: boolean = false
 ): void {
+
    (this as any)._originalRemove(type, listener, useCapture);
 
   if (!this.eventListenerList) this.eventListenerList = {};
@@ -62,14 +74,13 @@ Element.prototype.removeEventListener = function (
   const list = this.eventListenerList[type];
 
   for (let i = 0; i < list.length; i++) {
-    if (list[i].listener === listener && list[i].useCapture === useCapture) {
-      list.splice(i,1);
+    if (list[i].type == type) {
+      this.eventListenerList[type].splice(i,1);
       break;
     }
   }
-
-  if (list.length === 0) {
-    delete this.eventListenerList[type];
+  if (this.eventListenerList[type].length == 0) { 
+    delete this.eventListenerList[type]
   }
 };
 
