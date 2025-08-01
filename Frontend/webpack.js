@@ -7,6 +7,7 @@ class Setting {
   clear = ['view/assets/**'];
   img = "view/assets/img";
   font = "view/assets/fonts";
+  dist = "";
   template = "./head.php";
     path;
     fs;
@@ -62,7 +63,7 @@ class Setting {
 
             ENV[key] = value;
           });
-            ['JS', 'CSS', 'IMG', 'FONT', 'TEMPLATE'].forEach((key) => { 
+            ['JS', 'CSS', 'IMG', 'FONT', 'TEMPLATE', 'DIST'].forEach((key) => { 
               if (ENV[key]) {
                 this[key.toLowerCase()] = ENV[key];
                 console.log("env get param "+key+": " + ENV[key])
@@ -78,7 +79,7 @@ class Setting {
     }
 
     getPage() {
-        const dir = this.path.resolve(this.dir, "dist/view/page")
+        const dir = this.path.resolve(this.dir, this.dist + "/view/page")
         const page = this.fs.readdirSync(dir);
         page.forEach((fileAndDir) => {
             const file = dir + '/' + fileAndDir;
@@ -263,7 +264,7 @@ const modulesW = {
   entry: web.pages.entry,
   output: {
     filename: "view/assets/js/[name]_[hash].js",
-    path: web.path.resolve(web.dir, "dist"),
+    path: web.path.resolve(web.dir, this.dist),
     assetModuleFilename: "view/assets/img/[name][ext][query]",
   },
   resolve: web.resolve(),
