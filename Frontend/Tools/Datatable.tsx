@@ -397,11 +397,11 @@ export class Datatable {
         const status: Array<JSX.Element> = []
         if (this.statusInfo) {
             const countTo = (this.page.count * this.page.limit) > this.page.all ? this.page.all : this.page.count * this.page.limit;
-            let countfrom = (this.page.count * this.page.limit) - (this.page.limit - 1)
+            let countfrom = this.page.all == 0 ? 0 : (this.page.count * this.page.limit) - (this.page.limit - 1)
             status.push(<div className="">{
                 `Записи с ${countfrom} 
-                до ${countTo}
-                из ${this.page.all}`}</div>)
+                по ${(countTo || 0)}
+                из ${(this.page.all || 0)}`}</div>)
         }
         return status;
     }
