@@ -32,7 +32,8 @@ export const exception:exception = {
      multiple: setBoolean,
      placeholder: setProperty,
      autofocus: setBoolean,
-     required: setBoolean
+     required: setBoolean,
+     innerHTML: setInnerHTML,
 }
 export function universalSetAttribute(e: HTMLElement|any, k: string, n: string) {
      e[k] = n;
@@ -54,4 +55,7 @@ export function setBoolean(e: HTMLElement | any, k: attribute, n: boolean){
      } else { 
           e.removeAttribute(k, n);
      }
+}
+export function setInnerHTML(e: HTMLElement | any, k: attribute, n: string){ 
+     e.innerHTML = n;
 }
