@@ -38,6 +38,18 @@ trait Select
     }
 
     /**
+     * show
+     *
+     * @param  string $value
+     * @return Model
+     */
+    public function show(string $value): Model
+    {
+        $this->strQuery = "SHOW {$value}" . $this->fromTable();
+        $this->SUB = "SHOW";
+        return $this;
+    }
+    /**
      * join
      *
      * @param  mixed $table
