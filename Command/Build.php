@@ -10,8 +10,8 @@ class Build {
      public $isPetWarning = false;
     function __construct() {
        if(!defined('ROOT')) define('ROOT', $this->search_dir_vendor());
-       if (!file_exists(ROOT . '/.env')) {
-           $this->copy('.env.sample.php',  ROOT . DIRECTORY_SEPARATOR .'.env');
+       if (!file_exists(ROOT .  DIRECTORY_SEPARATOR . ENV)) {
+           $this->copy('.env.sample.php',  ROOT . DIRECTORY_SEPARATOR . ENV);
         }
         include ROOT . '/vendor/autoload.php';
         if(!defined('APP')) define('APP','APP');

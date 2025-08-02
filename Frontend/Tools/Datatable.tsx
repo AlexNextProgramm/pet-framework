@@ -30,7 +30,7 @@ export class Datatable {
     public countsTab: boolean = false;
     public colors: boolean = false;
     public showColums: boolean = false;
-
+    public rerender: Function| null = null;
     public addElementHeader:Array<Function> = []
 
     public settings: settingDatabase = {
@@ -172,42 +172,48 @@ export class Datatable {
         return window.datatable[name] as Datatable;
     }
 
-    private render(item: any) {
+   private render(item: any) {
 
         const colunm = this.table.querySelector("[name=column]")
         const aliasAll = colunm.querySelectorAll("[alias]")
-        const tbody: Array<RocetElement> = [];
-
-        item.forEach((row: any, indexRow: number) => {
-            const TR: Array<RocetElement> = []
-            aliasAll.forEach((el, indexElem: number) => {
-                const alias = el.getAttribute('alias');
-                const noneColumn: boolean = !(this.settings.hideColumsIndex.indexOf(indexElem) !== -1)
-                let result: RocetElement = <td className={noneColumn ? "" : "d-none"}>{String(row[alias])}</td>
-                if (noneColumn) {
-                    this.table.querySelector('[name=column]').querySelectorAll('th').forEach((el, i: number) => {
-                        if (this.settings.hideColumsIndex.indexOf(i) !== -1) {
-                            el.classList.add('d-none')
-                        }
-                    })
-                }
-                if (this.buildCells) {
-                    const rowBuild = this.buildCells(row, alias, indexRow, indexElem)
-                    result = rowBuild || result;
-                }
-
-                TR.push(result)
-            });
-            let Rows: RocetElement = <tr>{...TR}</tr>
-            if (this.buildRows) {
-                const rows = this.buildRows(row, TR, indexRow)
-                Rows = rows || Rows
-            }
-            tbody.push(Rows);
-        });
-
+        let tbody: Array<RocetElement> = [];
         const table = new Rocet(this.table.querySelector('tbody'));
-        if (tbody.length == 0) tbody.push(<div className="not-found">По вашему запросу ничего не найдено</div>)
+        if (!this.rerender) {
+
+            item.forEach((row: any, indexRow: number) => {
+                const TR: Array<RocetElement> = []
+    
+                aliasAll.forEach((el, indexElem: number) => {
+                    const alias = el.getAttribute('alias');
+                    const noneColumn: boolean = !(this.settings.hideColumsIndex.indexOf(indexElem) !== -1)
+                    let result: RocetElement = <td className={noneColumn ? "" : "d-none"}>{String(row[alias])}</td>
+                    if (noneColumn) {
+                        this.table.querySelector('[name=column]').querySelectorAll('th').forEach((el, i: number) => {
+                            if (this.settings.hideColumsIndex.indexOf(i) !== -1) {
+                                el.classList.add('d-none')
+                            }
+                        })
+                    }
+                    if (this.buildCells) {
+                        const rowBuild = this.buildCells(row, alias, indexRow, indexElem)
+                        result = rowBuild || result;
+                    }
+    
+                    TR.push(result)
+                });
+                let Rows: RocetElement = <tr>{...TR}</tr>
+                if (this.buildRows) {
+                    const rows = this.buildRows(row, TR, indexRow)
+                    Rows = rows || Rows
+                }
+                tbody.push(Rows);
+            });
+           
+            if (tbody.length == 0) tbody.push(<div className="not-found">По вашему запросу ничего не найдено</div>)
+        } else { 
+            tbody = this.rerender(item, aliasAll);
+        }
+
         table.render(() => {
             return <tbody>{...tbody}</tbody>
         })

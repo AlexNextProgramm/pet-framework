@@ -21,11 +21,11 @@ function search_include_class($path, $class = '') {
 function env($constans = null, $default = null) : ?string
 {
     if(!$constans) return null;
-    if (!file_exists(ROOT . '/.env')) {
+    if (!file_exists(ROOT . DS. ENV)) {
         throw new Pet\Errors\AppException("There is no .env file in the project root");
     }
 
-    $env = file(ROOT . '/.env');
+    $env = file(ROOT . DS . ENV);
 
     foreach ($env as $str) {
         if (str_contains(trim($str), '#') && strpos(trim($str), "#") == 0) continue;
@@ -42,10 +42,10 @@ function env($constans = null, $default = null) : ?string
 
 function setConstantEnv($ROOT): void
 {
-    if (!file_exists($ROOT . '/.env')) {
+    if (!file_exists($ROOT  . DS . ENV)) {
         throw new Pet\Errors\AppException("There is no .env file in the project root");
     }
-    $env = file($ROOT . '/.env');
+    $env = file($ROOT  . DS . ENV);
     foreach ($env as $str) {
         if (str_contains(trim($str), '#') && strpos(trim($str), "#") == 0) continue;
         if (str_contains($str, '=')) {
