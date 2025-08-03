@@ -98,6 +98,8 @@ $('input[ui=text]').render((Rocet: Rocet, i: number) => {
 $('input[ui=switсh]').render((Rocet: Rocet, i: number) => {
     const el = $(Rocet.item(i));
     const input = <input /> as RocetNode
+    if (el.attr('render')) return;
+    el.attr('render', '1');
     input.props = el.getObjectAttr();
     input.props.className = "form-check-input"
     input.props.type = "checkbox"
