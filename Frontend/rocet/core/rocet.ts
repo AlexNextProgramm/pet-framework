@@ -407,6 +407,14 @@ export class Rocet extends RocetObject {
       this.Elements[0].textContent = str;
     }
   }
+
+  public html(str: string | null = null) {
+    if (str === null) {
+      return this.Elements[0].innerHTML;
+    } else {
+      this.Elements[0].innerHTML = str;
+    }
+  }
 }
 
 export function r(data: string | HTMLElement | RocetElement | EventTarget | null = null) {
