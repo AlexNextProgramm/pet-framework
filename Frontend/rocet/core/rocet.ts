@@ -179,6 +179,9 @@ export class Rocet extends RocetObject {
   public classToggle(name: string) {
     this.Elements.forEach((el) => el.classList.toggle(name))
   }
+  public classRemove(name: string) {
+    this.Elements.forEach((el) => el.classList.remove(name))
+  }
 
   private execureElements($RocketElem: Rocet, i: any) {
     if (this.ExecElements[i])
