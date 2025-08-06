@@ -85,7 +85,7 @@ abstract class Model extends DB
 
     /**
      * setInfo
-     * устанавливет info только для модели 
+     * устанавливет info только для модели
      * @param array $data
      * @return Model
      */

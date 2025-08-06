@@ -99,8 +99,16 @@ trait Select
      * @param string $str
      * @return Model
      */
-    public function where(string $str = ''): Model
+    public function where(string $str = '', string|array $value = [], string $sign = '='): Model
     {
+        if (!empty($value) && gettype($value) == 'string') {
+            $str = "$str $sign $value";
+        }
+        if (!empty($value) && gettype($value) == 'array') {
+            $sign = $sign == '=' ? "IN" : $sign;
+            $str = "$str $sign (".implode(',', $value).")";
+        }
+
         return $this->whereAdd($str);
     }
 
