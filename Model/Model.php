@@ -80,7 +80,8 @@ abstract class Model extends DB
     public function findM(array|null $fields = null, callable|null $callback = null): array
     {
         $results = $this->find($fields, $callback);
-        return array_map(fn($data)=>(new self())->setInfo($data), $results);
+        $class = $this::class;
+        return array_map(fn($data)=>(new $class())->setInfo($data), $results);
     }
 
     /**
