@@ -172,19 +172,22 @@ abstract class Model extends DB
     /**
      * ifExistDelete
      *
-     * @param  array|int|string|null $whereElseId
+     * @param  array $whereElseId
      * @return bool
      */
-    public function ifExistDelete(array|int|string|null $whereElseId = null):bool {
-        if(!empty($whereElseId)){
-            $this->setInfoId($whereElseId);
+    public function ifExistDelete(?array $whereElseId = null):bool {
+        $many = [];
+        if (!empty($whereElseId)) {
+            $many = $this->findM($whereElseId);
         }
-
-        if ($this->exist()) {
-            $this->delete();
-            return true;
+        $isBool = false;
+        foreach ($many as $model) {
+            if ($model->exist()) {
+                $model->delete();
+                $isBool = true;
+            }
         }
-        return false;
+        return $isBool;
     }
 
     /**
