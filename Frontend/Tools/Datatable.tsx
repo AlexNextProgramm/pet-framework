@@ -13,7 +13,7 @@ interface settingDatabase {
 export class Datatable {
 
     public rows: Function | null = null;
-    public table: HTMLTableElement
+    public table: HTMLTableElement | HTMLDivElement
     public ColumsElements: HTMLTableCellElement[] = []
 
     public buildCells: Function;
@@ -31,7 +31,8 @@ export class Datatable {
     public colors: boolean = false;
     public showColums: boolean = false;
     public rerender: Function| null = null;
-    public addElementHeader:Array<Function> = []
+    public addElementHeader: Array<Function> = [];
+    public isDataTableScrolling: boolean = false;
 
     public settings: settingDatabase = {
         hideColumsIndex: [],
@@ -64,6 +65,7 @@ export class Datatable {
         } else {
             this.table = table;
         }
+        this.isDataTableScrolling = this.table.getAttribute('scrolling') == '1';
         this.initWrapper()
         let limit = Number(this.table.getAttribute('limit'))
         this.page = {
@@ -100,7 +102,7 @@ export class Datatable {
         this.showColums = this.table.getAttribute('showColums') == '1'
         this.infoHeader = this.table.getAttribute('infoHeader') == '1' || this.limitInfo || this.colors || this.showColums;
         this.infoFooter = this.table.getAttribute('infoFooter') == '1' || this.statusInfo || this.pagination;
-
+        this.isDataTableScrolling = this.table.getAttribute('scrolling') == '1';
         window.datatable = {
             [name]: this
         }
@@ -117,9 +119,18 @@ export class Datatable {
 
     private initWrapper() {
         const wrapper = document.createElement('div');
-        wrapper.classList.add('datatable-wrapper')
-        this.table.parentNode.insertBefore(wrapper, this.table);
-        wrapper.appendChild(this.table);
+        wrapper.classList.add('datatable-wrapper');
+        console.log(this.isDataTableScrolling)
+        if (this.isDataTableScrolling) {
+            const scrolling = document.createElement('div');
+            scrolling.classList.add('datatable-wrapper-scrolling');
+            wrapper.append(scrolling);
+            this.table.parentNode.insertBefore(wrapper, this.table);
+            scrolling.append(this.table)
+        } else { 
+            this.table.parentNode.insertBefore(wrapper, this.table);
+            wrapper.appendChild(this.table);
+        }
         this.wrapper = wrapper;
     }
 

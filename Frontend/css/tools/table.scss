@@ -1,8 +1,11 @@
+.datatable-wrapper-scrolling{
+    overflow: auto;
+}
+
 .datatable-wrapper {
     display: flex;
     flex-direction: column;
     width: 100%;
-
     .info-footer-table {
         display: flex;
         flex-direction: row;
