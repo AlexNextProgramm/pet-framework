@@ -169,7 +169,7 @@ trait Select
         if ($this->strOrders != "") {
             $this->strOrders .= ", $str $toSort";
         } else {
-            $this->strOrders = " ORDER BY $str";
+            $this->strOrders = " ORDER BY $str $toSort";
         }
 
         return $this;
