@@ -23,7 +23,7 @@ export class ajax {
         } else { 
             body = new FormData();
             Object.keys(data).forEach((key: string) => {
-                if (typeof data[key] == 'object') {
+                if (typeof data[key] == 'object' && !(data[key] instanceof File)) {
                     body.append(key, JSON.stringify(data[key]));
                 } else {
                     body.append(key, data[key]);
