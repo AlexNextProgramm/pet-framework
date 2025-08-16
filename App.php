@@ -83,6 +83,7 @@ class App
     {
         spl_autoload_register(function ($class) {
             $file = str_replace('\\', DS, $class) . '.php';
+            $file = self::PUBLIC_DIR.DS.$file;
             if (file_exists($file)) {
                 require_once $file;
                 return true;

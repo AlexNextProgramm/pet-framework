@@ -32,8 +32,8 @@ class Command {
             case 'serve':
                 $this->server();
                 break;
-            case 'build_sample':
-                (new Build())->architecture();
+            case 'socket':
+                $this->startSocket($comm[2]);
                 break;
             case 'load':
                 ConnectFtp::load();
@@ -43,12 +43,6 @@ class Command {
                 break;
             case "make:model":
                 (new MakeModel($comm[2] ?? null));
-                break;
-            case "make:apache":
-                (new Apache())->setVirtualHost($comm[2] ?? null);
-                break;
-            case "make:cert":
-                (new Apache())->setCert($comm[2] ?? null);
                 break;
             default:
                 echo "no command ";
@@ -63,16 +57,9 @@ class Command {
         Console::text("Web: $host", "green");
         exec("php -S $hostName -t \"{$this->NAME_DIR_PROJECT}/\"");
     }
-
-    private function make(string $type, $comm)
+    private function startSocket($name)
     {
-        if (count($comm) < 2) die("Требуеться установить имя");
-        $name = $comm[2];
-        if ($type == "controller") {
-
-            $sample = file_get_contents(__DIR__ . "/sample/controller.sample.php");
-            $sample = str_replace('NAME', $name, $sample);
-            file_put_contents(self::ROOT . $this->NAME_DIR_PROJECT . Build::APPNAME . "/Controller/$name" . "Controller.php", $sample);
-        }
+        $script = SOCKET_DIR .DS. "$name.php";
+        include $script;
     }
 }

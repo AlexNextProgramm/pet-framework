@@ -112,4 +112,13 @@ class Console {
         self::text($text);
         self::text($out);
     }
+
+    static function die($text, $color = null){
+        self::text($text, $color);
+        exit;
+    }
+
+    static function print($text, $color = null){
+        self::text(print_r($text,true), $color);
+    }
 }

@@ -1,31 +1,48 @@
 <?php
-namespace Pet\Soket;
-use Pet\Soket\Socket;
+namespace Pet\Socket;
+use Pet\Socket\Socket;
 
-class Coool{
+class Cool{
+    private $server;
+    private $error = [
+        'error'=> '',
+        'message' => ''
+    ];
 
-
-    static function init(Socket $socket){
-       $Coll = new self();
-       $server = $Coll->contact($socket);
-
+     static function init(Socket $socket){
+       $cool = new self();
+       $cool->server = $cool->stream($socket);
+       return $cool;
     }
-    private function contact(Socket $socket){
-        $ssl = null;
-        if ($socket->Cert && $socket->keyPub){
+
+    private function stream(Socket $socket){
+        $ssl = [];
+        if (!empty($socket->Cert) && !empty($socket->keyPub)){
             $ssl = [
                 'ssl' => [
                     'local_cert'          => $socket->Cert,
                     'local_pk'            => $socket->keyPub,
                     'disable_compression' => true,
                     'verify_peer'         => false,
-                    'ssltransport'        => $socket->transport,
+                    'ssltransport'        => $socket->protocol,
                 ]
             ];
         }
-     $address =  $socket->transport . '://' . $socket->host . ':' . $socket->port;
-     $server = stream_socket_server($address, $errno, $errstr, STREAM_SERVER_BIND | STREAM_SERVER_LISTEN, $ssl);
-     
+     $address =  $socket->protocol. '://' . $socket->host . ':' . $socket->port;
+     return stream_socket_server($address, $this->error['error'], $this->error['message'], STREAM_SERVER_BIND | STREAM_SERVER_LISTEN,  stream_context_create($ssl));
+    }
+    public function getError(){
+        return $this->error;
     }
 
+    public function getServer(){
+        return $this->server;
+    }
+    public function isLaunch():bool
+    {
+        return $this->getServer() !== false;
+    }
+    public function getIdResource(){
+        return get_resource_id($this->getServer());
+    }
 }
