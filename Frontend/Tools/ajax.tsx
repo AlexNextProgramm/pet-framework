@@ -54,10 +54,10 @@ export class ajax {
 
     public static modalOpen(data: any , callback:Function = null) {
         const callbackModal = data['callbackModal'] || null;
-
         ajax.post(data, {}, '/modal').then((response) => {
             const parse = JSON.parse(response)
             const body = document.body
+            $('.modal-carset').remove();
             const modal:HTMLElement = document.createElement('div') as HTMLElement
             modal.classList.add('modal-carset');
             modal.innerHTML = parse.html;

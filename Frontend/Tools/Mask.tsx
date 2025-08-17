@@ -28,12 +28,16 @@ export class Mask {
             this.change($(ev.target), ev.key, this)
         });
         $input.on('paste', (ev: ClipboardEvent) => {
-            const data: string = String(parseInt(ev.clipboardData.getData('text'))) || '';
+            const data: string = String(ev.clipboardData.getData('text')) || '';
             for (let i = 0; i < data.length; i++) {
-                if (!Number.isNaN(parseInt(this.sampleClear[i]))) {
+                let key = data[i];
+                if (Number.isNaN(parseInt(key))) {
                     continue;
                 }
-                this.change($(ev.target), data[i], this);
+                if (!Number.isNaN(parseInt(this.sampleClear[i])) ) {
+                    continue;
+                }
+                this.change($(ev.target), key, this);
             }
             ev.preventDefault();
         });
