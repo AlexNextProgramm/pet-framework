@@ -43,6 +43,12 @@ class Router extends Middleware
         return new Router();
     }
 
+    public static function options($path, ...$callback): Router {
+        Router::$Route[] = ["path" => $path, "method" => 'OPTIONS', "callback" => $callback];
+        Router::$id = array_key_last(Router::$Route);
+        return new Router();
+    }
+
     public function name($string): Router {
         Router::$Route[Router::$id]['name'] = $string;
         return $this;
