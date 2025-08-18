@@ -14,10 +14,11 @@ abstract class Model extends DB
     use  Select, Update, Delete, Insert;
     public array $hidden = [];
 
-    public function __construct(array|null $data = null, bool $isNotExistCreate = false)
+    public function __construct(array|int|string|null $data = null, bool $isNotExistCreate = false)
     {
             parent::__construct($data);
         if (!$this->exist() && $isNotExistCreate) {
+            if (gettype($data) == 'integer') $data = ['id' => $data];
             $this->create($data);
         }
     }

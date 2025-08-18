@@ -46,13 +46,13 @@ abstract class DB
     /**
      * __construct
      *
-     * @param array|string $id
+     * @param array|int|string $id
      * @return void
      */
-    public function __construct(array|string|null $id = null)
+    public function __construct(array|int|string|null $id = null)
     {
         $this->conn();
-         $this->setInfoId($id);
+        $this->setInfoId($id);
     }
 
     /**
