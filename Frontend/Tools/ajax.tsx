@@ -54,6 +54,7 @@ export class ajax {
 
     public static modalOpen(data: any , callback:Function = null) {
         const callbackModal = data['callbackModal'] || null;
+        const callbackClose = data['callbackClose'] || null;
         ajax.post(data, {}, '/modal').then((response) => {
             const parse = JSON.parse(response)
             const body = document.body
@@ -73,6 +74,9 @@ export class ajax {
 
             $('.close-modal').on('click', () => { 
                 modal.remove();
+                if (typeof window[callbackClose] === 'function') {
+                    (window[callbackClose] as Function)(data)
+                }
             })
             if (typeof window[callbackModal] === 'function') {
                 (window[callbackModal] as Function)(data)

@@ -485,4 +485,13 @@ export class Datatable {
         this.settings[key] = value;
         localStorage.setItem(this.table.getAttribute('name'), JSON.stringify(this.settings))
     }
+
+    public reload() {
+        const name = this.table.getAttribute("name");
+        ajax.post(this.dataSend, { datatable: name }).then((data) => {
+            if (isDevelopment) console.log("DataTable response: ", data);
+            this.page.all = data.pages.all;
+            this.render(data.item);
+        })
+    }
 }
