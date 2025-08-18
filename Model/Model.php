@@ -108,12 +108,16 @@ abstract class Model extends DB
 
     /**
      * set
-     * принимает ассоциативный массив
-     * @param  array $data
+     * @param  array|string $data
+     * @param  mixed $value
      * @return bool
      */
-    public function set(array $data): bool
+    public function set(array|string $data, mixed $value = null): bool
     {
+        if (is_string($data)) {
+            $data = [$data => $value];
+        }
+
         if ($this->isInfo()) {
             return $this->update($data)->whereId($this->get('id'))->execute();
         }
