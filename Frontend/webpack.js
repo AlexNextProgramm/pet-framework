@@ -187,7 +187,8 @@ class Setting {
                 '@rocet': this.path.resolve(this.dir, 'vendor/pet/framework/Frontend/rocet/core'),
                 '@libScss': this.path.resolve(this.dir, 'vendor/pet/framework/Frontend/css/tools'),
                 '@src': this.path.resolve(this.dir, 'src'),
-                '@tools': this.path.resolve(this.dir, 'vendor/pet/framework/Frontend/Tools')
+                '@tools': this.path.resolve(this.dir, 'vendor/pet/framework/Frontend/Tools'),
+                '@lib': this.path.resolve(this.dir, 'vendor/pet/framework/Frontend/lib')
 
                 
             }
