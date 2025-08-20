@@ -415,6 +415,10 @@ export class Rocet extends RocetObject {
       this.Elements[0].innerHTML = str;
     }
   }
+
+  public caretPos() { 
+   return (this.Elements[0] as any).selectionStart
+  }
 }
 
 export function r(data: string | HTMLElement | RocetElement | EventTarget | null = null) {
