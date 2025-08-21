@@ -38,10 +38,10 @@ abstract class Model extends DB
      * __set
      * при установки значений закидываем в таблицу update
      * @param  string $name
-     * @param  int|float|string|bool $value
+     * @param  int|float|string|bool|null $value
      * @return void
      */
-    public function __set(string $name, int|float|string|bool $value)
+    public function __set(string $name, string|float|int|bool|null $value)
     {
         if (!$this->isInfo() || empty($this->info['id'])){
             throw new AppException("not info in model or not id in info");
