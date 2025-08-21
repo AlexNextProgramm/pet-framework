@@ -43,10 +43,7 @@ abstract class Model extends DB
      */
     public function __set(string $name, string|float|int|bool|null $value)
     {
-        if (!$this->isInfo() || empty($this->info['id'])){
-            throw new AppException("not info in model or not id in info");
-        }
-       return $this->update([$name => $value])->whereId($this->info['id'])->fetch();
+        $this->set($name, $value);
     }
 
     /**
@@ -117,11 +114,10 @@ abstract class Model extends DB
         if (is_string($data)) {
             $data = [$data => $value];
         }
-
-        if ($this->isInfo()) {
-            return $this->update($data)->whereId($this->get('id'))->execute();
+        if (!$this->isInfo() || empty($this->info['id'])){
+            throw new AppException("not info in model or not id in info");
         }
-        return false;
+        return $this->update($data)->whereId($this->get('id'))->execute();
     }
 
     /**
