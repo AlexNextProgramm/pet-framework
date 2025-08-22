@@ -3,11 +3,14 @@ import { ajax } from "./ajax";
 import { $, Rocet } from "../rocet/core/rocet";
 import { integ } from "../rocet/core/integration";
 import './interface';
+
 interface settingDatabase {
     hideColumsIndex: Array<number>,
     colors: [number, number, number, boolean] | null,
     limitTabPagination: number
     limit: number
+    pagingCount: number | null
+    filter: any
 }
 export class Datatable {
 
@@ -37,7 +40,9 @@ export class Datatable {
         hideColumsIndex: [],
         colors: null,
         limitTabPagination: 3,
-        limit: 10
+        limit: 10,
+        pagingCount: null,
+        filter: null
     }
 
     private page: {
@@ -72,22 +77,60 @@ export class Datatable {
             limit: limit ? limit : 10,
             all: 0
         }
+        this.setSettingFilter();
         this.init()
+    }
+
+    private setSettingFilter() {
+        const setting = this.loadSettingStorage(false);
+        if (!setting) return;
+        const filter = setting['filter'] || [];
+        const names = Object.keys(filter);
+
+        for (let i = 0; i < names.length; i++) {
+            let name = names[i];
+            let value = filter[name];
+            let input = $(this.table).find(`[name="${name}"]`);
+            console.log((value?.value !== null && value.value != ''));
+            if (value.value && value.value !== null && value.value != '') { 
+                value = value.value;
+            }
+            if (typeof value == 'string' || typeof value == 'number') {
+                if (['checkbox'].includes(input.attr('type')) && value == 1) { 
+                    input.prop('checked', true);
+                    continue;
+                }
+                input.val(String(value));
+            }
+            if (Array.isArray(value) && input.item() instanceof HTMLSelectElement) {
+                let select:HTMLSelectElement = input.item();
+                Array.from(select.options).forEach((option:HTMLOptionElement) => {
+                    option.selected = false;
+                    value.forEach((v) => { 
+                        if (String(option.value) == String(v)) { 
+                            option.selected = true;
+                        }
+                    })
+                });
+            }
+        }
     }
 
     private setSetting() {
         if (this.loadSettingStorage()) {
             this.limitTabPagination = this.settings.limitTabPagination || 3
             this.page.limit = this.settings.limit || 10
-
+            this.page.count = this.settings.pagingCount || this.page.count
         }
     }
     // построить таблицу
-    private init() {
+    private init(isConstructor = false) {
         this.setSetting()
+        let gfilter = this.getFilter();
+        this.saveSettingStorage('filter', gfilter);
         this.dataSend = {
             table: {
-                search: this.getFilter(),
+                search: gfilter,
                 pages: this.page
             }
         }
@@ -163,8 +206,11 @@ export class Datatable {
             }
 
             if (el instanceof HTMLSelectElement) {
-                const value = Array.from(el.selectedOptions).map(option => option.value);
-                data[name] = sign ? { sign: sign, value: value } : value;
+                let value = Array.from(el.selectedOptions).map(option => option.value);
+                if (!(value.length == 1 && value[0] === '')) {
+                    data[name] = sign ? { sign: sign, value: value } : value;
+                }
+                
             }
             $(el as HTMLElement).on('change', () => {
                 this.init();
@@ -249,7 +295,9 @@ export class Datatable {
         if ($info.length == 0) {
             $info = $(<div className="info-header-table"></div>);
             this.wrapper.prepend($info.item());
-        } 
+        } else { 
+            return;
+        }
         const limitedSelect = this.initLimitInfo();
         $info.add(<div className="limited-select">{limitedSelect}</div>);
 
@@ -294,8 +342,10 @@ export class Datatable {
             this.addElementHeader.forEach((fn: Function) => {
                 BlockButtons.push(fn(this))
             });
-            $info.add(<div className="block-buttons">{...BlockButtons}</div>);
         }
+        BlockButtons.push(<button className="reset" onclick={()=>this.resetFilter()}></button>)
+        $info.add(<div className="block-buttons">{...BlockButtons}</div>);
+        
         this.eventlimitedInfo();
     }
 
@@ -398,16 +448,19 @@ export class Datatable {
             const limitStepAll = Math.ceil(datatable.page.all / datatable.page.limit)
 
             datatable.page.count = datatable.page.count >= limitStepAll ? limitStepAll : datatable.page.count + 1
+            datatable.saveSettingStorage('pagingCount',  datatable.page.count)
             datatable.init();
         }
         eventback.onclick = () => {
             const count = (datatable.page.count - 1) <= 0 ? 1 : (datatable.page.count - 1);
             datatable.page.count = count;
+            datatable.saveSettingStorage('pagingCount', datatable.page.count);
             datatable.init();
         }
         eventElementPagination.forEach((span) => {
             span.onclick = (evt) => {
-                datatable.page.count = Number(span.textContent)
+                datatable.page.count = Number(span.textContent);
+                datatable.saveSettingStorage('pagingCount',  datatable.page.count)
                 datatable.init();
             }
         })
@@ -489,11 +542,15 @@ export class Datatable {
         });
     }
 
-    private loadSettingStorage() {
+    private loadSettingStorage(isThis:boolean = true) {
         let setting: any = localStorage.getItem(this.table.getAttribute('name'))
         setting = JSON.parse(setting)
         if (setting) {
-            this.settings = setting
+            if (isThis) {
+                this.settings = setting
+            } else { 
+                return setting;
+            }
             return true;
         } else {
             return false;
@@ -512,5 +569,17 @@ export class Datatable {
             this.page.all = data.pages.all;
             this.render(data.item);
         })
+    }
+
+    public resetFilter() {
+        console.log($(this.table).find('theadth'));
+        $(this.table).find('thead').find('[name]').each(($el: Rocet) => {
+            if (['INPUT', "SELECT", "TEXTAREA"].includes($el.tagName)) { 
+                $el.val('')
+            }
+        })
+        this.saveSettingStorage('pagingCount', 1);
+        this.saveSettingStorage('filter', null);
+        this.init();
     }
 }
