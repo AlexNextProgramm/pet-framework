@@ -1,13 +1,8 @@
-.datatable-wrapper-scrolling{
-    overflow: auto;
-}
-
 .datatable-wrapper {
     display: flex;
     flex-direction: column;
     width: 100%;
-   
-    }
+
     .info-footer-table {
         display: flex;
         flex-direction: row;
@@ -168,23 +163,12 @@
                 background: var(--colors-theme-table);
                 color: var(--colors-theme-table-font-invert);
                 border: none;
+                // height: 100%;
 
                 &:hover {
                     background: var(--colors-theme-table-hover);
                 }
             }
-                        .reset {
-                            border-radius: 50%;
-                            width: 30px;
-                            height: 30px;
-                            margin-left: 10px;
-                            margin-right: 10px;
-            
-                            &::after {
-                                content: "\21BB";
-                                font-size: 18px;
-                                font-weight: 600;
-                            }
         }
     }
 
@@ -213,6 +197,11 @@
             input[name=search]:focus {
                 box-shadow: none;
             }
+            & th{
+                & input,& select{
+                    width: 100%;
+                } 
+            }
         }
 
         td {
@@ -233,6 +222,7 @@
 
         tbody {
             position: relative;
+
             .not-found {
                 text-align: center;
                 padding: 20px;
@@ -247,70 +237,9 @@
                 bottom: 0;
             }
 
-            tr:nth-of-type(even) {
-                background-color: var(--colors-theme-table-line);
-            }
-
             tr:hover {
                 background-color: var(--colors-theme-table-line-hover);
             }
-        }
-    }
-}
-.selectT{
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: max-content;
-    cursor: pointer;
-    font-weight: 600;
-    border-radius: 10px;
-    background: var(--colors-theme-table);
-    color: var(--colors-theme-table-font-invert);
-    &-label{
-        position: relative;
-        padding: 10px 27px 10px 10px;
-        &::after{
-            position: absolute;
-            content: '\27A4';
-            transform: rotate(90deg);
-            right: 7px;
-            color: var(--colors-theme-table-font-invert);;
-        }
-    }
-    &-content{
-        display: flex;
-        flex-direction: column;
-        position: absolute;
-        width: 0px;
-        top: 40px;
-        z-index: 9999;
-        left: 0px;
-        overflow: hidden;
-        background-color: var();
-    }
-    &-active{
-        padding: 10px;
-        border-radius: 5px;
-        width: max-content;
-        overflow: visible;
-        background-color: var(--colors-theme-table-hover);
-        label{
-            padding: 4px;
-            border-radius: 4px;
-            margin-bottom: 2px;
-            color: var(--colors-theme-table-font);
-            cursor: pointer;
-            &:hover{
-                background: var(--colors-theme-table);
-                color: var(--colors-theme-table-font-invert);
-            }
-        }
-        .checked{
-            background: var(--colors-theme-table);
-            color: var(--colors-theme-table-font-invert);
         }
     }
 }

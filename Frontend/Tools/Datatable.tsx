@@ -575,7 +575,6 @@ export class Datatable {
     }
 
     public resetFilter() {
-        console.log($(this.table).find('theadth'));
         $(this.table).find('thead').find('[name]').each(($el: Rocet) => {
             if (['INPUT', "SELECT", "TEXTAREA"].includes($el.tagName)) { 
                 $el.val('')
