@@ -267,7 +267,7 @@ export class Datatable {
                 select.push(<label className={ischeck ? 'checked' : ''}>{th.textContent}<input class="d-none" type="checkbox"  data-value={String(i)} checked={ischeck} onclick={(evt: any) => this.eventShowColums(evt, this)}></input></label>)
             })
             
-            $info.add(<div className="selectT" >
+            $info.add(<div className="selectT" tabindex="1">
                     <label className="selectT-label" onclick={selectT}>Видимость столбцов</label>
                     <div className="selectT-content">{...select}</div>
                 </div>
@@ -283,6 +283,9 @@ export class Datatable {
                     $(this).closest('label').classRemove('checked');
                 }
             });
+            $info.find('.selectT').on('focusout', function () { 
+                $(this).find('.selectT-content').classRemove('selectT-active')
+            })
         }
 
 
