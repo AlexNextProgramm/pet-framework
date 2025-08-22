@@ -114,17 +114,20 @@ export class Datatable {
                 });
             }
         }
+        if (setting.pagingCount) { 
+            this.page.count = setting.pagingCount || this.page.count
+        }
     }
 
     private setSetting() {
         if (this.loadSettingStorage()) {
             this.limitTabPagination = this.settings.limitTabPagination || 3
             this.page.limit = this.settings.limit || 10
-            this.page.count = this.settings.pagingCount || this.page.count
+            
         }
     }
     // построить таблицу
-    private init(isConstructor = false) {
+    private init() {
         this.setSetting()
         let gfilter = this.getFilter();
         this.saveSettingStorage('filter', gfilter);

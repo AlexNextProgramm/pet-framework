@@ -416,6 +416,16 @@ export class Rocet extends RocetObject {
     }
   }
 
+  public prop(name: string, value:any = null) { 
+    if (value === null) {
+      this.Elements.forEach((el: HTMLElement) => {
+        (el as any)[name] = value;
+      });
+    }
+    return ((this.Elements[0] || null) as any)[name] || null
+
+  }
+
   public caretPos() { 
    return (this.Elements[0] as any).selectionStart
   }
