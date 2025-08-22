@@ -3,7 +3,6 @@ import { ajax } from "./ajax";
 import { $, Rocet } from "../rocet/core/rocet";
 import { integ } from "../rocet/core/integration";
 import './interface';
-
 interface settingDatabase {
     hideColumsIndex: Array<number>,
     colors: [number, number, number, boolean] | null,
@@ -120,7 +119,7 @@ export class Datatable {
     private initWrapper() {
         const wrapper = document.createElement('div');
         wrapper.classList.add('datatable-wrapper');
-        console.log(this.isDataTableScrolling)
+    
         if (this.isDataTableScrolling) {
             const scrolling = document.createElement('div');
             scrolling.classList.add('datatable-wrapper-scrolling');
@@ -198,13 +197,6 @@ export class Datatable {
                     const alias = el.getAttribute('alias');
                     const noneColumn: boolean = !(this.settings.hideColumsIndex.indexOf(indexElem) !== -1)
                     let result: RocetElement = <td className={noneColumn ? "" : "d-none"}>{String(row[alias])}</td>
-                    if (noneColumn) {
-                        this.table.querySelector('[name=column]').querySelectorAll('th').forEach((el, i: number) => {
-                            if (this.settings.hideColumsIndex.indexOf(i) !== -1) {
-                                el.classList.add('d-none')
-                            }
-                        })
-                    }
                     if (this.buildCells) {
                         const rowBuild = this.buildCells(row, alias, indexRow, indexElem)
                         result = rowBuild || result;
@@ -225,9 +217,20 @@ export class Datatable {
             tbody = this.rerender(item, aliasAll);
         }
 
-        table.render(() => {
-            return <tbody>{...tbody}</tbody>
-        })
+       table.render(() => {
+           return <tbody>{...tbody}</tbody>
+       });
+
+       if (this.settings?.hideColumsIndex) {
+           $(this.table).find('thead > tr').each(($tr: Rocet) => {
+               $tr.find('th').each(($th: Rocet, i: number) => {
+                   if (this.settings.hideColumsIndex.indexOf(i) !== -1) {
+                       $th.classAdd('d-none');
+                   }
+               })
+           })
+       }
+
         if (this.infoFooter) {
             this.initInfoFooter();
         }
@@ -242,43 +245,54 @@ export class Datatable {
         }
     }
     private initInfoHeader() {
-        const div: HTMLElement = this.wrapper.querySelector(".info-header-table") ?? document.createElement('div');
-        if (!div.classList.contains('info-header-table')) {
-            div.classList.add('info-header-table');
-            this.wrapper.prepend(div)
-        }
-        const info = new Rocet(div);
-        const limitedSelect = this.initLimitInfo()
-        let colors: JSX.Element
+        let $info: Rocet = $(this.wrapper.querySelector(".info-header-table"));
+        if ($info.length == 0) {
+            $info = $(<div className="info-header-table"></div>);
+            this.wrapper.prepend($info.item());
+        } 
+        const limitedSelect = this.initLimitInfo();
+        $info.add(<div className="limited-select">{limitedSelect}</div>);
+
+        let colors: JSX.Element;
         if (this.colors) {
             colors = <div className="colors"><p>colors</p><colors onclick={(evt: any) => this.eventColors(evt, this)}></colors></div>
+            $info.add(colors)
         }
-        let colums: JSX.Element
+
+        let colums: JSX.Element;
         const select: Array<JSX.Element> = []
         if (this.showColums) {
             this.ColumsElements.forEach((th: HTMLTableCellElement, i) => {
-                select.push(<options value={String(i)} selected={!(this.settings.hideColumsIndex.indexOf(i) !== -1)} onclick={(evt: any) => this.eventShowColums(evt, this)}>{th.textContent}</options>)
+                let ischeck = !(this.settings.hideColumsIndex.indexOf(i) !== -1)
+                select.push(<label className={ischeck ? 'checked' : ''}>{th.textContent}<input class="d-none" type="checkbox"  data-value={String(i)} checked={ischeck} onclick={(evt: any) => this.eventShowColums(evt, this)}></input></label>)
             })
+            
+            $info.add(<div className="selectT" >
+                    <label className="selectT-label" onclick={selectT}>Видимость столбцов</label>
+                    <div className="selectT-content">{...select}</div>
+                </div>
+            );
+            function selectT(ev:MouseEvent) { 
+                const btn = $(this);
+                btn.closest('.selectT').find('.selectT-content').classToggle('selectT-active')
+            }
+            $info.find('label input[type="checkbox"]').on('click', function () {
+                if (this.checked) {
+                    $(this).closest('label').classAdd('checked');
+                } else {
+                    $(this).closest('label').classRemove('checked');
+                }
+            });
         }
+
 
         const BlockButtons: Array<JSX.Element> = [];
         if (this.addElementHeader.length != 0) { 
-            this.addElementHeader.forEach((fn:Function) => { 
+            this.addElementHeader.forEach((fn: Function) => {
                 BlockButtons.push(fn(this))
-            })
+            });
+            $info.add(<div className="block-buttons">{...BlockButtons}</div>);
         }
-
-        info.render(() => {
-            return <div className="info-header-table">
-                <div className="limited-select">{limitedSelect}</div>
-                {/* {colors} */}
-                {colums}
-                {/* <select type="multi-issuing" multiple label="Видимость столбцов">
-                    {...select}
-                </select> */}
-                <div className="block-buttons">{...BlockButtons}</div>
-            </div>
-        })
         this.eventlimitedInfo();
     }
 
@@ -446,13 +460,11 @@ export class Datatable {
 
     private eventShowColums(evt: MouseEvent | any, datatable: Datatable) {
         datatable.ColumsElements.forEach((th: HTMLTableCellElement, i: number) => {
-            if (i == Number(evt.selectedValue)) {
-                if (!evt.selected) {
-                    th.classList.add('d-none')
+            if (i == Number($(evt.target).data('value'))) {
+                if (!evt.target.checked) {
                     datatable.hideShowColumn(i, true)
                     datatable.settings.hideColumsIndex.push(i)
                 } else {
-                    th.classList.remove('d-none')
                     datatable.hideShowColumn(i, false)
                     datatable.settings.hideColumsIndex = datatable.settings.hideColumsIndex.filter((ind: number) => ind !== i);
                 }
@@ -464,8 +476,12 @@ export class Datatable {
     public hideShowColumn(index: number, hideShow: boolean) {
         this.table.querySelectorAll('tr').forEach(row => {
             const cell = row.querySelector(`td:nth-child(${index + 1})`);
+            const th = row.querySelector(`th:nth-child(${index + 1})`);
             if (cell) {
                 hideShow ? cell.classList.add('d-none') : cell.classList.remove('d-none');
+            }
+            if (th) {
+                hideShow ? th.classList.add('d-none') : th.classList.remove('d-none');
             }
         });
     }
