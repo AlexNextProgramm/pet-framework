@@ -135,10 +135,16 @@ abstract class Model extends DB
 
     /**
      * exist
+     * @param array|null
      * @return bool
      */
-    public function exist():bool
+    public function exist(?array $data):bool
     {
+        if (!empty($data)) {
+            return !empty($this->find($data, function (Model $m) {
+                $m->limit('1');
+            }));
+        }
         return $this->isInfo();
     }
 
