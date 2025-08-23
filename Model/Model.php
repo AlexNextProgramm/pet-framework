@@ -127,7 +127,7 @@ abstract class Model extends DB
      */
     public function reboot():Model
     {
-        if($this->exist()){
+        if ($this->exist()) {
             $this->setInfoId((int)$this->get('id'));
         }
         return $this;
@@ -138,7 +138,7 @@ abstract class Model extends DB
      * @param array|null
      * @return bool
      */
-    public function exist(?array $data):bool
+    public function exist(?array $data = null):bool
     {
         if (!empty($data)) {
             return !empty($this->find($data, function (Model $m) {
