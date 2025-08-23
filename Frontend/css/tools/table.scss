@@ -197,10 +197,13 @@
             input[name=search]:focus {
                 box-shadow: none;
             }
-            & th{
-                & input,& select{
+
+            & th {
+
+                & input,
+                & select {
                     width: 100%;
-                } 
+                }
             }
         }
 
@@ -241,9 +244,24 @@
                 background-color: var(--colors-theme-table-line-hover);
             }
         }
+
+        .reset {
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            margin-left: 10px;
+            margin-right: 10px;
+
+            &::after {
+                content: "\21BB";
+                font-size: 18px;
+                font-weight: 600;
+            }
+        }
     }
 }
-.selectT{
+
+.selectT {
     display: flex;
     position: relative;
     flex-direction: column;
@@ -255,18 +273,22 @@
     border-radius: 10px;
     background: var(--colors-theme-table);
     color: var(--colors-theme-table-font-invert);
-    &-label{
+
+    &-label {
         position: relative;
         padding: 10px 27px 10px 10px;
-        &::after{
+
+        &::after {
             position: absolute;
             content: '\27A4';
             transform: rotate(90deg);
             right: 7px;
-            color: var(--colors-theme-table-font-invert);;
+            color: var(--colors-theme-table-font-invert);
+            ;
         }
     }
-    &-content{
+
+    &-content {
         display: flex;
         flex-direction: column;
         position: absolute;
@@ -277,24 +299,28 @@
         overflow: hidden;
         background-color: var();
     }
-    &-active{
+
+    &-active {
         padding: 10px;
         border-radius: 5px;
         width: max-content;
         overflow: visible;
         background-color: var(--colors-theme-table-hover);
-        label{
+
+        label {
             padding: 4px;
             border-radius: 4px;
             margin-bottom: 2px;
             color: var(--colors-theme-table-font);
             cursor: pointer;
-            &:hover{
+
+            &:hover {
                 background: var(--colors-theme-table);
                 color: var(--colors-theme-table-font-invert);
             }
         }
-        .checked{
+
+        .checked {
             background: var(--colors-theme-table);
             color: var(--colors-theme-table-font-invert);
         }
