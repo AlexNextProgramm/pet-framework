@@ -69,7 +69,6 @@ export class Mask {
         if (Number.isNaN(data)) return;
         let regx = new RegExp('([\*]{1,1})', 'i');
         template = template.replace(regx, String(data));
-        console.log(template);
         $target.attr('data-mask', template);
         let value = '';
 
