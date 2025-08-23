@@ -5,7 +5,7 @@ export class Mask {
     private sample: string | null = '';
     private sampleClear: string | null = '';
     private value: string;
-
+    private rep: Array<[Number, String]>;
     constructor(selector: string = null) {
         this.select = selector || this.select;
     }
@@ -14,9 +14,10 @@ export class Mask {
      * Template = +7(***)-**-**'
      * 
      **/
-    public modelNumber(sample: string) {
+    public modelNumber(sample: string, rep: Array<[Number, String]>) {
         if (sample == '') return console.warn('Mask model not null');
         this.sample = sample;
+        this.rep = rep
         this.claerInt();
         this.init();
     }
@@ -39,6 +40,7 @@ export class Mask {
                 }
                 this.change($(ev.target), key, this);
             }
+           
             ev.preventDefault();
         });
     }
@@ -58,6 +60,7 @@ export class Mask {
                 }
                 del[i] = '';
             }
+        
             $target.attr('data-mask', pattern.join(''));
             $target.val(del.join(''));
         }
@@ -66,17 +69,19 @@ export class Mask {
         if (Number.isNaN(data)) return;
         let regx = new RegExp('([\*]{1,1})', 'i');
         template = template.replace(regx, String(data));
-
+        console.log(template);
         $target.attr('data-mask', template);
         let value = '';
 
         for (let i = 0; i < template.length; i++) {
-            if (template[i] == '*') {
+            if (template[i] == '*' ) {
                 break;
             }
             value += template[i];
         }
-
+        this.rep.forEach((r: any) => {
+            value = value.substring(0, (r[0]- 1)) + r[1] + value.substring((r[0]- 1) + 1);
+        })
         $target.val(value);
     }
 
