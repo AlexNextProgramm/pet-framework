@@ -103,7 +103,7 @@ export class Datatable {
                 input.val(String(value));
             }
             if (Array.isArray(value) && input.item() instanceof HTMLSelectElement) {
-                let select:HTMLSelectElement = input.item();
+                 let select:HTMLSelectElement = input.item() as HTMLSelectElement;
                 Array.from(select.options).forEach((option:HTMLOptionElement) => {
                     option.selected = false;
                     value.forEach((v) => { 
