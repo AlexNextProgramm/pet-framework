@@ -126,8 +126,8 @@ abstract class DB
     {
        return " $from `{$this->table}` ".($this->tableAlias? " AS {$this->tableAlias} ": "");
     }
-    public function getTableName(){
-       return $this->table;
+    public function getTableName() {
+        return $this->table;
     }
     /**
      * q
@@ -155,16 +155,22 @@ abstract class DB
             return;
         }
         $pdoStatment = null;
+        $query = '';
         if (gettype($id) == 'string' || gettype($id) == 'integer') {
-            $pdoStatment = $this->q("SELECT * FROM {$this->table} WHERE id='$id';");
+            $query = "SELECT * FROM {$this->table} WHERE {$this->table}.id = '$id';";
+            $pdoStatment = $this->q($query);
         }
 
         if (gettype($id) == 'array') {
             $data = implode(" AND ", Tools::filter($id, fn($k, $v) => "{$this->table}.$k = '$v' "));
-            $pdoStatment =  $this->q("SELECT * FROM {$this->table} WHERE $data LIMIT 2;");
+            $query = "SELECT * FROM {$this->table} WHERE $data LIMIT 2;";
+            $pdoStatment =  $this->q($query);
         }
         $result = $pdoStatment ? $pdoStatment->fetchAll(PDO::FETCH_ASSOC):[];
-            $this->info = count($result) == 1 ? $result[0] : []; // не должно в этом условии быть множества
+        if (count($result) > 1) {
+            throw new AppException('Модель не может присвоить множество ваш запрос получает более 2 строк ' . $query);
+        }
+        $this->info = count($result) == 1 ? $result[0] : []; // не должно в этом условии быть множества
     }
 
     /**
