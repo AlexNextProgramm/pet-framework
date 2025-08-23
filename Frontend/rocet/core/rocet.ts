@@ -429,6 +429,11 @@ export class Rocet extends RocetObject {
   public caretPos() { 
    return (this.Elements[0] as any).selectionStart
   }
+
+    public exist(): boolean
+  { 
+    return this.Elements.length != 0;
+  }
 }
 
 export function r(data: string | HTMLElement | RocetElement | EventTarget | null = null) {
