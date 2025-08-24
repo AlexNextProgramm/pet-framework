@@ -582,12 +582,16 @@ export class Datatable {
         this.init();
     }
 
-    public setUrlParam(name:string, value:any) { 
+     public setUrlParam(name:string, value:any) { 
         let params = new URL(window.location.href);
-        console.log(params);
-        params.searchParams.set(name, String(value));
+        if (value === null || value === '') {
+            params.searchParams.delete(name)
+        } else { 
+            params.searchParams.set(name, String(value));
+        }
         history.replaceState(null, '', params.toString());
-    }
+     }
+
     public getUrlParam(name:string) { 
         let params = new URL(window.location.href);
         return params.searchParams.get(name)
