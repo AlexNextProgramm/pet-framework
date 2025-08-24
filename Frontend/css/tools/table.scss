@@ -179,6 +179,7 @@
             margin-right: 10px;
 
             &::after {
+                font-family: 'Arial Unicode MS', 'Segoe UI Symbol', sans-serif !important;
                 content: "\21BB";
                 font-size: 18px;
                 font-weight: 600;
@@ -279,6 +280,7 @@
         padding: 10px 27px 10px 10px;
 
         &::after {
+            font-family: 'Arial Unicode MS', 'Segoe UI Symbol', sans-serif !important;
             position: absolute;
             content: '\27A4';
             transform: rotate(90deg);

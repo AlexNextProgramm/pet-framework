@@ -214,6 +214,7 @@ export class Datatable {
                 
             }
             $(el as HTMLElement).on('change', () => {
+                this.setUrlParam('page', null);
                 this.init();
             });
         })
