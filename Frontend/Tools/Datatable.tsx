@@ -92,31 +92,29 @@ export class Datatable {
             let value = filter[name];
             let input = $(this.table).find(`[name="${name}"]`);
             console.log((value?.value !== null && value.value != ''));
-            if (value.value && value.value !== null && value.value != '') { 
+            if (value.value && value.value !== null && value.value != '') {
                 value = value.value;
             }
             if (typeof value == 'string' || typeof value == 'number') {
-                if (['checkbox'].includes(input.attr('type')) && value == 1) { 
+                if (['checkbox'].includes(input.attr('type')) && value == 1) {
                     input.prop('checked', true);
                     continue;
                 }
                 input.val(String(value));
             }
             if (Array.isArray(value) && input.item() instanceof HTMLSelectElement) {
-                 let select:HTMLSelectElement = input.item() as HTMLSelectElement;
-                Array.from(select.options).forEach((option:HTMLOptionElement) => {
+                let select: HTMLSelectElement = input.item() as HTMLSelectElement;
+                Array.from(select.options).forEach((option: HTMLOptionElement) => {
                     option.selected = false;
-                    value.forEach((v) => { 
-                        if (String(option.value) == String(v)) { 
+                    value.forEach((v) => {
+                        if (String(option.value) == String(v)) {
                             option.selected = true;
                         }
                     })
                 });
             }
         }
-        if (setting.pagingCount) { 
-            this.page.count = setting.pagingCount || this.page.count
-        }
+            this.page.count = Number(this.getUrlParam('page') || 1)
     }
 
     private setSetting() {
@@ -449,21 +447,20 @@ export class Datatable {
         const eventnext: HTMLSpanElement = datatable.wrapper.querySelector('[evt=next-pagination]');
         eventnext.onclick = () => {
             const limitStepAll = Math.ceil(datatable.page.all / datatable.page.limit)
-
             datatable.page.count = datatable.page.count >= limitStepAll ? limitStepAll : datatable.page.count + 1
-            datatable.saveSettingStorage('pagingCount',  datatable.page.count)
+            datatable.setUrlParam('page', datatable.page.count);
             datatable.init();
         }
         eventback.onclick = () => {
             const count = (datatable.page.count - 1) <= 0 ? 1 : (datatable.page.count - 1);
             datatable.page.count = count;
-            datatable.saveSettingStorage('pagingCount', datatable.page.count);
+            datatable.setUrlParam('page', datatable.page.count);
             datatable.init();
         }
         eventElementPagination.forEach((span) => {
             span.onclick = (evt) => {
                 datatable.page.count = Number(span.textContent);
-                datatable.saveSettingStorage('pagingCount',  datatable.page.count)
+                datatable.setUrlParam('page', datatable.page.count);
                 datatable.init();
             }
         })
@@ -583,5 +580,16 @@ export class Datatable {
         this.saveSettingStorage('pagingCount', 1);
         this.saveSettingStorage('filter', null);
         this.init();
+    }
+
+    public setUrlParam(name:string, value:any) { 
+        let params = new URL(window.location.href);
+        console.log(params);
+        params.searchParams.append(name, String(value));
+        history.replaceState(null, '', params.toString());
+    }
+    public getUrlParam(name:string) { 
+        let params = new URL(window.location.href);
+        return params.searchParams.get(name)
     }
 }
