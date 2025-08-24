@@ -123,7 +123,7 @@ export class Datatable {
     private setSetting() {
         if (this.loadSettingStorage()) {
             this.limitTabPagination = this.settings.limitTabPagination || 3
-            this.page.limit = this.settings.limit || 10
+            this.page.limit = this.settings.limit || this.page.limit
             
         }
     }
