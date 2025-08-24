@@ -35,6 +35,7 @@ export class Datatable {
     public rerender: Function| null = null;
     public addElementHeader: Array<Function> = [];
     public isDataTableScrolling: boolean = false;
+    public isSaveSetting: boolean = false;
 
     public settings: settingDatabase = {
         hideColumsIndex: [],
@@ -70,11 +71,13 @@ export class Datatable {
             this.table = table;
         }
         this.isDataTableScrolling = this.table.getAttribute('scrolling') == '1';
+        this.isSaveSetting = $(this.table).attr('is-save-setting') == '1';
         this.initWrapper()
         let limit = Number(this.table.getAttribute('limit'))
+        console.log(limit);
         this.page = {
             count: 1,
-            limit: limit ? limit : 10,
+            limit: limit ? limit: 10,
             all: 0
         }
         this.setSettingFilter();
@@ -559,8 +562,10 @@ export class Datatable {
     }
 
     public saveSettingStorage(key: keyof settingDatabase, value: any) {
-        this.settings[key] = value;
-        localStorage.setItem(this.table.getAttribute('name'), JSON.stringify(this.settings))
+        if (this.isSaveSetting) { 
+            this.settings[key] = value;
+            localStorage.setItem(this.table.getAttribute('name'), JSON.stringify(this.settings))
+        }
     }
 
     public reload() {
@@ -583,7 +588,7 @@ export class Datatable {
         this.init();
     }
 
-     public setUrlParam(name:string, value:any) { 
+    public setUrlParam(name:string, value:any) { 
         let params = new URL(window.location.href);
         if (value === null || value === '') {
             params.searchParams.delete(name)
@@ -591,8 +596,7 @@ export class Datatable {
             params.searchParams.set(name, String(value));
         }
         history.replaceState(null, '', params.toString());
-     }
-
+    }
     public getUrlParam(name:string) { 
         let params = new URL(window.location.href);
         return params.searchParams.get(name)
