@@ -585,7 +585,7 @@ export class Datatable {
     public setUrlParam(name:string, value:any) { 
         let params = new URL(window.location.href);
         console.log(params);
-        params.searchParams.append(name, String(value));
+        params.searchParams.set(name, String(value));
         history.replaceState(null, '', params.toString());
     }
     public getUrlParam(name:string) { 
