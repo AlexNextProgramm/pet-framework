@@ -70,11 +70,17 @@ export class Rocet extends RocetObject {
     return htmlPattern.test(str);
   }
 
-  private createElementFromHTML(htmlString: string): HTMLElement | null {
-    const template = document.createElement('template');
-    template.innerHTML = htmlString.trim();
-    return template.content.firstChild as HTMLElement || null;
+ private createElementFromHTML(htmlString: string): Array<HTMLElement> {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+    const  template = doc.body; // или выбрать нужный элемент
+    const arr: Array<HTMLElement> = [];
+    for (let i = 0; i < template.children.length; i++) { 
+      arr.push(template.children[i] as HTMLElement)
+    } 
+    return arr;
   }
+
   public getIt(id: string): Rocet {
     this.Elements = Array.from(document.querySelectorAll(id));
     return this;
