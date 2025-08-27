@@ -70,17 +70,11 @@ export class Rocet extends RocetObject {
     return htmlPattern.test(str);
   }
 
- private createElementFromHTML(htmlString: string): Array<HTMLElement> {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlString, 'text/html');
-    const  template = doc.body; // или выбрать нужный элемент
-    const arr: Array<HTMLElement> = [];
-    for (let i = 0; i < template.children.length; i++) { 
-      arr.push(template.children[i] as HTMLElement)
-    } 
-    return arr;
+  private createElementFromHTML(htmlString: string): HTMLElement | null {
+    const template = document.createElement('template');
+    template.innerHTML = htmlString.trim();
+    return template.content.firstChild as HTMLElement;
   }
-
   public getIt(id: string): Rocet {
     this.Elements = Array.from(document.querySelectorAll(id));
     return this;
@@ -184,9 +178,6 @@ export class Rocet extends RocetObject {
   }
   public classToggle(name: string) {
     this.Elements.forEach((el) => el.classList.toggle(name))
-  }
-  public classRemove(name: string) {
-    this.Elements.forEach((el) => el.classList.remove(name))
   }
 
   private execureElements($RocketElem: Rocet, i: any) {
@@ -412,33 +403,6 @@ export class Rocet extends RocetObject {
     } else {
       this.Elements[0].textContent = str;
     }
-  }
-
-  public html(str: string | null = null) {
-    if (str === null) {
-      return this.Elements[0].innerHTML;
-    } else {
-      this.Elements[0].innerHTML = str;
-    }
-  }
-
-  public prop(name: string, value:any = null) { 
-    if (value === null) {
-      this.Elements.forEach((el: HTMLElement) => {
-        (el as any)[name] = value;
-      });
-    }
-    return ((this.Elements[0] || null) as any)[name] || null
-
-  }
-
-  public caretPos() { 
-   return (this.Elements[0] as any).selectionStart
-  }
-
-    public exist(): boolean
-  { 
-    return this.Elements.length != 0;
   }
 }
 
