@@ -431,6 +431,11 @@ export class Rocet extends RocetObject {
   { 
     return this.Elements.length != 0;
   }
+  public classRemove(value: string) { 
+    this.Elements.forEach((el: HTMLElement) => {
+        el.classList.remove(value);
+    });
+  }
 }
 
 export function r(data: string | HTMLElement | RocetElement | EventTarget | null = null) {
