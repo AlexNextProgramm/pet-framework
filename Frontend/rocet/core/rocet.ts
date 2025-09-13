@@ -404,6 +404,33 @@ export class Rocet extends RocetObject {
       this.Elements[0].textContent = str;
     }
   }
+  
+  public html(str: string | null = null) {
+    if (str === null) {
+      return this.Elements[0].innerHTML;
+    } else {
+      this.Elements[0].innerHTML = str;
+    }
+  }
+
+  public prop(name: string, value:any = null) { 
+    if (value === null) {
+      this.Elements.forEach((el: HTMLElement) => {
+        (el as any)[name] = value;
+      });
+    }
+    return ((this.Elements[0] || null) as any)[name] || null
+
+  }
+
+  public caretPos() { 
+   return (this.Elements[0] as any).selectionStart
+  }
+
+    public exist(): boolean
+  { 
+    return this.Elements.length != 0;
+  }
 }
 
 export function r(data: string | HTMLElement | RocetElement | EventTarget | null = null) {
