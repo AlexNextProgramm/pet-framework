@@ -15,7 +15,7 @@ class Monitor{
     static function init(){
         $git = new Monitor();
 
-        while (1) {
+        while (true) {
             if (!$git->isChange()) {
                 sleep($git->intervalSeconds);
                 continue;
@@ -37,9 +37,14 @@ class Monitor{
             sleep($this->intervalSeconds);
             return false;
         }
+
         $cmdDiff = "git rev-list HEAD...origin/$this->branch --count";
         $count = trim(shell_exec($cmdDiff));
-        return $count > 0;
+        if($count > 0){
+            exec('git pull', $output, $result);
+            return true;
+        }
+        return false;
     }
 
 
