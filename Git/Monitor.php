@@ -29,6 +29,17 @@ class Monitor{
         }
     }
 
+    static function initOne() {
+        $git = new Monitor();
+        if (!$git->isChange()) {
+            return;
+        }
+
+        $git->composerUpdate();
+        $git->startNpm();
+        $git->startMigrate();
+    }
+
     public function isChange():bool 
     {
         exec('git fetch', $outputFetch, $returnFetch);

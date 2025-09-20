@@ -46,9 +46,11 @@ class Command {
             case "info":
                 $this->info(); 
                 break;
-
             case "git-monitor":
                 Monitor::init();
+                break;
+            case "git-update":
+                Monitor::initOne();
                 break;
             default:
                 echo "no command ";
