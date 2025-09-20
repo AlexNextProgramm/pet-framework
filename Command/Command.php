@@ -2,7 +2,7 @@
 
 namespace Pet\Command;
 
-
+use Git\Monitor;
 use Pet\Apache\Apache;
 use Pet\Command\Console\Console;
 use Pet\Command\FTP\ConnectFtp;
@@ -45,6 +45,10 @@ class Command {
                 (new MakeModel($comm[2] ?? null));
             case "info":
                 $this->info(); 
+                break;
+
+            case "git-monitor":
+                Monitor::init();
                 break;
             default:
                 echo "no command ";
