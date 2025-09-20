@@ -2,7 +2,7 @@
 
 namespace Pet\Command;
 
-use Git\Monitor;
+use Pet\Git\Monitor;
 use Pet\Apache\Apache;
 use Pet\Command\Console\Console;
 use Pet\Command\FTP\ConnectFtp;

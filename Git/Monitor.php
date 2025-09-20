@@ -1,5 +1,5 @@
 <?php
-namespace Git;
+namespace Pet\Git;
 
 use Error;
 use Exception;
