@@ -7,7 +7,7 @@ use Pet\Command\Console\Console;
 use Pet\Migration\MigrateCommand;
 
 class Monitor{
-    public $intervalSeconds = 300;
+    public $intervalSeconds = 120;
     public $branch = "main";
     public function __construct() {
     }
