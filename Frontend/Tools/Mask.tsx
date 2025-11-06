@@ -3,6 +3,7 @@ import { $, Rocet } from "@rocet/rocet";
 export class Mask {
     private select: string = '[type=phone]';
     private sample: string | null = '';
+    private defaultSmample = '';
     private sampleClear: string | null = '';
     private value: string;
     private rep: Array<[Number, String]>;
@@ -17,6 +18,7 @@ export class Mask {
     public modelNumber(sample: string, rep: Array<[Number, String]>) {
         if (sample == '') return console.warn('Mask model not null');
         this.sample = sample;
+        this.defaultSmample = sample;
         this.rep = rep
         this.claerInt();
         this.init();
@@ -25,6 +27,9 @@ export class Mask {
         const $input = $(this.select);
         if ($input.length == 0) return console.log('Mask elements 0');
         $input.on('keydown', (ev: KeyboardEvent) => {
+            if (!$input.val() || $input.val() == '') { 
+                $input.attr('data-mask', this.defaultSmample);
+            }
             ev.preventDefault();
             this.change($(ev.target), ev.key, this)
         });
