@@ -1,7 +1,7 @@
 <?php
 namespace Pet\Command\FTP;
 
-use Pet\Command\FTP\Ftp;
+use Pet\Command\FTP\Sftp;
 use Pet\Command\Console\Console;
 
 class ConnectFtp {
