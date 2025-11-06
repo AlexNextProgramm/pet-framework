@@ -6,7 +6,7 @@ use Pet\Command\Console\Console;
 
 class ConnectFtp {
 
-    const ROOT = ROOT . DIRECTORY_SEPARATOR;
+    const ROOT = ROOT . DS;
     public static $PUBLIC_DIR;
     public static $VENDOR_DIR;
     public static $IGNORE_DIR;

@@ -18,12 +18,7 @@ framework for easy use
   "files":[
     "/vendor/pet/framework/function.php"
   ],
-    "scripts":{
-        "post-package-install":[
-            "php ./vendor/pet/framework/Command/start_build.php"
-        ]
-    }
-
+    "scripts":
 }
 
 ```
@@ -58,26 +53,5 @@ php pet make:migrate
 
 ```
 php pet migrate
-php pet migrate:up
-
-```
-
-Накатить только 1 следующую
-
-```
-php pet migrate:up:one
-```
-
-Откатить все миграции
-
-```
-php pet migrate:back
-
-```
-
-Откатить последнюю
-
-```
-php pet migrate:back:end
 
 ```
