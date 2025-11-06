@@ -6,7 +6,7 @@ namespace Pet\Command\FTP;
 use Pet\Command\Console\Console;
 use Exception;
 
-class Ftp {
+class Sftp {
     public $host = "";
     public $port = 21;
 

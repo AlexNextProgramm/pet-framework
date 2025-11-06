@@ -49,7 +49,7 @@ class ConnectFtp {
         Console::input($outInput);
         $isVendor = Console::isYes($outInput);
 
-        $ftp = new Ftp();
+        $ftp = new Sftp();
         $ftp->host = env('FTP_HOST');
         $ftp->login = env('FTP_LOGIN');
         $ftp->fileIgnore = self::$IGNORE_FILE;
