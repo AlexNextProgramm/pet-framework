@@ -14,10 +14,10 @@ class ConnectFtp {
     public static $isInput = false;
 
     public function __construct() {
-        self::$PUBLIC_DIR = self::ROOT . env('PUBLIC_DIR', 'dist');
+        self::$PUBLIC_DIR = self::ROOT . DIST;
         self::$VENDOR_DIR = self::ROOT . '/vendor';
-        self::$IGNORE_DIR = explode("|", env('FTP_DIR_EXEPTION'));
-        self::$IGNORE_FILE = explode("|", env('FTP_FILE_EXEPTION'));
+        self::$IGNORE_DIR = explode("|", FTP_DIR_EXEPTION);
+        self::$IGNORE_FILE = explode("|", FTP_FILE_EXEPTION);
     }
 
     public static function load() {
@@ -55,17 +55,17 @@ class ConnectFtp {
         $ftp->fileIgnore = self::$IGNORE_FILE;
         $ftp->dirIgnore = self::$IGNORE_DIR;
 
-        if (trim(env('FTP_PASSWORD')) == '') {
+        if (trim(FTP_PASSWORD) == '') {
             Console::text("Нет пароля  FTP (*_*)", 'red');
             return false;
         }
 
 
-        $ftp->password = env('FTP_PASSWORD');
+        $ftp->password = FTP_PASSWORD;
         if ($ftp->connectCount(5)) {
-            $ftp->dirHost = env('FTP_HOST_DIR');
-            $ftp->dir(env('FTP_HOST_DIR'));
-            $ftp->putDirFiles(self::$PUBLIC_DIR, 'dist');
+            $ftp->dirHost = FTP_HOST_DIR;
+            $ftp->dir(FTP_HOST_DIR);
+            $ftp->putDirFiles(self::$PUBLIC_DIR, DIST);
             if ($isVendor == 'y') {
                 $ftp->putDirFiles(self::$VENDOR_DIR, 'vendor');
             }
