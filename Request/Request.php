@@ -75,4 +75,26 @@ class Request
         $header =  getallheaders();
         foreach($header as $key => $val) $this->header[strtolower($key)] = strtolower($val);
     }
+
+
+    public function ip(): string|false {
+        $ip_keys = [
+            'REMOTE_ADDR',
+            'HTTP_X_FORWARDED_FOR',
+            'HTTP_X_REAL_IP',
+            'HTTP_CLIENT_IP',
+        ];
+
+        foreach ($ip_keys as $key) {
+            if (!empty($_SERVER[$key])) {
+                $ips = explode(',', $_SERVER[$key]);
+                $ip = trim($ips[0]);
+                if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                    return $ip;
+                }
+            }
+        }
+
+        return false;
+    }
 }
