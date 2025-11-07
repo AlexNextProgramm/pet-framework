@@ -31,6 +31,10 @@ class Response
         }
     }
 
+    public static function code($code) {
+        http_response_code($code);
+    }
+
     public static function echo($data)
     {
         if (gettype($data) == 'string') {
