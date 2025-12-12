@@ -54,7 +54,8 @@ class Request
         $REQUEST = array_merge($_GET, $_POST, $_FILES);
         $decode = [];
         $input = file_get_contents('php://input');
-        if (($_SERVER['CONTENT_TYPE'] ?? null) === 'application/json' && !empty($input)) $decode = Tools::jsonDe($input);
+        $ctype = strtolower($_SERVER['CONTENT_TYPE'] ?? '');
+        if (str_contains($ctype, 'json') && !empty($input)) $decode = Tools::jsonDe($input);
         return array_merge($REQUEST, $decode);
     }
 
