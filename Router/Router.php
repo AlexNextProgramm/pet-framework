@@ -99,11 +99,13 @@ class Router extends Middleware
                 }
             }
 
-            // если контроллер что-то хочет вернут
-            if (!empty($controller) &&  count($controller) == 1 && !empty($controller[0])) {
-                echo json_encode($controller[0], JSON_UNESCAPED_UNICODE);
-            } elseif (!empty($controller) && count($controller) > 1) {
-                echo json_encode($controller, JSON_UNESCAPED_UNICODE);
+           foreach ($controller as $i => $r) {
+                if (gettype($r) != 'array' && in_array($r, [null, false, ''])) {
+                    unset($controller[$i]);
+                }
+            }
+            if (!empty($controller)) {
+                echo json_encode(count($controller) == 1 ? $controller[0] : $controller, JSON_UNESCAPED_UNICODE);
             }
             $control = true;
             $control = true;
