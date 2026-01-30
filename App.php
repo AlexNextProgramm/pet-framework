@@ -13,7 +13,7 @@ class App
 {
 
     public const PUBLIC_DIR = PUBLIC_DIR;
-    public const ROUTER_DIR = PUBLIC_DIR . DS . 'router';
+    public const ROUTER_DIR = ROUTER_DIR;
     public $router;
     public $request;
     public $session;
@@ -30,7 +30,6 @@ class App
     /**
      * init
      *
-     * @param  mixed $router_dir
      * @return void
      */
     public static function init()
