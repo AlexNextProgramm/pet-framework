@@ -6,7 +6,7 @@ use Pet\Errors\AppException;
 
 class View
 {
-    const DIR_VIEW = PUBLIC_DIR . DS . 'view';
+    const DIR_VIEW = VIEW_DIR;
     private static $argument = [];
     /**
      * open
