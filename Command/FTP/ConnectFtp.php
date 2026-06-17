@@ -3,6 +3,7 @@ namespace Pet\Command\FTP;
 
 use Pet\Command\FTP\Sftp;
 use Pet\Command\Console\Console;
+use Pet\Git\Git;
 
 class ConnectFtp {
 
@@ -49,19 +50,7 @@ class ConnectFtp {
         Console::input($outInput);
         $isVendor = Console::isYes($outInput);
 
-        $ftp = new Sftp();
-        $ftp->host = env('FTP_HOST');
-        $ftp->login = env('FTP_LOGIN');
-        $ftp->fileIgnore = self::$IGNORE_FILE;
-        $ftp->dirIgnore = self::$IGNORE_DIR;
-
-        if (trim(FTP_PASSWORD) == '') {
-            Console::text("Нет пароля  FTP (*_*)", 'red');
-            return false;
-        }
-
-
-        $ftp->password = FTP_PASSWORD;
+        $ftp  = self::initFtp();
         if ($ftp->connectCount(5)) {
             $ftp->dirHost = FTP_HOST_DIR;
             $ftp->dir(FTP_HOST_DIR);
@@ -73,5 +62,34 @@ class ConnectFtp {
         } else {
             Console::text("Не удалось подключиться по  FTP...", 'red');
         }
+    }
+    public static function initFtp():Sftp
+    {
+        $ftp = new Sftp();
+        $ftp->host = env('FTP_HOST');
+        $ftp->login = env('FTP_LOGIN');
+        $ftp->fileIgnore = self::$IGNORE_FILE;
+        $ftp->dirIgnore = self::$IGNORE_DIR;
+
+        if (trim(FTP_PASSWORD) == '') {
+            Console::die("Нет пароля  FTP (*_*)", 'red');
+        }
+
+        $ftp->password = FTP_PASSWORD;
+        return $ftp;
+    }
+
+    public static function loadDiff()
+    {
+        if (Git::version() === false) {
+            Console::die('Error git');
+        }
+        $result = Git::status();
+        $ftp = self::initFtp();
+
+        foreach($result as $file){
+            
+        }
+
     }
 }

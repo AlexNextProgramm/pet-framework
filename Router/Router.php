@@ -65,7 +65,7 @@ class Router extends Middleware
         $request = request();
         $control = false;
 
-        foreach (Router::$Route as $Rout) {
+        foreach (self::getOrderedRoutes() as $Rout) {
              //Прямое направление через event при ajax
             $resultAjax = 'Нет ответных данных';
             if (in_array($request->getMethod(), self::$ajaxtype) && self::ajax($request, $resultAjax)) {
@@ -74,7 +74,7 @@ class Router extends Middleware
             if ($Rout['method'] != $request->getMethod()) continue;
             if ($control) continue;
 
-            // Проверка на гибкие ссылки
+            // Проверка на гибкие ссылки и wildcard
             if (self::isLinkRouter($request,$Rout)) continue;
 
             //Заглушка в middleware
@@ -118,7 +118,7 @@ class Router extends Middleware
     private static function ajax($request, &$result) : bool
     {
         // Проверка роутера на ложный запрос. ajax не может выполнен
-        foreach (Router::$Route as $Rout) {
+        foreach (self::getOrderedRoutes() as $Rout) {
             if ($Rout['method'] != "GET") continue;
             if (self::isLinkRouter($request, $Rout)) continue;
             foreach (self::$event as $key => $action) {
@@ -131,11 +131,59 @@ class Router extends Middleware
         return false;
     }
 
+    private static function getOrderedRoutes(): array
+    {
+        $explicit = [];
+        $wildcard = [];
+
+        foreach (Router::$Route as $route) {
+            if (self::isWildcardRoute($route['path'])) {
+                $wildcard[] = $route;
+            } else {
+                $explicit[] = $route;
+            }
+        }
+
+        return array_merge($explicit, $wildcard);
+    }
+
+    private static function isWildcardRoute(string $path): bool
+    {
+        return str_ends_with($path, '/*');
+    }
+
     private static function isLinkRouter($request, $Rout):bool
     {
+        if ($request->path == $Rout['path']) {
+            return false;
+        }
+
+        if (self::isWildcardRoute($Rout['path'])) {
+            return !self::wildcardLink($Rout['path'], $request);
+        }
+
         $fLink = Router::flexibleLink($Rout['path']);
         $isFlexLink  = $fLink ? $fLink === $request->path : false;
-        return $request->path != $Rout['path'] && !$isFlexLink;
+        return !$isFlexLink;
+    }
+
+    private static function wildcardLink(string $pattern, $request): bool
+    {
+        $prefix = substr($pattern, 0, -1);
+        $path = $request->path;
+        $base = rtrim($prefix, '/');
+
+        if ($path === $base) {
+            Request::$parametr['*'] = '';
+            return true;
+        }
+
+        if (str_starts_with($path, $prefix)) {
+            Request::$parametr['*'] = substr($path, strlen($prefix));
+            return true;
+        }
+
+        return false;
     }
     private static function flexibleLink($flex)
     {

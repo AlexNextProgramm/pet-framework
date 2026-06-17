@@ -38,6 +38,9 @@ class Command {
             case 'load':
                 ConnectFtp::load();
                 break;
+            case 'load-diff':
+                ConnectFtp::loadDiff();
+                break;
             case 'migrate':
                 MigrateCommand::init('migrate');
                 break;
