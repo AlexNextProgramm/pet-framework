@@ -8,6 +8,8 @@ class Request
 {
     public static array $attribute = [];
     public static array $parametr = [];
+    public static array $levels = [];
+    public static string $original = '';
     public $header = [];
     public $path;
 
@@ -29,6 +31,10 @@ class Request
     {
         $path = str_contains($_SERVER['REQUEST_URI'], '?') ? explode('?', $_SERVER['REQUEST_URI'])[0] :
             $_SERVER['REQUEST_URI'];
+
+        self::$original = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '';
+        self::$levels = array_values(array_filter(explode('/', trim($path, '/'))));
+
         return $path != '/'? Tools::strRep(strlen($path) - 1, '', $path, '/'): $path;
     }
 

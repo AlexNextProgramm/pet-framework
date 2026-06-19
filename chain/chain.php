@@ -70,4 +70,24 @@ function supple(string|null $key = null):null|array|string
     return $parametr;
 }
 
+/**
+ * levels
+ * сегменты пути после домена /a/b/c -> ['a', 'b', 'c']
+ * @return array
+ */
+function levels(): array
+{
+    return Request::$levels;
+}
+
+/**
+ * original
+ * доменное имя запроса
+ * @return string
+ */
+function original(): string
+{
+    return Request::$original;
+}
+
 ?>
