@@ -37,6 +37,52 @@ class View
     }
 
     /**
+     * appendHtmlspecialchars
+     *
+     * Добавляет данные в $argument, предварительно применяя
+     * htmlspecialchars ко всем строковым значениям массива.
+     * Рекурсивно обрабатывает вложенные массивы.
+     *
+     * @param  array $data
+     * @return void
+     */
+    public static function appendHtmlspecialchars(array $data): void
+    {
+        $escapedData = self::escapeArray($data);
+        self::$argument = array_merge(self::$argument, $escapedData);
+    }
+
+    /**
+     * escapeArray
+     *
+     * Рекурсивно применяет htmlspecialchars ко всем строковым
+     * значениям в массиве.
+     *
+     * @param  array $data
+     * @return array
+     */
+    private static function escapeArray(array $data): array
+    {
+        $result = [];
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $result[$key] = self::escapeArray($value);
+            } elseif (is_object($value)) {
+                if (method_exists($value, '__toString')) {
+                    $result[$key] = htmlspecialchars((string) $value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                } else {
+                    $result[$key] = $value;
+                }
+            } elseif (is_string($value)) {
+                $result[$key] = htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            } else {
+                $result[$key] = $value;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * getPath
      *
      * @param  mixed $path
