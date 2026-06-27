@@ -2,6 +2,8 @@
 
 namespace Pet\Request;
 
+use Pet\File\File;
+use Pet\File\FileCollection;
 use Pet\Tools\Tools;
 
 class Request
@@ -13,12 +15,16 @@ class Request
     public $header = [];
     public $path;
 
+    /** @var FileCollection|null Коллекция загруженных файлов */
+    private static ?FileCollection $uploadedFiles = null;
+
 
     public function __construct()
     {
         self::$attribute = $this->input();
         $this->path = $this->getURI();
         $this->parsingHeaders();
+        self::$uploadedFiles = null;
     }
 
     public function getMethod(): string
@@ -66,16 +72,59 @@ class Request
     }
 
     /**
-     * file
+     * Возвращает загруженный файл как объект File или коллекцию FileCollection.
+     *
+     * @param  string|null $name Имя поля в $_FILES
+     * @return File|FileCollection|array|null
+     */
+    public function file(?string $name = null): File|FileCollection|array|null
+    {
+        if ($_FILES === []) {
+            return $name !== null ? null : [];
+        }
+
+        if (self::$uploadedFiles === null) {
+            self::$uploadedFiles = FileCollection::fromUploadedFiles($_FILES);
+        }
+
+        if ($name === null) {
+            return self::$uploadedFiles;
+        }
+
+        if (!isset($_FILES[$name])) {
+            return null;
+        }
+
+        if (is_array($_FILES[$name]['name'] ?? null)) {
+            return FileCollection::fromUploadedFiles($_FILES[$name]);
+        }
+
+        if (($_FILES[$name]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+            return File::fromUpload($_FILES[$name]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Проверяет, был ли загружен файл с указанным именем.
      *
      * @param  string $name
-     * @return string|null|array
+     * @return bool
      */
-     public function file(?string $name = null): array|string|null
+    public function hasFile(string $name): bool
     {
-        if (!$name) return $_FILES;
-        if (key_exists($name, $_FILES)) return $_FILES[$name];
-        return null;
+        return isset($_FILES[$name]) && ($_FILES[$name]['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE;
+    }
+
+    /**
+     * Возвращает все загруженные файлы как массив сырых $_FILES.
+     *
+     * @return array
+     */
+    public function allFiles(): array
+    {
+        return $_FILES;
     }
 
     private function parsingHeaders(){

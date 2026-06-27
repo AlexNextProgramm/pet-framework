@@ -1,2 +1,3 @@
-set /p id=""
-@echo %id% 
+@echo off
+set /p input=
+echo %input%
