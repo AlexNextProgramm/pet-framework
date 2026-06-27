@@ -71,7 +71,7 @@ class Request
      * @param  string $name
      * @return string|null|array
      */
-    public function file(string $name = null): array|string|null
+     public function file(?string $name ): array|string|null
     {
         if (!$name) return $_FILES;
         if (key_exists($name, $_FILES)) return $_FILES[$name];
