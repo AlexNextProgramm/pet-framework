@@ -4,18 +4,44 @@ namespace Pet\File;
 
 use Pet\File\Exception\FileException;
 
+/**
+ * Объектное представление файла в файловой системе.
+ *
+ * Предоставляет удобный интерфейс для выполнения операций с отдельным файлом:
+ * чтение, запись, копирование, перемещение, удаление, получение метаданных.
+ *
+ * @package Pet\File
+ */
 class File
 {
+    /** @var string Полный путь к файлу */
     private string $path;
+
+    /** @var string|null Кешированный MIME-тип */
     private ?string $mimeType = null;
+
+    /** @var int|null Кешированный размер файла в байтах */
     private ?int $size = null;
+
+    /** @var string|null Кешированный хеш файла */
     private ?string $hash = null;
 
+    /**
+     * @param string $path Полный путь к файлу.
+     */
     public function __construct(string $path)
     {
         $this->path = $path;
     }
 
+    /**
+     * Создаёт экземпляр File из массива загруженного файла ($_FILES).
+     *
+     * @param array $file Элемент из глобального массива $_FILES.
+     * @return self
+     *
+     * @throws FileException Если при загрузке произошла ошибка.
+     */
     public static function fromUpload(array $file): self
     {
         if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
@@ -25,51 +51,103 @@ class File
         return new self($file['tmp_name']);
     }
 
+    /**
+     * Возвращает полный путь к файлу.
+     *
+     * @return string
+     */
     public function path(): string
     {
         return $this->path;
     }
 
+    /**
+     * Проверяет существование файла в файловой системе.
+     *
+     * @return bool
+     */
     public function exists(): bool
     {
         return file_exists($this->path);
     }
 
+    /**
+     * Проверяет, является ли путь обычным файлом.
+     *
+     * @return bool
+     */
     public function isFile(): bool
     {
         return is_file($this->path);
     }
 
+    /**
+     * Проверяет, доступен ли файл для чтения.
+     *
+     * @return bool
+     */
     public function isReadable(): bool
     {
         return is_readable($this->path);
     }
 
+    /**
+     * Проверяет, доступен ли файл для записи.
+     *
+     * @return bool
+     */
     public function isWritable(): bool
     {
         return is_writable($this->path);
     }
 
+    /**
+     * Возвращает имя файла с расширением (basename).
+     *
+     * @return string
+     */
     public function name(): string
     {
         return pathinfo($this->path, PATHINFO_BASENAME);
     }
 
+    /**
+     * Возвращает имя файла без расширения.
+     *
+     * @return string
+     */
     public function filename(): string
     {
         return pathinfo($this->path, PATHINFO_FILENAME);
     }
 
+    /**
+     * Возвращает расширение файла.
+     *
+     * @return string
+     */
     public function extension(): string
     {
         return pathinfo($this->path, PATHINFO_EXTENSION);
     }
 
+    /**
+     * Возвращает путь к директории файла.
+     *
+     * @return string
+     */
     public function dirname(): string
     {
         return pathinfo($this->path, PATHINFO_DIRNAME);
     }
 
+    /**
+     * Возвращает размер файла в байтах.
+     *
+     * @return int
+     *
+     * @throws FileException Если файл не существует.
+     */
     public function size(): int
     {
         if ($this->size === null) {
@@ -80,6 +158,11 @@ class File
         return $this->size;
     }
 
+    /**
+     * Возвращает размер файла в человекочитаемом формате (B, KB, MB, GB, TB).
+     *
+     * @return string
+     */
     public function sizeFormatted(): string
     {
         $bytes = $this->size();
@@ -94,6 +177,13 @@ class File
         return round($bytes, 2) . ' ' . $units[$i];
     }
 
+    /**
+     * Возвращает MIME-тип файла.
+     *
+     * @return string
+     *
+     * @throws FileException Если файл не существует.
+     */
     public function mimeType(): string
     {
         if ($this->mimeType === null) {
@@ -105,6 +195,14 @@ class File
         return $this->mimeType;
     }
 
+    /**
+     * Возвращает хеш файла (по умолчанию md5).
+     *
+     * @param string $algo Алгоритм хеширования (md5, sha1, sha256 и т.д.).
+     * @return string
+     *
+     * @throws FileException Если файл не существует.
+     */
     public function hash(string $algo = 'md5'): string
     {
         $key = $algo . '_hash';
@@ -117,6 +215,13 @@ class File
         return $this->hash;
     }
 
+    /**
+     * Читает содержимое файла в строку.
+     *
+     * @return string
+     *
+     * @throws FileException Если файл не существует или недоступен для чтения.
+     */
     public function content(): string
     {
         $this->ensureExists();
@@ -131,6 +236,14 @@ class File
         return $content;
     }
 
+    /**
+     * Записывает данные в файл (перезаписывает содержимое).
+     *
+     * @param string $content Данные для записи.
+     * @return self
+     *
+     * @throws FileException Если файл недоступен для записи.
+     */
     public function put(string $content): self
     {
         $bytes = file_put_contents($this->path, $content);
@@ -146,6 +259,14 @@ class File
         return $this;
     }
 
+    /**
+     * Дописывает данные в конец файла.
+     *
+     * @param string $content Данные для добавления.
+     * @return self
+     *
+     * @throws FileException Если файл недоступен для записи.
+     */
     public function append(string $content): self
     {
         $bytes = file_put_contents($this->path, $content, FILE_APPEND);
@@ -160,6 +281,12 @@ class File
         return $this;
     }
 
+    /**
+     * Добавляет данные в начало файла (препендит).
+     *
+     * @param string $content Данные для добавления.
+     * @return self
+     */
     public function prepend(string $content): self
     {
         $existing = $this->exists() ? $this->content() : '';
@@ -167,6 +294,14 @@ class File
         return $this->put($content . $existing);
     }
 
+    /**
+     * Копирует файл в указанное место.
+     *
+     * @param string $destination Путь назначения.
+     * @return self Новый экземпляр File для скопированного файла.
+     *
+     * @throws FileException Если исходный файл не существует или не удалось скопировать.
+     */
     public function copy(string $destination): self
     {
         $this->ensureExists();
@@ -181,6 +316,14 @@ class File
         return new self($destination);
     }
 
+    /**
+     * Перемещает файл в указанное место.
+     *
+     * @param string $destination Путь назначения.
+     * @return self Тот же экземпляр с обновлённым путём.
+     *
+     * @throws FileException Если исходный файл не существует или не удалось переместить.
+     */
     public function move(string $destination): self
     {
         $this->ensureExists();
@@ -200,6 +343,12 @@ class File
         return $this;
     }
 
+    /**
+     * Переименовывает файл в той же директории.
+     *
+     * @param string $newName Новое имя файла.
+     * @return self
+     */
     public function rename(string $newName): self
     {
         $dir = $this->dirname();
@@ -207,6 +356,11 @@ class File
         return $this->move($dir . DIRECTORY_SEPARATOR . $newName);
     }
 
+    /**
+     * Удаляет файл.
+     *
+     * @return bool true если файл был удалён, false если файл не существовал.
+     */
     public function delete(): bool
     {
         if (!$this->exists()) {
@@ -216,16 +370,31 @@ class File
         return unlink($this->path);
     }
 
+    /**
+     * Проверяет, является ли файл изображением.
+     *
+     * @return bool
+     */
     public function isImage(): bool
     {
         return str_starts_with($this->mimeType(), 'image/');
     }
 
+    /**
+     * Проверяет, является ли файл текстовым.
+     *
+     * @return bool
+     */
     public function isText(): bool
     {
         return str_starts_with($this->mimeType(), 'text/');
     }
 
+    /**
+     * Проверяет, является ли файл архивом.
+     *
+     * @return bool
+     */
     public function isArchive(): bool
     {
         return in_array($this->mimeType(), [
@@ -237,16 +406,33 @@ class File
         ], true);
     }
 
+    /**
+     * Проверяет, является ли файл PDF-документом.
+     *
+     * @return bool
+     */
     public function isPdf(): bool
     {
         return $this->mimeType() === 'application/pdf';
     }
 
+    /**
+     * Читает файл построчно, пропуская пустые строки.
+     *
+     * @return string[]
+     */
     public function lines(): array
     {
         return file($this->path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
     }
 
+    /**
+     * Возвращает время последней модификации файла (Unix timestamp).
+     *
+     * @return int
+     *
+     * @throws FileException Если файл не существует.
+     */
     public function lastModified(): int
     {
         $this->ensureExists();
@@ -254,6 +440,13 @@ class File
         return filemtime($this->path);
     }
 
+    /**
+     * Возвращает права доступа к файлу в восьмеричном формате (например, 0644).
+     *
+     * @return string
+     *
+     * @throws FileException Если файл не существует.
+     */
     public function permissions(): string
     {
         $this->ensureExists();
@@ -261,6 +454,13 @@ class File
         return substr(sprintf('%o', fileperms($this->path)), -4);
     }
 
+    /**
+     * Возвращает UID владельца файла.
+     *
+     * @return int
+     *
+     * @throws FileException Если файл не существует.
+     */
     public function owner(): int
     {
         $this->ensureExists();
@@ -268,6 +468,13 @@ class File
         return fileowner($this->path);
     }
 
+    /**
+     * Возвращает GID группы файла.
+     *
+     * @return int
+     *
+     * @throws FileException Если файл не существует.
+     */
     public function group(): int
     {
         $this->ensureExists();
@@ -275,6 +482,11 @@ class File
         return filegroup($this->path);
     }
 
+    /**
+     * Преобразует информацию о файле в ассоциативный массив.
+     *
+     * @return array{path: string, name: string, filename: string, extension: string, dirname: string, size: int, size_formatted: string, mime_type: string, is_image: bool, is_text: bool, last_modified: int, permissions: string}
+     */
     public function toArray(): array
     {
         return [
@@ -293,11 +505,23 @@ class File
         ];
     }
 
+    /**
+     * Возвращает путь к файлу при строковом преобразовании.
+     *
+     * @return string
+     */
     public function __toString(): string
     {
         return $this->path;
     }
 
+    /**
+     * Проверяет существование файла и выбрасывает исключение, если его нет.
+     *
+     * @return void
+     *
+     * @throws FileException
+     */
     private function ensureExists(): void
     {
         if (!$this->exists()) {
@@ -305,6 +529,13 @@ class File
         }
     }
 
+    /**
+     * Проверяет доступность файла для чтения.
+     *
+     * @return void
+     *
+     * @throws FileException
+     */
     private function ensureReadable(): void
     {
         if (!$this->isReadable()) {
@@ -312,6 +543,14 @@ class File
         }
     }
 
+    /**
+     * Создаёт директорию, если она не существует.
+     *
+     * @param string $dir Путь к директории.
+     * @return void
+     *
+     * @throws FileException Если не удалось создать директорию.
+     */
     private function ensureDir(string $dir): void
     {
         if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
@@ -319,6 +558,12 @@ class File
         }
     }
 
+    /**
+     * Преобразует код ошибки загрузки в человекочитаемое сообщение.
+     *
+     * @param int $error Код ошибки UPLOAD_ERR_*.
+     * @return string
+     */
     private static function uploadErrorMessage(int $error): string
     {
         return match ($error) {
