@@ -9,11 +9,11 @@ class Error
     const STATUS_HTTP = HTTP::class;
     public static $events = [];
 
-    public static function setHttp($code, $massange = null)
+    public static function setHttp(int $code, ?string $massange = null): void
     {
-        http_response_code($code);
+        Header::status($code);
         if (key_exists($code, self::$events)) {
-            (new EssenceClass())->open(self::$events[$code], [$massange]);
+            (new Invoker())->call(self::$events[$code], $massange);
         }
     }
 }

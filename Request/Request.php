@@ -104,4 +104,49 @@ class Request
 
         return false;
     }
+
+    /**
+     * Возвращает путь запроса (URI без query-строки).
+     *
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    /**
+     * Возвращает значение заголовка запроса (регистронезависимо).
+     *
+     * @param  string $name Имя заголовка
+     * @return string|null
+     */
+    public function getHeader(string $name): ?string
+    {
+        $key = strtolower($name);
+        return $this->header[$key] ?? null;
+    }
+
+    /**
+     * Устанавливает параметр маршрута (из flexible- или wildcard-маршрутов).
+     *
+     * @param  string $name  Имя параметра
+     * @param  string $value Значение параметра
+     * @return void
+     */
+    public static function setParameter(string $name, string $value): void
+    {
+        self::$parametr[$name] = $value;
+    }
+
+    /**
+     * Возвращает параметр маршрута по имени.
+     *
+     * @param  string      $name Имя параметра
+     * @return string|null
+     */
+    public static function getParameter(string $name): ?string
+    {
+        return self::$parametr[$name] ?? null;
+    }
 }
