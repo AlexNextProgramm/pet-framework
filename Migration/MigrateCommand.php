@@ -43,42 +43,52 @@ class MigrateCommand extends Model
             $this->q(
                 "CREATE TABLE `migrate` (
                     `id` INT NOT NULL AUTO_INCREMENT ,
-                    `name` VARCHAR(500) NULL DEFAULT NULL , 
-                    `hash`  VARCHAR(500) NULL DEFAULT NULL , 
+                    `name` VARCHAR(500) NULL DEFAULT NULL ,
+                    `hash`  VARCHAR(500) NULL DEFAULT NULL ,
                     `cdate` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                     `sql_str`  TEXT NULL DEFAULT NULL,
-                    PRIMARY KEY (`id`)  
+                    PRIMARY KEY (`id`)
                     ) ENGINE = InnoDB;"
             );
-    }
+        }
 
         $cq = 0;
-        dirEach($this->DIR, callFile: function ($name) use (&$cq){
+        $files = scandir($this->DIR);
+        $files = array_values(array_filter($files, fn($f) => $f !== '.' && $f !== '..'));
+        sort($files);
+
+        foreach ($files as $name) {
             $query = file_get_contents($this->DIR . "/$name");
             if (empty($query)) {
                 Console::text("Пустой файл миграции", 'red');
+                continue;
             }
             $hash = md5($query);
-            if (empty($this->find(['hash' => "$hash"]))) {
-                $this->insert(['name' => "$name", 'hash' => "$hash"]);
-                foreach (explode(";", $query) as $q) {
-                    try {
-                        if (empty(trim($q))) {
-                            continue;
-                        }
-                        $Query = $this->q($q);
-                        if ($Query) {
-                            $Query->fetch();
-                            $this->set(['sql_str'=> $q]);
-                            Console::text(($cq + 1) . ") Выполнен: " . str_replace("\n", "", iconv_substr(trim($q), 0, 50, 'UTF-8')), Console::GREEN);
-                        }
-                    } catch (Error | Exception $e) {
-                        Console::text("Error: " . $e->getMessage(), Console::RED);
-                    }
-                    $cq++;
-                }
+            if (!empty($this->find(['hash' => "$hash"]))) {
+                continue;
             }
-        });
+
+            $migrateId = $this->create(['name' => "$name", 'hash' => "$hash"]);
+            if ($migrateId === false) {
+                Console::text("Ошибка вставки записи миграции", Console::RED);
+                continue;
+            }
+
+            foreach (explode(";", $query) as $q) {
+                try {
+                    if (empty(trim($q))) {
+                        continue;
+                    }
+                    $this->q($q);
+                    $this->set(['sql_str' => $q]);
+                    Console::text(($cq + 1) . ") Выполнен: " . str_replace("\n", "", iconv_substr(trim($q), 0, 50, 'UTF-8')), Console::GREEN);
+                } catch (Error | Exception $e) {
+                    Console::text("Error: " . $e->getMessage(), Console::RED);
+                }
+                $cq++;
+            }
+        }
+
         Console::text("=====================", Console::YELLOW);
         if ($cq == 0) {
             Console::text("Новых миграций нет", Console::YELLOW);
