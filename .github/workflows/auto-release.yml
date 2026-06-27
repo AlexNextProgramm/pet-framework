@@ -1,0 +1,47 @@
+name: Auto Release
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          # Получаем последний тег или начинаем с v0.0.0
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+
+      - name: Bump version
+        id: bump
+        run: |
+          LATEST_TAG="${{ steps.get_tag.outputs.latest_tag }}"
+          # Убираем 'v' если есть
+          VERSION=${LATEST_TAG#v}
+          # Разбиваем на части
+          MAJOR=$(echo $VERSION | cut -d. -f1)
+          MINOR=$(echo $VERSION | cut -d. -f2)
+          PATCH=$(echo $VERSION | cut -d. -f3)
+          # Увеличиваем patch
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="v$MAJOR.$MINOR.$NEW_PATCH"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create and push tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag ${{ steps.bump.outputs.new_version }}
+          git push origin ${{ steps.bump.outputs.new_version }}
