@@ -64,20 +64,29 @@ class Tools {
      * @param  array $array
      * @return string "index"|"gibrid"|"assos"
      */
-    static function is_assos(array $array):string
-     {
+    static function is_assos(array $array): string
+    {
         $keys = array_keys($array);
         $str = implode("", $keys);
-        if(is_numeric($str)) return 'index';
-        try{
-            if (@array_sum($keys) > 0 || @array_sum($keys) == 0 && key_exists('0', $array)) {
-                return "gibrid";
+        
+        if (is_numeric($str)) return 'index';
+        
+        $hasString = false;
+        $hasInt = false;
+        
+        foreach ($keys as $key) {
+            if (is_string($key)) {
+                $hasString = true;
             } else {
-                return 'assos';
+                $hasInt = true;
             }
-        }catch(Exception $e){
-            return 'assos';
         }
+        
+        if ($hasInt && $hasString) {
+            return 'gibrid';
+        }
+        
+        return 'assos';
     }
 
     /**
