@@ -239,7 +239,7 @@ trait Select
 
     private function conditions($str, $conds): void
     {
-        if ($this->SUB = "WHERE") {
+        if ($this->SUB == "WHERE") {
             $this->strWhere .= " $conds $str";
         }
     }

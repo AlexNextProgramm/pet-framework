@@ -110,7 +110,7 @@ abstract class DB
     private function conn()
     {
         try {
-            $this->DB = new PDO("{$this->db_type}:host={$this->db_host}:{$this->db_port};dbname={$this->db_name}", $this->db_user, $this->db_password);
+            $this->DB = new PDO("{$this->db_type}:host={$this->db_host};port={$this->db_port};dbname={$this->db_name}", $this->db_user, $this->db_password);
         } catch (\PDOException $e) {
             throw new AppException($e->errorInfo[2], $e->errorInfo[1]);
         }

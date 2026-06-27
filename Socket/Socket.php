@@ -29,8 +29,8 @@ abstract class Socket {
 
 
     abstract public function evConnect(ResorceSocket $resource): void;
-    abstract public function evDisconnect(ResorceSocket $resource): void;
-    abstract public function evData(ResorceSocket $resource): void;
+    abstract public function evDisconnect(ResorceSocket $resource, mixed $info = null): void;
+    abstract public function evData(ResorceSocket $resource, mixed $data = null): void;
     abstract public function evError(string $resource): void;
 
 

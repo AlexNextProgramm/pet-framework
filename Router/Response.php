@@ -24,7 +24,7 @@ class Response
     {
 
         if ($path == request()->path) {
-            Error::setHttp(Error::STATUS_HTTP::FATAL, "redirect to itself is prohibited");
+            Error::setHttp(HTTP::FATAL, "redirect to itself is prohibited");
             throw new AppException("redirect to itself is prohibited", E_ERROR);
         } else {
             header("Location: $path");

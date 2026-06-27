@@ -46,6 +46,7 @@ class Command {
                 break;
             case "make:model":
                 (new MakeModel($comm[2] ?? null));
+                break;
             case "info":
                 $this->info(); 
                 break;

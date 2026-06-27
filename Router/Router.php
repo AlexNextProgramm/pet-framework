@@ -105,9 +105,9 @@ class Router extends Middleware
                 }
             }
             if (!empty($controller)) {
+                header('Content-Type: application/json; charset=utf-8');
                 echo json_encode(count($controller) == 1 ? $controller[0] : $controller, JSON_UNESCAPED_UNICODE);
             }
-            $control = true;
             $control = true;
         }
 
