@@ -8,19 +8,46 @@ use Exception;
 use PDOException;
 use PDOStatement;
 use Pet\Command\Console\Console;
+use Pet\DataBase\Config\DataBase;
 use Pet\Errors\AppException;
 use Pet\Tools\Tools;
 
 abstract class DB
 {
+    /**
+     * @var string Имя подключения к БД (для мульти-БД)
+     */
+    protected string $connectionName = 'default';
 
-    private string $db_type = DB_TYPE;
-    private string $db_host = DB_HOST;
-    protected string $db_name = DB_NAME;
-    private string|int $db_port = DB_PORT;
-    private string $db_user = DB_USER;
-    private string $db_password = DB_PASSWORD;
+    /**
+     * @var string|null Тип БД (mysql, pgsql, sqlite) — определяется из конфига
+     */
+    protected ?string $db_type = null;
 
+    /**
+     * @var string|null Хост
+     */
+    protected ?string $db_host = null;
+
+    /**
+     * @var string Имя БД
+     */
+    protected string $db_name = '';
+
+    /**
+     * @var string|int|null Порт
+     */
+    protected string|int|null $db_port = null;
+
+    /**
+     * @var string|null Пользователь
+     */
+    protected ?string $db_user = null;
+
+    /**
+     * @var string|null Пароль
+     */
+    protected ?string $db_password = null;
 
     protected string $strQuery = "";
     protected string $strWhere = "";
@@ -40,18 +67,59 @@ abstract class DB
     protected $error = [];
     private PDO|null $DB = null;
 
-    protected function pdo() {
+    /**
+     * Устанавливает имя подключения к БД.
+     * Позволяет переключаться между разными базами данных.
+     *
+     * @param string $name Имя подключения из конфига
+     * @return static
+     */
+    public function setConnection(string $name): static
+    {
+        $this->connectionName = $name;
+        $this->DB = null; // Сбросим PDO, чтобы переподключиться
+        return $this;
+    }
+
+    /**
+     * Возвращает имя текущего подключения.
+     *
+     * @return string
+     */
+    public function getConnectionName(): string
+    {
+        return $this->connectionName;
+    }
+
+    protected function pdo(): PDO
+    {
+        if ($this->DB === null) {
+            $this->DB = ConnectionManager::connection($this->connectionName);
+            // Синхронизируем свойства с конфигом
+            $config = DataBase::get($this->connectionName);
+            $this->db_type = $config['type'];
+            $this->db_host = $config['host'];
+            $this->db_name = $config['name'];
+            $this->db_port = $config['port'];
+            $this->db_user = $config['user'];
+            $this->db_password = $config['password'];
+        }
         return $this->DB;
     }
+
     /**
      * __construct
      *
-     * @param array|int|string $id
+     * @param array|int|string|null $id
+     * @param string|null $connectionName Имя подключения (для мульти-БД)
      * @return void
      */
-    public function __construct(array|int|string|null $id = null)
+    public function __construct(array|int|string|null $id = null, ?string $connectionName = null)
     {
-        $this->conn();
+        if ($connectionName !== null) {
+            $this->setConnection($connectionName);
+        }
+        $this->pdo(); // Инициализация подключения
         $this->setInfoId($id);
     }
 
@@ -71,20 +139,20 @@ abstract class DB
                 return $this->q($query)->fetch(PDO::FETCH_ASSOC) ?: [];
             }
         } catch (PDOException|Exception $q) {
-            $this->error[] = $q->errorInfo;
-            throw new AppException($q->errorInfo[2], $q->errorInfo[1]);
+            $this->error[] = $q->errorInfo ?? $q->getMessage();
+            throw new AppException($q->errorInfo[2] ?? $q->getMessage(), $q->errorInfo[1] ?? $q->getCode());
             return [];
         }
     }
 
     public function toString(): string
     {
-        return $this->strQuery . $this->strJoin . $this->strWhere . $this->strGroups . $this->strOrders.$this->strLimit. $this->strOffset;
+        return $this->strQuery . $this->strJoin . $this->strWhere . $this->strGroups . $this->strOrders . $this->strLimit . $this->strOffset;
     }
 
-    private function clearQuery():void
+    private function clearQuery(): void
     {
-        $this->strQuery = $this->strJoin = $this->strWhere =  $this->strGroups = $this->strOrders = $this->strOffset = $this->strLimit = '';
+        $this->strQuery = $this->strJoin = $this->strWhere = $this->strGroups = $this->strOrders = $this->strOffset = $this->strLimit = '';
     }
 
      /**
@@ -95,25 +163,25 @@ abstract class DB
     public function execute(): bool
     {
         try {
-
             $query = $this->toString();
             $this->clearQuery();
-            return $this->DB->prepare($query)->execute();
+            return $this->pdo()->prepare($query)->execute();
         } catch (PDOException $q) {
             $this->error[] = $q->errorInfo;
-            throw new AppException($q->errorInfo[2], $q->errorInfo[1]);
+            throw new AppException($q->errorInfo[2] ?? $q->getMessage(), $q->errorInfo[1] ?? $q->getCode());
             return false;
         }
     }
 
-
-    private function conn()
+    /**
+     * conn — больше не используется напрямую.
+     * Подключение управляется через ConnectionManager::connection()
+     *
+     * @deprecated Используйте $this->pdo()
+     */
+    private function conn(): void
     {
-        try {
-            $this->DB = new PDO("{$this->db_type}:host={$this->db_host};port={$this->db_port};dbname={$this->db_name}", $this->db_user, $this->db_password);
-        } catch (\PDOException $e) {
-            throw new AppException($e->errorInfo[2], $e->errorInfo[1]);
-        }
+        $this->pdo();
     }
 
     /**
@@ -122,13 +190,16 @@ abstract class DB
      * @param  mixed $from
      * @return string
      */
-    public function FromTable(string $from = "FROM"):string
+    public function FromTable(string $from = "FROM"): string
     {
-       return " $from `{$this->table}` ".($this->tableAlias? " AS {$this->tableAlias} ": "");
+       return " $from `{$this->table}` ".($this->tableAlias ? " AS {$this->tableAlias} " : "");
     }
-    public function getTableName() {
+
+    public function getTableName(): string
+    {
         return $this->table;
     }
+
     /**
      * q
      *
@@ -137,10 +208,11 @@ abstract class DB
      */
     public function q(string $query): PDOStatement
     {
-        if (!$this->DB) {
+        $pdo = $this->pdo();
+        if (!$pdo) {
             throw new AppException('NO CONNECT DB');
         }
-        return $this->DB->query($query, PDO::FETCH_ASSOC);
+        return $pdo->query($query, PDO::FETCH_ASSOC);
     }
 
     /**
@@ -166,11 +238,11 @@ abstract class DB
             $query = "SELECT * FROM {$this->table} WHERE $data LIMIT 2;";
             $pdoStatment =  $this->q($query);
         }
-        $result = $pdoStatment ? $pdoStatment->fetchAll(PDO::FETCH_ASSOC):[];
+        $result = $pdoStatment ? $pdoStatment->fetchAll(PDO::FETCH_ASSOC) : [];
         if (count($result) > 1) {
             throw new AppException('Модель не может присвоить множество ваш запрос получает более 2 строк ' . $query);
         }
-        $this->info = count($result) == 1 ? $result[0] : []; // не должно в этом условии быть множества
+        $this->info = count($result) == 1 ? $result[0] : [];
     }
 
     /**
@@ -199,11 +271,9 @@ abstract class DB
 
     public function arrayQuote(&$array): void
     {
-        if (!$this->DB) {
-            $this->conn();
-        }
+        $pdo = $this->pdo();
         foreach ($array as $i => $v) {
-            $array[$i] = $this->DB->quote($v);
+            $array[$i] = $pdo->quote($v);
         }
     }
 
@@ -211,8 +281,69 @@ abstract class DB
     {
         return $this->error[array_key_last($this->error)] ?? null;
     }
+
     public function getInfo(): array
     {
         return $this->info ?? [];
+    }
+
+    /**
+     * Возвращает lastInsertId от текущего PDO-подключения.
+     *
+     * @return string
+     */
+    public function lastInsertId(): string
+    {
+        return $this->pdo()->lastInsertId();
+    }
+
+    /**
+     * Возвращает имя текущей БД.
+     *
+     * @return string
+     */
+    public function getDbName(): string
+    {
+        return ConnectionManager::getDbName($this->connectionName);
+    }
+
+    /**
+     * Начинает транзакцию.
+     *
+     * @return bool
+     */
+    public function beginTransaction(): bool
+    {
+        return $this->pdo()->beginTransaction();
+    }
+
+    /**
+     * Подтверждает транзакцию.
+     *
+     * @return bool
+     */
+    public function commit(): bool
+    {
+        return $this->pdo()->commit();
+    }
+
+    /**
+     * Откатывает транзакцию.
+     *
+     * @return bool
+     */
+    public function rollback(): bool
+    {
+        return $this->pdo()->rollBack();
+    }
+
+    /**
+     * Проверяет, активна ли транзакция.
+     *
+     * @return bool
+     */
+    public function inTransaction(): bool
+    {
+        return $this->pdo()->inTransaction();
     }
 }
