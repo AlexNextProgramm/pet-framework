@@ -31,7 +31,7 @@ abstract class Model extends DB
      */
     public function __get(string $name): mixed
     {
-        return $this->info[$name];
+        return $this->info[$name] ?? null;
     }
 
     /**

@@ -27,7 +27,10 @@ class Response
             Error::setHttp(HTTP::FATAL, "redirect to itself is prohibited");
             throw new AppException("redirect to itself is prohibited", E_ERROR);
         } else {
-            header("Location: $path");
+            if (!headers_sent()) {
+                ob_clean();
+                header("Location: $path");
+            }
         }
     }
 
@@ -40,22 +43,23 @@ class Response
         if (gettype($data) == 'string') {
             echo $data;
         } else {
-            if (self::$type == self::TYPE_JSON) {
+            if (self::$type == self::TYPE_JSON && !headers_sent()) {
                 header(self::$type);
-                echo json_encode($data, JSON_UNESCAPED_UNICODE);
             }
+            echo json_encode($data, JSON_UNESCAPED_UNICODE);
         }
     }
 
     public static function die($data)
     {
+        ob_clean();
         if (gettype($data) == 'string') {
             die($data);
         } else {
-            if (self::$type == self::TYPE_JSON) {
+            if (self::$type == self::TYPE_JSON && !headers_sent()) {
                 header(self::$type);
-                die(json_encode($data, JSON_UNESCAPED_UNICODE));
             }
+            die(json_encode($data, JSON_UNESCAPED_UNICODE));
         }
     }
     public static function set($responseHeader): void

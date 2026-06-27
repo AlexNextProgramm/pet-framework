@@ -61,6 +61,7 @@ class Router extends Middleware
 
     public static function init()
     {
+        ob_start();
 
         $request = request();
         $control = false;
@@ -105,7 +106,9 @@ class Router extends Middleware
                 }
             }
             if (!empty($controller)) {
-                header('Content-Type: application/json; charset=utf-8');
+                if (!headers_sent()) {
+                    header('Content-Type: application/json; charset=utf-8');
+                }
                 echo json_encode(count($controller) == 1 ? $controller[0] : $controller, JSON_UNESCAPED_UNICODE);
             }
             $control = true;
@@ -113,6 +116,8 @@ class Router extends Middleware
 
         // Если по итогу роутер не найден
         if (!$control) http_response_code('404');
+
+        ob_end_flush();
     }
 
     private static function ajax($request, &$result) : bool
