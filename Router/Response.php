@@ -55,6 +55,12 @@ class Response
         die($data);
     }
 
+    public static function text(string $data, $code = HTTP::SUCCESS) {
+        Header::status($code);
+        !Header::sent() ? Header::html() : '';
+        die($data);
+    }
+
     public static function svg(string $data, $code = HTTP::SUCCESS) {
         Header::type(Header::SVG);
         die($data);
