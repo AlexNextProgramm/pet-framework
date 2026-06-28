@@ -61,6 +61,13 @@ abstract class DB
 
     protected $info = [];
 
+    /**
+     * @var bool Флаг проверки на множественный результат.
+     * Если false (по умолчанию) — при нахождении нескольких строк берётся первая.
+     * Если true — выбрасывается исключение, если найдено более 1 строки.
+     */
+    protected bool $allowMultiple = false;
+
     protected string $table = "";
     protected string|false $tableAlias = false;
     protected $column = [];
@@ -240,7 +247,12 @@ abstract class DB
         }
         $result = $pdoStatment ? $pdoStatment->fetchAll(PDO::FETCH_ASSOC) : [];
         if (count($result) > 1) {
-            throw new AppException('Модель не может присвоить множество ваш запрос получает более 2 строк ' . $query);
+            if ($this->allowMultiple) {
+                throw new AppException('Модель не может присвоить множество ваш запрос получает более 2 строк ' . $query);
+            }
+            // По умолчанию берём первую запись
+            $this->info = $result[0];
+            return;
         }
         $this->info = count($result) == 1 ? $result[0] : [];
     }

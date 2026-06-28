@@ -16,6 +16,13 @@ abstract class Model extends DB
     public array $hidden = [];
 
     /**
+     * @var bool Флаг проверки на множественный результат при загрузке модели.
+     * Если false (по умолчанию) — при нахождении нескольких строк берётся первая.
+     * Если true — выбрасывается исключение, если найдено более 1 строки.
+     */
+    protected bool $allowMultiple = false;
+
+    /**
      * @var string|null Имя подключения к БД для этой модели
      */
     protected static ?string $connection = null;
