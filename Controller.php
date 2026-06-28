@@ -7,6 +7,7 @@ use Pet\View\View;
 use Pet\Session\Session;
 use Pet\Errors\AppException;
 use Pet\Router\Header;
+use Pet\Router\Response;
 
 abstract class Controller
 {
@@ -37,10 +38,7 @@ abstract class Controller
      */
     protected function json(mixed $data, int $code = 200): void
     {
-        Header::status($code);
-        Header::json();
-        echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        exit;
+       Response::json();
     }
 
     /**

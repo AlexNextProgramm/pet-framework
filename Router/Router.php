@@ -501,8 +501,7 @@ class Router extends Middleware
 
             if ($headerValue !== null && $headerValue !== '') {
                 $result = (new Invoker())->call($action, $request);
-                Response::die($result);
-                // Response::die() завершает выполнение
+                Response::json($result);
             }
         }
 

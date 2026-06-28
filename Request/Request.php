@@ -4,6 +4,8 @@ namespace Pet\Request;
 
 use Pet\File\File;
 use Pet\File\FileCollection;
+use Pet\Router\Header;
+use Pet\Router\HTTP;
 use Pet\Tools\Tools;
 
 class Request
@@ -198,4 +200,5 @@ class Request
     {
         return self::$parametr[$name] ?? null;
     }
+
 }

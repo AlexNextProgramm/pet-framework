@@ -9,7 +9,6 @@ use Pet\Tools\Tools;
 
 class Response
 {
-    private static string $type = Header::HTML;
 
     public function __construct(int $status = 200){
         Header::status($status);
@@ -39,31 +38,25 @@ class Response
 
     public static function echo(mixed $data): void
     {
-        if (gettype($data) == 'string') {
-            echo $data;
-        } else {
-            if (self::$type === Header::JSON && !Header::sent()) {
-                Header::json();
-            }
-            echo json_encode($data, JSON_UNESCAPED_UNICODE);
-        }
+        !Header::sent()? Header::type(Header::HTML) : '';
+        echo $data;
     }
 
-    public static function die(mixed $data): never
+    public static function json(array|object $data, $code = HTTP::SUCCESS):void
     {
-        ob_clean();
-        if (gettype($data) == 'string') {
-            die($data);
-        } else {
-            if (self::$type === Header::JSON && !Header::sent()) {
-                Header::json();
-            }
-            die(json_encode($data, JSON_UNESCAPED_UNICODE));
-        }
+        Header::status($code);
+        !Header::sent() ? Header::json() : '';
+        die(json_encode($data, JSON_UNESCAPED_UNICODE));
     }
 
-    public static function set(string $responseHeader): void
-    {
-        self::$type = $responseHeader;
+    public static function html(string $data, $code = HTTP::SUCCESS) {
+        Header::status($code);
+        !Header::sent() ? Header::html() : '';
+        die($data);
+    }
+
+    public static function svg(string $data, $code = HTTP::SUCCESS) {
+        Header::type(Header::SVG);
+        die($data);
     }
 }
