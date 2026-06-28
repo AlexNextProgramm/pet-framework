@@ -65,7 +65,10 @@ class Invoker
         }
 
         // Статический вызов: [ClassName::class, 'method']
-        if (is_string($class) && $method !== null && is_callable([$class, $method], true)) {
+        if (is_string($class) && $method !== null
+            && is_callable([$class, $method], true)
+            && (new \ReflectionMethod($class, $method))->isStatic()
+        ) {
             return [$class, $method](...$args);
         }
 
