@@ -3,21 +3,23 @@
 namespace Pet\Errors;
 
 use Exception;
+use Throwable;
 
+/**
+ * AppException — базовое исключение фреймворка PET.
+ *
+ * Используется во всех компонентах для единообразной обработки ошибок.
+ * Наследует родительский {@see Exception}, код ошибки хранится в родительском свойстве `code`.
+ */
 class AppException extends Exception
 {
-    // Дополнительные свойства
-    protected $errorCode;
-    // Конструктор
-    public function __construct($message = "", $code = 0, Exception $previous = null)
+    /**
+     * @param string         $message  Сообщение об ошибке
+     * @param int            $code     Код ошибки (по умолчанию 0)
+     * @param Throwable|null $previous Предыдущее исключение
+     */
+    public function __construct(string $message = '', int $code = 0, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
-        $this->errorCode = $code; // Сохранение кода ошибки
-    }
-
-    // Метод для получения кода ошибки
-    public function getErrorCode()
-    {
-        return $this->errorCode;
     }
 }
