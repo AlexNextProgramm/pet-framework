@@ -48,6 +48,12 @@ class Command {
             case "make:model":
                 new MakeModel($argument);
                 break;
+            case "list:model":
+                $this->listModels();
+                break;
+            case "list:controller":
+                $this->listControllers();
+                break;
             case "info":
                 $this->info();
                 break;
@@ -70,7 +76,7 @@ class Command {
     {
         $host = URLDEV;
         $hostName = str_replace(['https://', 'http://'], '', $host);
-        Console::text("Web: $host", "green");
+        Console::link($host, $host, 'green');
         exec("php -S $hostName -t \"{$this->NAME_DIR_PROJECT}/\"");
     }
 
@@ -168,5 +174,214 @@ APP="App"
         } else {
             Console::text("Ошибка: не удалось создать файл .env", Console::RED);
         }
+    }
+
+    /**
+     * Определяет путь к поддиректории приложения (Model, Controller и т.д.)
+     *
+     * @param string $subDir Имя поддиректории (например, 'Model', 'Controller')
+     * @return string|null Полный путь или null, если не найдена
+     */
+    private function resolveAppDir(string $subDir): ?string
+    {
+        $possibleDirs = [];
+
+        // Вариант 1: ROOT . DS . PUBLIC_DIR . DS . APP (как в MakeModel)
+        $possibleDirs[] = ROOT . DS . PUBLIC_DIR . DS . APP . DS . $subDir;
+
+        // Вариант 2: если PUBLIC_DIR уже абсолютный (содержит [ROOT])
+        if (str_starts_with(PUBLIC_DIR, DS)) {
+            $possibleDirs[] = PUBLIC_DIR . DS . APP . DS . $subDir;
+        }
+
+        // Вариант 3: если APP уже содержит полный путь
+        if (str_starts_with(APP, DS)) {
+            $possibleDirs[] = APP . DS . $subDir;
+        }
+
+        foreach ($possibleDirs as $dir) {
+            if (is_dir($dir)) {
+                return $dir;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Вывод списка моделей приложения
+     *
+     * Сканирует директорию APP/Model/ и выводит таблицу с именами моделей,
+     * соответствующими таблицами БД и файлами.
+     *
+     * @return void
+     */
+    private function listModels(): void
+    {
+        $modelDir = $this->resolveAppDir('Model');
+
+        if ($modelDir === null) {
+            Console::text("Директория моделей не найдена.", Console::RED);
+            Console::text("Проверьте пути: PUBLIC_DIR=" . PUBLIC_DIR . ", APP=" . APP, Console::YELLOW);
+            return;
+        }
+
+        $files = scandir($modelDir);
+        $models = [];
+
+        foreach ($files as $file) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            $path = $modelDir . DS . $file;
+
+            if (!is_file($path) || pathinfo($file, PATHINFO_EXTENSION) !== 'php') {
+                continue;
+            }
+
+            $className = pathinfo($file, PATHINFO_FILENAME);
+
+            // Пытаемся получить таблицу из свойства модели через отражение
+            $table = '—';
+            $fullClass = APP . '\\Model\\' . $className;
+
+            if (class_exists($fullClass) && is_subclass_of($fullClass, \Pet\Model\Model::class)) {
+                try {
+                    $ref = new \ReflectionClass($fullClass);
+                    if ($ref->hasProperty('table')) {
+                        $prop = $ref->getProperty('table');
+                        $prop->setAccessible(true);
+                        $instance = $ref->newInstanceWithoutConstructor();
+                        $tableValue = $prop->getValue($instance);
+                        if (!empty($tableValue)) {
+                            $table = $tableValue;
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    $table = '?';
+                }
+            }
+
+            $models[] = [
+                'Модель' => $className,
+                'Таблица' => $table,
+                'Файл' => $file,
+            ];
+        }
+
+        if (empty($models)) {
+            Console::text("Модели не найдены в: $modelDir", Console::YELLOW);
+            return;
+        }
+
+        Console::header('Список моделей', 'cyan', 60);
+        Console::newLine();
+        Console::table($models, ['Модель', 'Таблица', 'Файл'], 'cyan');
+        Console::newLine();
+        Console::text("Всего моделей: " . count($models), 'green');
+    }
+
+    /**
+     * Извлекает имена публичных методов из PHP-файла без его выполнения.
+     *
+     @param string $filePath Полный путь к файлу
+     @return array Список имён методов
+     */
+    private function extractPublicMethods(string $filePath): array
+    {
+        $methods = [];
+        $content = file_get_contents($filePath);
+
+        if ($content === false) {
+            return $methods;
+        }
+
+        // Удаляем многострочные комментарии
+        $content = preg_replace('/\/\*.*?\*\//s', '', $content);
+        // Удаляем однострочные комментарии
+        $content = preg_replace('/\/\/.*/', '', $content);
+
+        // Ищем публичные методы: public [static] function methodName(
+        preg_match_all(
+            '/public\s+(?:static\s+)?function\s+(\w+)\s*\(/',
+            $content,
+            $matches
+        );
+
+        if (!empty($matches[1])) {
+            // Список методов базового контроллера, которые не являются экшенами
+            $parentMethods = [
+                'json', 'redirect', 'back', 'withInput', 'withErrors',
+                'render', 'renderPartial', 'callMiddleware', 'middleware',
+                'saveFile', 'saveUploadedFile', 'deleteFile',
+                'setData', 'getData', 'isPost', 'isAjax',
+                'csrf_token', 'validateCsrf', 'cacheResponse', 'noCache',
+            ];
+
+            foreach ($matches[1] as $method) {
+                if (!in_array($method, $parentMethods, true)) {
+                    $methods[] = $method;
+                }
+            }
+        }
+
+        return $methods;
+    }
+
+    /**
+     * Вывод списка контроллеров приложения
+     *
+     * Сканирует директорию APP/Controller/ и выводит таблицу с именами контроллеров,
+     * списком экшенов (публичных методов) и файлами.
+     *
+     * @return void
+     */
+    private function listControllers(): void
+    {
+        $controllerDir = $this->resolveAppDir('Controller');
+
+        if ($controllerDir === null) {
+            Console::text("Директория контроллеров не найдена.", Console::RED);
+            Console::text("Проверьте пути: PUBLIC_DIR=" . PUBLIC_DIR . ", APP=" . APP, Console::YELLOW);
+            return;
+        }
+
+        $files = scandir($controllerDir);
+        $controllers = [];
+
+        foreach ($files as $file) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            $path = $controllerDir . DS . $file;
+
+            if (!is_file($path) || pathinfo($file, PATHINFO_EXTENSION) !== 'php') {
+                continue;
+            }
+
+            $className = pathinfo($file, PATHINFO_FILENAME);
+
+            // Извлекаем экшены через парсинг файла (без загрузки класса)
+            $actions = $this->extractPublicMethods($path);
+
+            $controllers[] = [
+                'Контроллер' => $className,
+                'Экшены' => !empty($actions) ? implode(', ', $actions) : '—',
+                'Файл' => $file,
+            ];
+        }
+
+        if (empty($controllers)) {
+            Console::text("Контроллеры не найдены в: $controllerDir", Console::YELLOW);
+            return;
+        }
+
+        Console::header('Список контроллеров', 'violet', 60);
+        Console::newLine();
+        Console::table($controllers, ['Контроллер', 'Экшены', 'Файл'], 'violet');
+        Console::newLine();
+        Console::text("Всего контроллеров: " . count($controllers), 'green');
     }
 }

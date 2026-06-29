@@ -5,6 +5,7 @@ use Pet\File\FileCollection;
 use Pet\Request\Request;
 use Pet\Territory;
 use Pet\View\View;
+use Pet\View\Blade;
 
 /**
  * view
@@ -91,6 +92,21 @@ function levels(): array
 function original(): string
 {
     return Request::$original;
+}
+
+/**
+ * blade
+ *
+ * Рендеринг Blade-шаблона с возвратом HTML.
+ * Аналог view(), но для .blade.php шаблонов.
+ *
+ * @param  string $name Имя шаблона (с точками: user.profile)
+ * @param  array  $data Параметры для шаблона
+ * @return string HTML
+ */
+function blade(string $name, array $data = []): string
+{
+    return Blade::render($name, $data);
 }
 
 ?>

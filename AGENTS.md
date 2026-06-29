@@ -57,14 +57,17 @@
 | **Базовый контроллер** | [`Controller.php`](Controller.php) — абстрактный класс `Pet\Controller` |
 | **Маршруты приложения** | Файлы с вызовами `Router::get()`, `Router::post()` и т.д. в корне проекта (обычно `routes.php`) |
 | **Модели** | Классы, наследующие [`Pet\Model\Model`](Model/Model.php) в папке приложения |
+| **Генерация моделей** | [`Model/MakeModel.php`](Model/MakeModel.php) — генерация через Blade-шаблон [`blade/Model.blade.php`](blade/Model.blade.php) |
 | **Конфигурация БД** | Файл `.env` в корне проекта + [`DataBase/Config/DataBase.php`](DataBase/Config/DataBase.php) |
 | **Миграции** | SQL-файлы в папке `migrate/` (или указанной в `MIGRATE_DIR`) |
 | **Шаблоны** | PHP-файлы в папке `view/` (или указанной в `VIEW_DIR`) |
+| **Blade-шаблоны** | [`View/Blade.php`](View/Blade.php) — API для рендеринга, [`View/BladeCompiler.php`](View/BladeCompiler.php) — компиляция `.blade.php` в PHP |
 | **Глобальные функции** | [`function.php`](function.php) и [`chain/chain.php`](chain/chain.php) |
 | **WebSocket-сервер** | Классы, наследующие [`Pet\Socket\Socket`](Socket/Socket.php) |
 | **Middleware** | Классы, наследующие [`Pet\Router\Middleware`](Router/Middleware.php) |
 | **Файловая библиотека** | Всё пространство имён [`Pet\File\*`](File/) |
 | **Консольные команды** | [`Command/Command.php`](Command/Command.php) — регистрация и обработка |
+| **Console API** | [`Command/Console/Console.php`](Command/Console/Console.php) — цветной вывод, таблицы, прогресс-бары, гиперссылки |
 | **Обработка ошибок** | [`Errors/Errors.php`](Errors/Errors.php) и [`Errors/AppException.php`](Errors/AppException.php) |
 | **HTTP-запросы** | [`Request/Request.php`](Request/Request.php) |
 | **Cookie / Сессии** | [`Cookie/Cookie.php`](Cookie/Cookie.php) и [`Session/Session.php`](Session/Session.php) |
@@ -87,6 +90,12 @@
 | `supple('` | Извлечение параметров из URL |
 | `attrs()` | Получение всех входных данных |
 | `view(` | Вызов шаблона |
+| `Blade::render(` | Рендеринг Blade-шаблона |
+| `BladeCompiler::compile(` | Компиляция Blade-синтаксиса |
+| `Console::text(` | Цветной вывод в консоль |
+| `Console::table(` | Вывод таблицы в консоль |
+| `Console::link(` | Кликабельная гиперссылка в терминале |
+| `MakeModel::` / `new MakeModel(` | Генерация модели |
 | `Response::` | Формирование HTTP-ответов |
 | `Error::setHttp(` | Обработка HTTP-ошибок |
 | `Session::` / `Cookie::` | Работа с сессиями и куки |
@@ -119,9 +128,13 @@
 | ORM / Модели | [`Pet\Model\Model`](Model/Model.php) | Active Record с traits [`Select`](DataBase/Select.php), [`Insert`](DataBase/Insert.php), [`Update`](DataBase/Update.php), [`Delete`](DataBase/Delete.php) |
 | БД (PDO) | [`Pet\DataBase\DB`](DataBase/DB.php) | Базовый класс подключения через PDO, транзакции, мульти-БД |
 | Шаблонизатор | [`Pet\View\View`](View/View.php) | Отображение шаблонов с XSS-экранированием |
+| Blade-шаблоны | [`Pet\View\Blade`](View/Blade.php) | Laravel-подобный шаблонизатор: секции, стеки, компоненты, макеты |
+| Blade-компилятор | [`Pet\View\BladeCompiler`](View/BladeCompiler.php) | Компиляция `.blade.php` в PHP: `{{ }}`, `@if`, `@foreach`, `@section`, `@extends` и 50+ директив |
 | WebSocket | [`Pet\Socket\Socket`](Socket/Socket.php) | Нативный WebSocket-сервер на PHP-сокетах |
 | Миграции | [`Pet\Migration`](Migration/) | SQL-миграции с отслеживанием по хешу |
-| Консоль | [`Pet\Command\Command`](Command/Command.php) | CLI-команды: serve, migrate, socket, make:model, git-monitor, ftp-load |
+| Консоль | [`Pet\Command\Command`](Command/Command.php) | CLI-команды: serve, migrate, socket, make:model, git-monitor, ftp-load, list:model, list:controller, env |
+| Console API | [`Pet\Command\Console\Console`](Command/Console/Console.php) | Цветной вывод, таблицы, прогресс-бары, гиперссылки (OSC 8), ввод, подтверждения |
+| Генерация моделей | [`Pet\Model\MakeModel`](Model/MakeModel.php) | Генерация модели через Blade-шаблон [`blade/Model.blade.php`](blade/Model.blade.php) |
 | Запросы | [`Pet\Request\Request`](Request/Request.php) | HTTP-запросы: input, files, headers, IP, path |
 | Cookie | [`Pet\Cookie\Cookie`](Cookie/Cookie.php) | Работа с куки (set, get, httpOnly, delete) |
 | Сессии | [`Pet\Session\Session`](Session/Session.php) | Работа с сессиями (set, get, kill) |
@@ -131,7 +144,7 @@
 | Файлы | [`Pet\File\*`](File/) | Полная файловая библиотека: [`File`](File/File.php), [`FileCollection`](File/FileCollection.php), [`FileManager`](File/FileManager.php), [`Storage`](File/Storage.php), [`Image`](File/Image.php), [`MimeTypeDetector`](File/MimeTypeDetector.php) |
 | Модули | [`Pet\Module\*`](Module/) | Интеграции: [`PlusOfon`](Module/PlusOfon.php) (SMS), [`Imap`](Module/Imap.php) (почта) |
 | Утилиты | [`Pet\Tools\Tools`](Tools/Tools.php) | JSON decode, array_implode, filter, scan и др. |
-| Глобальные функции | [`function.php`](function.php), [`chain/chain.php`](chain/chain.php) | `dd()`, `env()`, `view()`, `attr()`, `attrs()`, `request()`, `files()`, `supple()`, `levels()`, `original()`, `svg()`, `img()`, `uploads()`, `dirEach()` |
+| Глобальные функции | [`function.php`](function.php), [`chain/chain.php`](chain/chain.php) | `dd()`, `env()`, `view()`, `blade()`, `attr()`, `attrs()`, `request()`, `files()`, `supple()`, `levels()`, `original()`, `svg()`, `img()`, `uploads()`, `dirEach()` |
 
 ---
 

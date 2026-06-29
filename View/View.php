@@ -8,20 +8,40 @@ class View
 {
     const DIR_VIEW = VIEW_DIR;
     private static $argument = [];
+
     /**
      * open
-     * @param  string $viewName
-     * @param  array $argument
+     *
+     * Открывает и отображает view-файл.
+     * Поддерживает как обычные .php, так и .blade.php шаблоны.
+     * Для Blade-шаблонов использует BladeCompiler и Blade.
+     *
+     * @param  string $viewName Имя шаблона (с точками: user.profile)
+     * @param  array  $argument Параметры для шаблона
      * @return void
      */
     public static function open(string $viewName, array $argument = []): void {
-        $viewName = implode(DS, explode(".", $viewName)) . ".php";
         if (!is_dir(self::DIR_VIEW)) {
             throw new AppException("not directory view", E_ERROR);
         }
-        if (!file_exists(self::DIR_VIEW . DS . $viewName)) {
-            throw new AppException("Not file in class view", E_ERROR);
+
+        // Определяем путь к файлу
+        $viewPath = implode(DS, explode(".", $viewName));
+
+        // Проверяем .blade.php
+        $bladePath = self::DIR_VIEW . DS . $viewPath . '.blade.php';
+        if (file_exists($bladePath)) {
+            // Рендерим Blade-шаблон
+            echo Blade::render($viewName, $argument);
+            return;
         }
+
+        // Проверяем .php
+        $phpPath = self::DIR_VIEW . DS . $viewPath . '.php';
+        if (!file_exists($phpPath)) {
+            throw new AppException("Not file in class view: " . $phpPath, E_ERROR);
+        }
+
         self::$argument = array_merge(self::$argument, $argument);
         foreach (self::$argument as $key => $val) {
             if (isset(${$key})) {
@@ -29,7 +49,30 @@ class View
             }
             ${$key} = $val;
         }
-        include self::DIR_VIEW . DS . "$viewName";
+        include $phpPath;
+    }
+
+    /**
+     * Проверить, существует ли view-файл.
+     *
+     * @param  string $viewName Имя шаблона (с точками)
+     * @return bool
+     */
+    public static function exists(string $viewName): bool
+    {
+        $viewPath = implode(DS, explode(".", $viewName));
+
+        // Проверяем .blade.php
+        if (file_exists(self::DIR_VIEW . DS . $viewPath . '.blade.php')) {
+            return true;
+        }
+
+        // Проверяем .php
+        if (file_exists(self::DIR_VIEW . DS . $viewPath . '.php')) {
+            return true;
+        }
+
+        return false;
     }
 
     public static function append(array $data){
@@ -85,25 +128,48 @@ class View
     /**
      * getPath
      *
-     * @param  mixed $path
-     * @return void
+     * Преобразует имя с точками в путь с разделителями.
+     *
+     * @param  string $path Имя с точками
+     * @param  string $exp  Расширение файла
+     * @return string
      */
     public static function gp(string $path, string $exp = ".php"): string
     {
         return str_replace(".", DS, $path)."$exp";
     }
 
+    /**
+     * getTemplate
+     *
+     * Возвращает HTML шаблона как строку.
+     * Поддерживает как .php, так и .blade.php шаблоны.
+     *
+     * @param  string $filename Имя шаблона (с точками)
+     * @param  array  $params   Параметры для шаблона
+     * @return string|false
+     */
     public static function getTemplate($filename, $params = [])
-    {       $templatePath = self::DIR_VIEW . DS . self::gp($filename);
+    {
+        $viewPath = str_replace(".", DS, $filename);
+
+        // Проверяем .blade.php
+        $bladePath = self::DIR_VIEW . DS . $viewPath . '.blade.php';
+        if (file_exists($bladePath)) {
+            return Blade::render($filename, $params);
+        }
+
+        // Проверяем .php
+        $templatePath = self::DIR_VIEW . DS . $viewPath . '.php';
         if (is_file($templatePath)) {
             ob_start();
             if (!empty($params)) {
                 extract($params, EXTR_SKIP | EXTR_REFS);
             }
-
             include $templatePath;
             return ob_get_clean();
         }
+
         return false;
     }
 }

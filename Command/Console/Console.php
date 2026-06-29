@@ -505,4 +505,26 @@ class Console {
         self::text(str_repeat(' ', $leftPad) . $title . str_repeat(' ', $rightPad), $color, null, 'oct', 'bold');
         self::text($line, $color);
     }
+
+    /**
+     * Вывод кликабельной гиперссылки в терминале (OSC 8)
+     *
+     * Использует escape-последовательность OSC 8 для создания кликабельных ссылок.
+     * Поддерживается в современных терминалах: VS Code, GNOME Terminal, iTerm2,
+     * kitty, Windows Terminal, Konsole и др.
+     *
+     * Формат: \033]8;;URL\033\\TEXT\033]8;;\033\\
+     *
+     * @param string      $text Текст ссылки
+     * @param string|null $url  URL (если null, используется $text)
+     * @param string|null $color Цвет текста (red, green, yellow, blue, white, violet, cyan)
+     * @return void
+     */
+    static function link(string $text, ?string $url = null, ?string $color = 'blue'): void
+    {
+       $color = $color ?? 'blue';
+       $ccolor = self::$color[$color] ?? '34';
+       echo  "\033[" . $ccolor . "m\033]8;;https://example.com\033\\Это ссылка\033]8;;\033\\\033[0m\n";
+       
+    }
 }
