@@ -45,6 +45,10 @@ class Command {
             case 'migrate':
                 MigrateCommand::init('migrate');
                 break;
+            case 'migrate:rollback':
+            case 'migrate:down':
+                MigrateCommand::init('migrate:rollback');
+                break;
             case "make:model":
                 new MakeModel($argument);
                 break;
