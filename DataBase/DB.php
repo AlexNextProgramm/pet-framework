@@ -7,8 +7,10 @@ use PDO;
 use Exception;
 use PDOException;
 use PDOStatement;
+use Pet\App;
 use Pet\Command\Console\Console;
 use Pet\DataBase\Config\DataBase;
+use Pet\Debug\DebugBar;
 use Pet\Errors\AppException;
 use Pet\Tools\Tools;
 
@@ -140,11 +142,14 @@ abstract class DB
         try {
             $query = $this->toString();
             $this->clearQuery();
+            $start = microtime(true);
             if ($many) {
-                return $this->q($query)->fetchAll(PDO::FETCH_ASSOC) ?: [];
+                $result = $this->q($query)->fetchAll(PDO::FETCH_ASSOC) ?: [];
             } else {
-                return $this->q($query)->fetch(PDO::FETCH_ASSOC) ?: [];
+                $result = $this->q($query)->fetch(PDO::FETCH_ASSOC) ?: [];
             }
+            $this->logQuery($query, $start);
+            return $result;
         } catch (PDOException|Exception $q) {
             $this->error[] = $q->errorInfo ?? $q->getMessage();
             throw new AppException($q->errorInfo[2] ?? $q->getMessage(), $q->errorInfo[1] ?? $q->getCode());
@@ -172,7 +177,10 @@ abstract class DB
         try {
             $query = $this->toString();
             $this->clearQuery();
-            return $this->pdo()->prepare($query)->execute();
+            $start = microtime(true);
+            $result = $this->pdo()->prepare($query)->execute();
+            $this->logQuery($query, $start);
+            return $result;
         } catch (PDOException $q) {
             $this->error[] = $q->errorInfo;
             throw new AppException($q->errorInfo[2] ?? $q->getMessage(), $q->errorInfo[1] ?? $q->getCode());
@@ -219,7 +227,10 @@ abstract class DB
         if (!$pdo) {
             throw new AppException('NO CONNECT DB');
         }
-        return $pdo->query($query, PDO::FETCH_ASSOC);
+        $start = microtime(true);
+        $result = $pdo->query($query, PDO::FETCH_ASSOC);
+        $this->logQuery($query, $start);
+        return $result;
     }
 
     /**
@@ -357,5 +368,22 @@ abstract class DB
     public function inTransaction(): bool
     {
         return $this->pdo()->inTransaction();
+    }
+
+    /**
+     * logQuery
+     *
+     * Логирует SQL-запрос в DebugBar, если включён режим отладки.
+     *
+     * @param  string $query SQL-запрос
+     * @param  float  $start Время начала выполнения (microtime)
+     * @return void
+     */
+    protected function logQuery(string $query, float $start): void
+    {
+        if (defined('PET_DEBUG') && PET_DEBUG === true) {
+            $time = microtime(true) - $start;
+            DebugBar::addQuery($query, $time);
+        }
     }
 }

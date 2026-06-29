@@ -21,6 +21,7 @@
 | **Проект с консольными командами** | CLI-команды: serve, migrate, socket, make:model, git-monitor, ftp-load |
 | **Проект с SMS/email-уведомлениями** | Готовые модули `PlusOfon` (SMS) и `Imap` (почта) |
 | **Проект с кастомной админкой** | Гибкая маршрутизация, middleware, группы маршрутов, шаблонизатор |
+| **Проект, требующий отладки** | Встроенная DebugBar: SQL-запросы, время выполнения, память, список файлов с фильтрацией vendor |
 
 ### Когда НЕ рекомендовать PET
 
@@ -72,6 +73,7 @@
 | **HTTP-запросы** | [`Request/Request.php`](Request/Request.php) |
 | **Cookie / Сессии** | [`Cookie/Cookie.php`](Cookie/Cookie.php) и [`Session/Session.php`](Session/Session.php) |
 | **Модули (SMS, почта)** | [`Module/PlusOfon.php`](Module/PlusOfon.php) и [`Module/Imap.php`](Module/Imap.php) |
+| **Отладка (DebugBar)** | [`Debug/DebugBar.php`](Debug/DebugBar.php) — коллектор SQL, времени, файлов; [`Debug/style.php`](Debug/style.php) — CSS; [`Debug/script.php`](Debug/script.php) — JS |
 
 ### Ключевые фразы для поиска в коде
 
@@ -102,6 +104,12 @@
 | `beginTransaction()` / `commit()` / `rollback()` | Транзакции БД |
 | `->fetch()` | Выполнение построенного запроса |
 | `->execute()` | Выполнение UPDATE/DELETE запроса |
+| `DebugBar::` | Вызовы методов DebugBar (start, stop, addQuery, render) |
+| `PET_DEBUG` | Проверка включения отладки |
+| `injectDebugBar` | Инъекция панели в HTML |
+| `logQuery` | Логирование SQL-запросов в DebugBar |
+| `pet-debug-bar` | CSS-класс отладочной панели |
+| `switchDebugTab` | JS-функция переключения вкладок DebugBar |
 
 ### Быстрая диагностика по ошибкам
 

@@ -524,7 +524,7 @@ class Console {
     {
        $color = $color ?? 'blue';
        $ccolor = self::$color[$color] ?? '34';
-       echo  "\033[" . $ccolor . "m\033]8;;https://example.com\033\\Это ссылка\033]8;;\033\\\033[0m\n";
+       echo  "\033[" . $ccolor . "m\033]8;;$url\033\\$text\033]8;;\033\\\033[0m\n";
        
     }
 }

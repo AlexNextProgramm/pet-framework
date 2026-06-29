@@ -2,6 +2,7 @@
 
 namespace Pet;
 
+use Pet\Debug\DebugBar;
 use Pet\Errors\AppException;
 use Pet\Errors\Errors;
 use Pet\Request\Request;
@@ -11,6 +12,13 @@ use Pet\Tools\Tools;
 
 class App
 {
+    /**
+     * Включает отладочную панель DebugBar.
+     * Установите в true перед вызовом App::init().
+     *
+     * @var bool
+     */
+    public static bool $debug = false;
 
     public const PUBLIC_DIR = PUBLIC_DIR;
     public const ROUTER_DIR = ROUTER_DIR;
@@ -34,6 +42,14 @@ class App
      */
     public static function init()
     {
+        // Определяем константу PET_DEBUG для доступа из других классов
+        if (self::$debug) {
+            defined('PET_DEBUG') || define('PET_DEBUG', true);
+            DebugBar::start();
+        } else {
+            defined('PET_DEBUG') || define('PET_DEBUG', false);
+        }
+
         $GLOBALS['app'] = new App();
         self::initClass();
         self::initRouter(self::ROUTER_DIR);

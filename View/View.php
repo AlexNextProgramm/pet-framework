@@ -2,6 +2,7 @@
 
 namespace Pet\View;
 
+use Pet\Debug\DebugBar;
 use Pet\Errors\AppException;
 
 class View
@@ -32,7 +33,8 @@ class View
         $bladePath = self::DIR_VIEW . DS . $viewPath . '.blade.php';
         if (file_exists($bladePath)) {
             // Рендерим Blade-шаблон
-            echo Blade::render($viewName, $argument);
+            $html = Blade::render($viewName, $argument);
+            echo self::injectDebugBar($html);
             return;
         }
 
@@ -49,7 +51,12 @@ class View
             }
             ${$key} = $val;
         }
+
+        // Буферизуем вывод для инъекции DebugBar
+        ob_start();
         include $phpPath;
+        $html = ob_get_clean();
+        echo self::injectDebugBar($html);
     }
 
     /**
@@ -156,7 +163,8 @@ class View
         // Проверяем .blade.php
         $bladePath = self::DIR_VIEW . DS . $viewPath . '.blade.php';
         if (file_exists($bladePath)) {
-            return Blade::render($filename, $params);
+            $html = Blade::render($filename, $params);
+            return self::injectDebugBar($html);
         }
 
         // Проверяем .php
@@ -167,9 +175,39 @@ class View
                 extract($params, EXTR_SKIP | EXTR_REFS);
             }
             include $templatePath;
-            return ob_get_clean();
+            $html = ob_get_clean();
+            return self::injectDebugBar($html);
         }
 
         return false;
+    }
+
+    /**
+     * injectDebugBar
+     *
+     * Вставляет отладочную панель DebugBar перед </body>,
+     * если включён режим отладки (PET_DEBUG).
+     *
+     * @param  string $html HTML-контент
+     * @return string
+     */
+    private static function injectDebugBar(string $html): string
+    {
+        if (!defined('PET_DEBUG') || PET_DEBUG !== true) {
+            return $html;
+        }
+
+        // Останавливаем сбор данных и получаем HTML панели
+        DebugBar::stop();
+        $debugHtml = DebugBar::render();
+
+        // Вставляем панель перед </body>
+        $pos = strripos($html, '</body>');
+        if ($pos !== false) {
+            return substr_replace($html, $debugHtml . "\n", $pos, 0);
+        }
+
+        // Если </body> нет — добавляем в конец
+        return $html . "\n" . $debugHtml;
     }
 }
