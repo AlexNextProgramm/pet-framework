@@ -256,7 +256,92 @@ view('user.profile', ['name' => 'John']);
 $html = View::getTemplate('email.welcome', ['name' => 'John']);
 ```
 
-### 5. Работа с запросами
+### 5. Blade-шаблоны
+
+```php
+use Pet\View\Blade;
+
+// Рендеринг Blade-шаблона
+$html = Blade::render('user.profile', ['name' => 'John']);
+
+// Вспомогательная функция
+$html = blade('user.profile', ['name' => 'John']);
+
+// Секции и макеты
+// layout.blade.php:
+// @yield('content')
+//
+// page.blade.php:
+// @extends('layout')
+// @section('content')
+//   <h1>{{ $title }}</h1>
+// @endsection
+
+// Стеки для скриптов и стилей
+Blade::startPush('scripts');
+// ... JS ...
+Blade::stopPush();
+echo Blade::renderStack('scripts');
+
+// Компоненты
+Blade::component('alert', 'components.alert');
+echo Blade::renderComponent('alert', ['type' => 'success']);
+
+// Blade-директивы: @if, @foreach, @csrf, @method, @json, @error и 50+ других
+```
+
+### 6. Генерация модели
+
+```php
+// Через CLI
+// php pet make:model User
+
+// Программно
+use Pet\Model\MakeModel;
+new MakeModel('User');
+// Создаёт app/Model/User.php из blade/Model.blade.php
+```
+
+### 7. Console API (цветной вывод)
+
+```php
+use Pet\Command\Console\Console;
+
+// Цветной текст
+Console::text('Hello World', 'green');
+Console::text('Ошибка!', 'red', 'white'); // красный на белом фоне
+
+// Стилизованные сообщения
+Console::success('Операция выполнена');
+Console::warning('Внимание!');
+Console::error('Критическая ошибка');
+Console::info('Информация');
+
+// Таблицы
+Console::table([
+    ['Имя' => 'John', 'Возраст' => '30'],
+    ['Имя' => 'Jane', 'Возраст' => '25'],
+], ['Имя', 'Возраст'], 'cyan');
+
+// Прогресс-бар
+Console::progressBar(5, 10, 50, 'Загрузка:');
+
+// Гиперссылки (OSC 8)
+Console::link('Нажми меня', 'https://example.com', 'green');
+
+// Ввод и подтверждения
+$name = Console::ask('Введите имя');
+if (Console::confirm('Продолжить?')) {
+    // ...
+}
+
+// Заголовки и списки
+Console::header('Мой заголовок', 'yellow', 60);
+Console::bulletList(['пункт 1', 'пункт 2'], 'green');
+Console::numberedList(['шаг 1', 'шаг 2'], 'white');
+```
+
+### 8. Работа с запросами
 
 ```php
 $request = request();
@@ -271,7 +356,7 @@ $levels = levels(); // сегменты пути
 $param  = supple('id'); // параметр из URL
 ```
 
-### 6. Файловая библиотека
+### 9. Файловая библиотека
 
 ```php
 use Pet\File\File;
@@ -302,7 +387,7 @@ $image->cropCenter(200, 200);
 $image->saveAsWebp('output.webp', 80);
 ```
 
-### 7. WebSocket
+### 10. WebSocket
 
 ```php
 use Pet\Socket\Socket;
@@ -321,7 +406,7 @@ class ChatServer extends Socket
 }
 ```
 
-### 8. Middleware
+### 11. Middleware
 
 ```php
 use Pet\Router\Middleware;
@@ -337,7 +422,7 @@ class AuthMiddleware extends Middleware
 }
 ```
 
-### 9. Cookie и Сессии
+### 12. Cookie и Сессии
 
 ```php
 use Pet\Cookie\Cookie;
@@ -352,15 +437,21 @@ $userId = Session::get('user_id');
 Session::kill();
 ```
 
-### 10. Консольные команды
+### 13. Консольные команды
 
 ```bash
-php pet serve          # Встроенный PHP-сервер
-php pet migrate        # Миграции БД
-php pet socket chat    # WebSocket-сервер
-php pet make:model User # Создание модели
-php pet load           # FTP-загрузка
-php pet git-monitor    # Git-мониторинг
+php pet serve              # Встроенный PHP-сервер
+php pet migrate            # Миграции БД
+php pet socket chat        # WebSocket-сервер
+php pet make:model User    # Создание модели
+php pet list:model         # Список моделей
+php pet list:controller    # Список контроллеров
+php pet env                # Создание .env файла
+php pet info               # Информация о фреймворке
+php pet load               # FTP-загрузка
+php pet load-diff          # FTP-загрузка только изменённых
+php pet git-monitor        # Git-мониторинг
+php pet git-update         # Git-мониторинг (один раз)
 ```
 
 ---
