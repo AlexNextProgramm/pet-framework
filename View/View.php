@@ -11,6 +11,11 @@ class View
     private static $argument = [];
 
     /**
+     * @var bool Флаг: DebugBar уже вставлен в итоговый HTML
+     */
+    private static bool $debugBarInjected = false;
+
+    /**
      * open
      *
      * Открывает и отображает view-файл.
@@ -193,21 +198,23 @@ class View
      */
     private static function injectDebugBar(string $html): string
     {
-        if (!defined('PET_DEBUG') || PET_DEBUG !== true) {
+        if (!defined('PET_DEBUG') || PET_DEBUG !== true || self::$debugBarInjected) {
             return $html;
         }
+
+        // Вставляем панель только в полный HTML-документ (init.php и т.п.),
+        // а не в частичные шаблоны вроде layout.php без </body>.
+        $pos = strripos($html, '</body>');
+        if ($pos === false) {
+            return $html;
+        }
+
+        self::$debugBarInjected = true;
 
         // Останавливаем сбор данных и получаем HTML панели
         DebugBar::stop();
         $debugHtml = DebugBar::render();
 
-        // Вставляем панель перед </body>
-        $pos = strripos($html, '</body>');
-        if ($pos !== false) {
-            return substr_replace($html, $debugHtml . "\n", $pos, 0);
-        }
-
-        // Если </body> нет — добавляем в конец
-        return $html . "\n" . $debugHtml;
+        return substr_replace($html, $debugHtml . "\n", $pos, 0);
     }
 }
