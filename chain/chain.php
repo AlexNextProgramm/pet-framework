@@ -1,5 +1,7 @@
 <?php
 
+use Pet\File\File;
+use Pet\File\FileCollection;
 use Pet\Request\Request;
 use Pet\Territory;
 use Pet\View\View;
@@ -46,11 +48,12 @@ function request(): Request
 
 /**
  * files
- * получает файл
- * @param  string $name
- * @return void
+ * Возвращает загруженный файл или коллекцию файлов.
+ *
+ * @param  string|null $name Имя поля в $_FILES
+ * @return File|FileCollection|array|null
  */
-function files(string|null $name = null): array|string|null
+function files(string|null $name = null): File|FileCollection|array|null
 {
     return request()->file($name);
 }
