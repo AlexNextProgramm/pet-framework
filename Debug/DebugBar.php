@@ -155,11 +155,8 @@ class DebugBar
         $fileCount = count($appFiles);
         $vendorCount = count($vendorFiles);
 
-        // Подключаем CSS из отдельного файла
-        $html = '';
-        ob_start();
-        include __DIR__ . '/style.php';
-        $html .= ob_get_clean();
+        // Подключаем CSS из отдельного файла (файл возвращает строку через return)
+        $html = (string) include __DIR__ . '/style.php';
 
         // Строим HTML панели
         $html .= <<<HTML
@@ -238,9 +235,7 @@ HTML;
 
         // --- JS ---
         $html .= '</div>';
-        ob_start();
-        include __DIR__ . '/script.php';
-        $html .= ob_get_clean();
+        $html .= (string) include __DIR__ . '/script.php';
 
         return $html;
     }

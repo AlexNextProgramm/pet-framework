@@ -1,3 +1,6 @@
+<?php
+
+return <<<'CSS'
 <style>
 .pet-debug-bar * {
     margin: 0;
@@ -189,3 +192,4 @@
     max-height: 40px;
 }
 </style>
+CSS;

@@ -1,3 +1,6 @@
+<?php
+
+return <<<'JS'
 <script>
 function switchDebugTab(tabName) {
     var bar = document.getElementById('pet-debug-bar');
@@ -23,3 +26,4 @@ function toggleVendorFiles() {
     }
 }
 </script>
+JS;
