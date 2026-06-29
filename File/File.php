@@ -506,6 +506,28 @@ class File
     }
 
     /**
+     * Конвертирует изображение текущего файла в WebP.
+     *
+     * Сохраняет .webp файл рядом с оригиналом.
+     *
+     * @param  int  $quality Качество WebP (0-100)
+     * @return self           Новый экземпляр File для созданного .webp файла
+     *
+     * @throws FileException Если исходный файл не существует или не удалось конвертировать.
+     */
+    public function convertImage(int $quality = 100): self
+    {
+        $this->ensureExists();
+
+        $image = new Image($this->path);
+        $image->convertToWebp($quality);
+
+        $dest = $this->dirname() . DIRECTORY_SEPARATOR . $this->filename() . '.webp';
+
+        return new self($dest);
+    }
+
+    /**
      * Возвращает путь к файлу при строковом преобразовании.
      *
      * @return string

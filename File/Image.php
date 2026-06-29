@@ -316,6 +316,28 @@ class Image
         return $this->save($path, 'webp', $quality);
     }
 
+    /**
+     * Конвертирует изображение в WebP и сохраняет рядом с оригиналом.
+     *
+     * @param  int  $quality Качество WebP (0-100)
+     * @return self
+     *
+     * @throws FileException Если не удалось конвертировать.
+     */
+    public function convertToWebp(int $quality = 100): self
+    {
+        $this->load();
+
+        $dest = dirname($this->path) . DIRECTORY_SEPARATOR .
+                pathinfo($this->path, PATHINFO_FILENAME) . '.webp';
+
+        $this->saveAsWebp($dest, $quality);
+
+        $this->path = $dest;
+
+        return $this;
+    }
+
     public function saveAsGif(string $path): string
     {
         return $this->save($path, 'gif');
