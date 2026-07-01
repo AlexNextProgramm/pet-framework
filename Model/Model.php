@@ -285,8 +285,6 @@ abstract class Model extends DB
             if (($data['id'] ?? false)) {
                 $this->setInfoId((int)$data['id']);
                 unset($data['id']);
-            } else {
-                $this->setInfoId($data);
             }
         }
         if ($this->exist()) {
