@@ -43,7 +43,25 @@ class MigrateCommand extends Model
     }
 
     /**
-     * Создаёт таблицу migrate, если её нет.
+     * Добавляет колонку в таблицу, если её нет.
+     */
+    private function ensureColumn(string $table, string $column, string $definition, ?string $after = null): void
+    {
+        $exists = $this->q(
+            "SELECT 1 FROM information_schema.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE()
+             AND TABLE_NAME = " . $this->pdo()->quote($table) . "
+             AND COLUMN_NAME = " . $this->pdo()->quote($column)
+        )->fetch();
+
+        if (empty($exists)) {
+            $afterClause = $after !== null ? " AFTER `$after`" : '';
+            $this->q("ALTER TABLE `$table` ADD `$column` $definition$afterClause");
+        }
+    }
+
+    /**
+     * Создаёт таблицу migrate, если её нет, и добавляет недостающие колонки.
      */
     private function ensureMigrateTable(): void
     {
@@ -62,6 +80,9 @@ class MigrateCommand extends Model
                     ) ENGINE = InnoDB;"
             );
         }
+
+        $this->ensureColumn('migrate', 'str_rollback', 'TEXT NULL DEFAULT NULL', 'sql_str');
+        $this->ensureColumn('migrate', 'error', 'TEXT NULL DEFAULT NULL', 'str_rollback');
     }
 
     /**

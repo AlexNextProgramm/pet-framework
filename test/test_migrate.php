@@ -292,6 +292,32 @@ $frameworkRecords = $migrate->find();
 $frameworkMigrations = array_filter($frameworkRecords, fn($r) => str_starts_with($r['name'], '[framework]'));
 Console::text("  • Внутренних миграций выполнено: " . count($frameworkMigrations), 'yellow');
 
+// ========== ТЕСТ 9: ОБНОВЛЕНИЕ СТАРОЙ СХЕМЫ MIGRATE ==========
+test_header('Тест 9: Обновление старой схемы migrate');
+
+$migrate->q("DROP TABLE `migrate`");
+$migrate->q(
+    "CREATE TABLE `migrate` (
+        `id` INT NOT NULL AUTO_INCREMENT,
+        `name` VARCHAR(500) NULL DEFAULT NULL,
+        `hash` VARCHAR(500) NULL DEFAULT NULL,
+        `cdate` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `sql_str` TEXT NULL DEFAULT NULL,
+        PRIMARY KEY (`id`)
+    ) ENGINE = InnoDB"
+);
+
+$upMethod->invoke($migrate);
+
+$columns = $migrate->q(
+    "SELECT COLUMN_NAME FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'migrate'
+     ORDER BY ORDINAL_POSITION"
+)->fetchAll(PDO::FETCH_COLUMN);
+
+assert_true(in_array('str_rollback', $columns, true), 'Колонка str_rollback добавлена в старую схему');
+assert_true(in_array('error', $columns, true), 'Колонка error добавлена в старую схему');
+
 // ========== ИТОГИ ==========
 Console::text("\n━━━ РЕЗУЛЬТАТЫ ТЕСТОВ ━━━", 'cyan');
 Console::text("  Пройдено: $passed", $failed > 0 ? 'red' : 'green');
