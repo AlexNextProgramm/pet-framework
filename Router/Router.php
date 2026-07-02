@@ -29,6 +29,9 @@ class Router extends Middleware
     /** @var array<int, array> Все зарегистрированные маршруты */
     private static array $routes = [];
 
+    /** @var callable|string|array|null Fallback-обработчик для 404 */
+    private static mixed $fallback = null;
+
     /** @var int ID последнего добавленного маршрута */
     private static int $lastRouteId = 0;
 
@@ -353,6 +356,17 @@ class Router extends Middleware
     }
 
     /**
+     * Регистрирует fallback-обработчик для ненайденных маршрутов (404).
+     *
+     * @param  callable|string|array $callback Обработчик
+     * @return void
+     */
+    public static function fallback(callable|string|array $callback): void
+    {
+        self::$fallback = $callback;
+    }
+
+    /**
      * ---------------------------------------------------------------------------
      *  События (AJAX)
      * ---------------------------------------------------------------------------
@@ -433,6 +447,12 @@ class Router extends Middleware
         // 404 — маршрут не найден
         if (!$routeMatched) {
             Header::status(HTTP::NOT_FOUND);
+            if (self::$fallback !== null) {
+                $results = ( new Invoker())->call(self::$fallback, $request);
+                if (!empty($results)) {
+                    self::sendResponse($results);
+                }
+            }
         }
 
         ob_end_flush();
