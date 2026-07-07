@@ -114,6 +114,18 @@ class Router extends Middleware
     }
 
     /**
+     * Регистрирует HEAD-маршрут.
+     *
+     * @param  string                    $path     URI-шаблон
+     * @param  callable|string|array     ...$callback Обработчик(и)
+     * @return static
+     */
+    public static function head(string $path, callable|string|array ...$callback): static
+    {
+        return self::addRoute('HEAD', $path, $callback);
+    }
+
+    /**
      * Добавляет маршрут во внутренний реестр.
      *
      * @param  string                    $method   HTTP-метод
